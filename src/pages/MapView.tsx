@@ -26,6 +26,7 @@ import {
   MenubarCheckboxItem
 } from '@/components/ui/menubar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Map from '@/components/Map';
 
 const MapView = () => {
   const [activeTab, setActiveTab] = useState("map");
@@ -180,59 +181,18 @@ const MapView = () => {
               
               <div className="md:col-span-2">
                 {/* This will be where the map shows with the route */}
-                <div className="relative rounded-xl overflow-hidden h-[600px] bg-eco-light-blue">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
-                    <div className="text-eco-green text-xl font-medium mb-3">Planification d'itinéraire</div>
-                    <div className="text-gray-600 max-w-md text-center mb-6">
-                      Sélectionnez votre point de départ et votre destination pour calculer l'itinéraire le plus écologique.
-                    </div>
-                    <div className="space-y-4 w-full max-w-md">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-eco-green flex items-center justify-center text-white">
-                          <Bike className="h-4 w-4" />
-                        </div>
-                        <div className="flex-grow">
-                          <div className="h-2 bg-eco-light-green rounded"></div>
-                        </div>
-                        <div className="flex-shrink-0 text-sm font-medium">-40% CO₂</div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white">
-                          <Zap className="h-4 w-4" />
-                        </div>
-                        <div className="flex-grow">
-                          <div className="h-2 bg-amber-100 rounded"></div>
-                        </div>
-                        <div className="flex-shrink-0 text-sm font-medium">-20% CO₂</div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white">
-                          <Car className="h-4 w-4" />
-                        </div>
-                        <div className="flex-grow">
-                          <div className="h-2 bg-red-100 rounded"></div>
-                        </div>
-                        <div className="flex-shrink-0 text-sm font-medium">+100% CO₂</div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="relative rounded-xl overflow-hidden h-[600px]">
+                  <Map />
                 </div>
               </div>
             </div>
           </TabsContent>
         </Tabs>
         
-        {/* Map Container Placeholder */}
+        {/* Map Container */}
         {activeTab === "map" && (
-          <div className="relative h-[calc(100vh-300px)] min-h-[500px] rounded-xl overflow-hidden shadow-lg mb-6 bg-eco-light-blue">
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-eco-green text-xl font-medium mb-3">Carte interactive en développement</div>
-              <div className="text-gray-600 max-w-md text-center mb-6">
-                Notre équipe travaille sur l'intégration d'une carte interactive complète avec Google Maps.
-              </div>
-            </div>
+          <div className="relative h-[calc(100vh-300px)] min-h-[500px] rounded-xl overflow-hidden shadow-lg mb-6">
+            <Map />
           </div>
         )}
         
