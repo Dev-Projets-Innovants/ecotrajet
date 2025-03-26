@@ -158,13 +158,15 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="h-80">
                 <ChartContainer config={chartConfig}>
-                  <BarChart data={userActivityData}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="Actifs" name="users" fill="#10b981" />
-                    <Bar dataKey="Nouveaux" name="newUsers" fill="#60a5fa" />
-                  </BarChart>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={userActivityData}>
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="Actifs" name="users" fill="#10b981" />
+                      <Bar dataKey="Nouveaux" name="newUsers" fill="#60a5fa" />
+                    </BarChart>
+                  </ResponsiveContainer>
                   <ChartLegend content={<ChartLegendContent />} />
                 </ChartContainer>
               </div>
@@ -179,13 +181,15 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="h-80">
                 <ChartContainer config={chartConfig}>
-                  <AreaChart data={emissionsData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Area type="monotone" dataKey="Économisées" name="emissions" fill="#22c55e" fillOpacity={0.3} stroke="#22c55e" />
-                  </AreaChart>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={emissionsData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Area type="monotone" dataKey="Économisées" name="emissions" fill="#22c55e" fillOpacity={0.3} stroke="#22c55e" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </ChartContainer>
               </div>
             </CardContent>
@@ -201,13 +205,15 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="h-80">
               <ChartContainer config={chartConfig}>
-                <LineChart data={tripsByTimeData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="hour" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="trips" name="trips" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
-                </LineChart>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={tripsByTimeData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="hour" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Line type="monotone" dataKey="trips" name="trips" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </ChartContainer>
             </div>
           </CardContent>
