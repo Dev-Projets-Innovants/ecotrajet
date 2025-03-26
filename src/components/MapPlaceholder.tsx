@@ -12,7 +12,7 @@ const MapPlaceholder = () => {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Trouvez facilement les options écologiques</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Découvrez une expérience de navigation écologique avec notre carte interactive. Planifiez des trajets optimisés et découvrez les options de transport les plus respectueuses de l'environnement.
+            Localisez en temps réel les stations Vélib', les bornes de recharge électrique et planifiez vos trajets écologiques.
           </p>
         </div>
         
