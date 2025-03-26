@@ -14,6 +14,7 @@ import Guide from "./pages/Guide";
 import ArticleDetail from "./pages/ArticleDetail";
 import TutorialVideos from "./pages/TutorialVideos";
 import ShareExperience from "./pages/ShareExperience";
+import Rewards from "./pages/Rewards";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/guide/article/:id" element={<ArticleDetail />} />
             <Route path="/guide/tutorials" element={<TutorialVideos />} />
             <Route path="/guide/share-experience" element={<ShareExperience />} />
+            <Route path="/rewards" element={<Rewards />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
