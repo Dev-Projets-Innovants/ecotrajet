@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -29,7 +28,6 @@ import {
 } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-// Données simulées pour l'exemple
 const userData = {
   name: "Thomas Dubois",
   level: "Aventurier Écologique",
@@ -81,13 +79,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Logique de déconnexion ici
     navigate("/");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2 text-eco-green">
@@ -100,9 +96,7 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* User Profile Section */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-white rounded-lg p-6 shadow">
           <div className="flex flex-col items-center">
             <Avatar className="h-24 w-24 border-4 border-eco-light-green">
@@ -159,23 +153,23 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Monthly Evolution Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="col-span-2">
             <CardHeader>
               <CardTitle>Évolution mensuelle</CardTitle>
               <CardDescription>Vos trajets écologiques au fil des mois</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ChartContainer
-                  config={{
-                    trips: { 
-                      color: "#4CAF50",
-                      label: "Trajets"
-                    },
-                  }}
-                >
+            <CardContent className="aspect-video">
+              <ChartContainer
+                config={{
+                  trips: { 
+                    color: "#4CAF50",
+                    label: "Trajets"
+                  },
+                }}
+                className="h-full w-full"
+              >
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={monthlyTripsData}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -197,12 +191,11 @@ const Dashboard = () => {
                       strokeWidth={2}
                     />
                   </AreaChart>
-                </ChartContainer>
-              </div>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
 
-          {/* Impact Écologique */}
           <Card>
             <CardHeader>
               <CardTitle>Impact Écologique</CardTitle>
@@ -218,9 +211,7 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        {/* Recent Trips and Weather */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Recent Trips */}
           <Card className="col-span-2">
             <CardHeader>
               <CardTitle>Trajets Récents</CardTitle>
@@ -257,7 +248,6 @@ const Dashboard = () => {
             </CardFooter>
           </Card>
 
-          {/* Weather Widget */}
           <Card>
             <CardHeader>
               <CardTitle>Météo Paris</CardTitle>
@@ -288,9 +278,7 @@ const Dashboard = () => {
           </Card>
         </div>
         
-        {/* Badges and Challenges */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Badges */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -320,7 +308,6 @@ const Dashboard = () => {
             </CardFooter>
           </Card>
 
-          {/* Challenges */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
