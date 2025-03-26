@@ -11,9 +11,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const videos = [
   {
     id: '1',
-    title: 'Comment débloquer un Vélib'',
-    description: 'Découvrez comment débloquer facilement un Vélib' avec l'application ÉcoTrajet en quelques étapes simples.',
-    author: 'ÉcoTrajet Officiel',
+    title: 'Comment débloquer un Velib\'',
+    description: 'Découvrez comment débloquer facilement un Velib\' avec l\'application EcoTrajet en quelques étapes simples.',
+    author: 'EcoTrajet Officiel',
     likes: 1240,
     comments: 56,
     shares: 28,
@@ -24,7 +24,7 @@ const videos = [
   {
     id: '2',
     title: 'Les meilleures pistes cyclables de Paris',
-    description: 'Top 5 des itinéraires les plus agréables pour se déplacer en Vélib' dans Paris tout en profitant du paysage.',
+    description: 'Top 5 des itinéraires les plus agréables pour se déplacer en Velib\' dans Paris tout en profitant du paysage.',
     author: 'Paris à Vélo',
     likes: 856,
     comments: 42,
