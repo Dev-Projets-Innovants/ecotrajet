@@ -22,7 +22,10 @@ const Navbar = () => {
     handleRewardsClick,
     handleCommunityClick,
     handleMapClick,
-    handleDashboardClick
+    handleDashboardClick,
+    handleTripPlannerClick,
+    handleStatisticsClick,
+    handleChallengesClick
   } = useNavbar(isAuthenticated);
 
   return (
@@ -44,6 +47,9 @@ const Navbar = () => {
               handleRewardsClick={handleRewardsClick}
               handleProfileClick={handleProfileClick}
               handleNotificationsClick={handleNotificationsClick}
+              handleTripPlannerClick={handleTripPlannerClick}
+              handleStatisticsClick={handleStatisticsClick}
+              handleChallengesClick={handleChallengesClick}
             />
 
             <NavbarMobile 
@@ -56,6 +62,9 @@ const Navbar = () => {
               handleRewardsClick={handleRewardsClick}
               handleProfileClick={handleProfileClick}
               handleNotificationsClick={handleNotificationsClick}
+              handleTripPlannerClick={handleTripPlannerClick}
+              handleStatisticsClick={handleStatisticsClick}
+              handleChallengesClick={handleChallengesClick}
             />
           </div>
         </div>

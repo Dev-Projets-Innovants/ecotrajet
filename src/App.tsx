@@ -28,6 +28,11 @@ import UserProfile from "./pages/UserProfile";
 import Notifications from "./pages/Notifications";
 import MapView from "./pages/MapView";
 
+// New pages
+import Statistics from "./pages/Statistics";
+import TripPlanner from "./pages/TripPlanner";
+import Challenges from "./pages/Challenges";
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -53,6 +58,11 @@ const App = () => {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/map" element={<MapView />} />
+            
+            {/* New routes */}
+            <Route path="/statistics" element={<Statistics />} />
+            <Route path="/trip-planner" element={<TripPlanner />} />
+            <Route path="/challenges" element={<Challenges />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminSignIn />} />

@@ -1,16 +1,17 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { 
-  BookOpen, 
-  Award, 
-  Settings, 
-  Calculator, 
-  Users, 
-  User, 
-  Bell 
-} from 'lucide-react';
 import NavLink from './NavLink';
+import { Button } from '@/components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
+import { cn } from '@/lib/utils';
+import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator } from 'lucide-react';
 
 interface NavbarDesktopProps {
   isAuthenticated: boolean;
@@ -20,6 +21,9 @@ interface NavbarDesktopProps {
   handleRewardsClick: (e: React.MouseEvent) => void;
   handleProfileClick: (e: React.MouseEvent) => void;
   handleNotificationsClick: (e: React.MouseEvent) => void;
+  handleTripPlannerClick: (e: React.MouseEvent) => void;
+  handleStatisticsClick: (e: React.MouseEvent) => void;
+  handleChallengesClick: (e: React.MouseEvent) => void;
 }
 
 const NavbarDesktop = ({
@@ -29,87 +33,149 @@ const NavbarDesktop = ({
   handleCommunityClick,
   handleRewardsClick,
   handleProfileClick,
-  handleNotificationsClick
+  handleNotificationsClick,
+  handleTripPlannerClick,
+  handleStatisticsClick,
+  handleChallengesClick
 }: NavbarDesktopProps) => {
   return (
-    <div className="hidden md:flex items-center space-x-8">
-      <div className="flex items-center space-x-6">
-        <NavLink 
-          to="#map" 
-          isAnchor
-          className="text-sm"
-          onClick={handleMapClick}
-        >
-          Carte
-        </NavLink>
-        <NavLink 
-          to="#dashboard" 
-          isAnchor
-          className="text-sm"
-          onClick={handleDashboardClick}
-        >
-          Tableau de bord
-        </NavLink>
-        <NavLink to="/guide" className="text-sm flex items-center gap-1">
-          <BookOpen className="h-4 w-4" />
-          Guide
-        </NavLink>
-        <NavLink to="/carbon-calculator" className="text-sm flex items-center gap-1">
-          <Calculator className="h-4 w-4" />
-          Calculateur
-        </NavLink>
-        <NavLink 
-          to="/community" 
-          className="text-sm flex items-center gap-1"
-          onClick={handleCommunityClick}
-        >
-          <Users className="h-4 w-4" />
-          Communauté
-        </NavLink>
-        <NavLink 
-          to="/rewards" 
-          className="text-sm flex items-center gap-1"
-          onClick={handleRewardsClick}
-        >
-          <Award className="h-4 w-4" />
-          Récompenses
-        </NavLink>
-        <NavLink to="/admin" className="text-sm flex items-center gap-1">
-          <Settings className="h-4 w-4" />
-          Admin
-        </NavLink>
-      </div>
-      <div className="flex items-center space-x-3">
-        <NavLink 
-          to="/notifications"
-          onClick={handleNotificationsClick}
-        >
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">3</span>
-          </Button>
-        </NavLink>
-        <NavLink 
-          to="/profile"
-          onClick={handleProfileClick}
-        >
-          <Button variant="ghost" size="icon">
-            <User className="h-5 w-5" />
-          </Button>
-        </NavLink>
-        <NavLink to="/signin">
-          <Button variant="ghost" className="text-sm px-4 py-2 h-9 rounded-full transition-all duration-300 hover:bg-eco-light-green hover:text-eco-green">
-            Connexion
-          </Button>
-        </NavLink>
-        <NavLink to="/signup">
-          <Button className="text-sm px-4 py-2 h-9 rounded-full bg-eco-green hover:bg-eco-dark-green text-white transition-all duration-300">
-            Inscription
-          </Button>
-        </NavLink>
-      </div>
+    <div className="hidden md:flex items-center space-x-6">
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-transparent">Explorer</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                <ListItem
+                  href="/map"
+                  title="Carte interactive"
+                  onClick={handleMapClick}
+                  icon={<MapPin className="h-4 w-4 mr-2 text-eco-green" />}
+                >
+                  Explorez les options de mobilité écologique sur notre carte interactive.
+                </ListItem>
+                <ListItem 
+                  href="/trip-planner" 
+                  title="Planificateur d'itinéraires" 
+                  onClick={handleTripPlannerClick}
+                  icon={<MapPin className="h-4 w-4 mr-2 text-eco-blue" />}
+                >
+                  Trouvez les meilleurs itinéraires écologiques pour vos déplacements.
+                </ListItem>
+                <ListItem 
+                  href="/dashboard" 
+                  title="Tableau de bord" 
+                  onClick={handleDashboardClick}
+                  icon={<BarChart className="h-4 w-4 mr-2 text-eco-green" />}
+                >
+                  Visualisez vos performances et votre impact environnemental.
+                </ListItem>
+                <ListItem 
+                  href="/statistics" 
+                  title="Statistiques" 
+                  onClick={handleStatisticsClick}
+                  icon={<BarChart2 className="h-4 w-4 mr-2 text-eco-blue" />}
+                >
+                  Analysez en profondeur vos habitudes de déplacement et leur impact.
+                </ListItem>
+                <ListItem 
+                  href="/carbon-calculator" 
+                  title="Calculateur d'empreinte" 
+                  icon={<Calculator className="h-4 w-4 mr-2 text-eco-green" />}
+                >
+                  Calculez l'empreinte carbone de vos déplacements.
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-transparent">Communauté</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                <ListItem 
+                  href="/community" 
+                  title="Forum" 
+                  onClick={handleCommunityClick}
+                  icon={<Users className="h-4 w-4 mr-2 text-eco-green" />}
+                >
+                  Échangez avec d'autres utilisateurs engagés pour l'environnement.
+                </ListItem>
+                <ListItem 
+                  href="/challenges" 
+                  title="Défis écologiques" 
+                  onClick={handleChallengesClick}
+                  icon={<Trophy className="h-4 w-4 mr-2 text-yellow-500" />}
+                >
+                  Participez à des défis collectifs pour réduire votre empreinte carbone.
+                </ListItem>
+                <ListItem 
+                  href="/rewards" 
+                  title="Récompenses" 
+                  onClick={handleRewardsClick}
+                  icon={<Trophy className="h-4 w-4 mr-2 text-eco-blue" />}
+                >
+                  Gagnez des points et débloquez des récompenses pour vos efforts écologiques.
+                </ListItem>
+                <ListItem 
+                  href="/guide" 
+                  title="Guide écologique" 
+                  icon={<BookOpen className="h-4 w-4 mr-2 text-eco-green" />}
+                >
+                  Découvrez des conseils et astuces pour une mobilité plus responsable.
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+
+      {isAuthenticated ? (
+        <div className="flex items-center space-x-2">
+          <NavLink to="/profile" onClick={handleProfileClick}>Profil</NavLink>
+          <NavLink to="/notifications" onClick={handleNotificationsClick}>Notifications</NavLink>
+        </div>
+      ) : (
+        <div className="flex items-center space-x-2">
+          <NavLink to="/signin">
+            <Button variant="ghost">Connexion</Button>
+          </NavLink>
+          <NavLink to="/signup">
+            <Button>Inscription</Button>
+          </NavLink>
+        </div>
+      )}
     </div>
   );
 };
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & { icon?: React.ReactNode }
+>(({ className, title, children, icon, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="flex items-center text-sm font-medium leading-none">
+            {icon}
+            {title}
+          </div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";
 
 export default NavbarDesktop;

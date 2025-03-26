@@ -83,6 +83,27 @@ export const useNavbar = (isAuthenticated: boolean) => {
     }
   };
 
+  const handleTripPlannerClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      handleProtectedAction("le planificateur d'itinéraires");
+    }
+  };
+
+  const handleStatisticsClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      handleProtectedAction("vos statistiques");
+    }
+  };
+
+  const handleChallengesClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      handleProtectedAction("les défis");
+    }
+  };
+
   return {
     isScrolled,
     mobileMenuOpen,
@@ -96,6 +117,9 @@ export const useNavbar = (isAuthenticated: boolean) => {
     handleRewardsClick,
     handleCommunityClick,
     handleMapClick,
-    handleDashboardClick
+    handleDashboardClick,
+    handleTripPlannerClick,
+    handleStatisticsClick,
+    handleChallengesClick
   };
 };

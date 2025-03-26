@@ -1,18 +1,10 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { 
-  BookOpen, 
-  Award, 
-  Settings, 
-  Calculator, 
-  Users, 
-  User, 
-  Bell, 
-  X, 
-  Menu 
-} from 'lucide-react';
 import NavLink from './NavLink';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
+import { X, Menu, MapPin, BarChart, Users, Trophy, BarChart2, Calculator, BookOpen } from 'lucide-react';
 
 interface NavbarMobileProps {
   mobileMenuOpen: boolean;
@@ -24,6 +16,9 @@ interface NavbarMobileProps {
   handleRewardsClick: (e: React.MouseEvent) => void;
   handleProfileClick: (e: React.MouseEvent) => void;
   handleNotificationsClick: (e: React.MouseEvent) => void;
+  handleTripPlannerClick: (e: React.MouseEvent) => void;
+  handleStatisticsClick: (e: React.MouseEvent) => void;
+  handleChallengesClick: (e: React.MouseEvent) => void;
 }
 
 const NavbarMobile = ({
@@ -35,135 +30,173 @@ const NavbarMobile = ({
   handleCommunityClick,
   handleRewardsClick,
   handleProfileClick,
-  handleNotificationsClick
+  handleNotificationsClick,
+  handleTripPlannerClick,
+  handleStatisticsClick,
+  handleChallengesClick
 }: NavbarMobileProps) => {
   return (
-    <>
-      <button 
-        className="md:hidden flex items-center text-gray-700" 
-        onClick={toggleMobileMenu}
-        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-      >
-        {mobileMenuOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <Menu className="h-6 w-6" />
-        )}
-      </button>
-
-      <div 
-        className={`fixed inset-0 bg-white z-40 pt-20 px-6 md:hidden transition-all duration-300 ease-in-out transform ${
-          mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-        }`}
-      >
-        <div className="flex flex-col space-y-6 items-center text-center">
-          <NavLink 
-            to="#map" 
-            isAnchor
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleMapClick(e);
-            }}
-          >
-            Carte
-          </NavLink>
-          <NavLink 
-            to="#dashboard" 
-            isAnchor
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleDashboardClick(e);
-            }}
-          >
-            Tableau de bord
-          </NavLink>
-          <NavLink 
-            to="/guide" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={toggleMobileMenu}
-          >
-            <BookOpen className="h-5 w-5" />
-            Guide
-          </NavLink>
-          <NavLink 
-            to="/carbon-calculator" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={toggleMobileMenu}
-          >
-            <Calculator className="h-5 w-5" />
-            Calculateur
-          </NavLink>
-          <NavLink 
-            to="/community" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleCommunityClick(e);
-            }}
-          >
-            <Users className="h-5 w-5" />
-            Communauté
-          </NavLink>
-          <NavLink 
-            to="/rewards" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleRewardsClick(e);
-            }}
-          >
-            <Award className="h-5 w-5" />
-            Récompenses
-          </NavLink>
-          <NavLink 
-            to="/profile" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleProfileClick(e);
-            }}
-          >
-            <User className="h-5 w-5" />
-            Profil
-          </NavLink>
-          <NavLink 
-            to="/notifications" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={(e) => {
-              toggleMobileMenu();
-              handleNotificationsClick(e);
-            }}
-          >
-            <Bell className="h-5 w-5" />
-            Notifications
-          </NavLink>
-          <NavLink 
-            to="/admin" 
-            className="text-lg py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
-            onClick={toggleMobileMenu}
-          >
-            <Settings className="h-5 w-5" />
-            Admin
-          </NavLink>
-          
-          <div className="flex flex-col w-full space-y-3 pt-4">
-            <NavLink to="/signin" onClick={toggleMobileMenu}>
-              <Button variant="ghost" className="w-full py-2 rounded-full hover:bg-eco-light-green hover:text-eco-green">
-                Connexion
+    <div className="md:hidden">
+      <Sheet open={mobileMenuOpen} onOpenChange={toggleMobileMenu}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Menu">
+            <Menu className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="p-0">
+          <div className="flex flex-col h-full">
+            <div className="p-4 flex justify-between items-center">
+              <span className="text-lg font-semibold">Menu</span>
+              <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
+                <X className="h-5 w-5" />
               </Button>
-            </NavLink>
-            <NavLink to="/signup" onClick={toggleMobileMenu}>
-              <Button className="w-full py-2 rounded-full bg-eco-green hover:bg-eco-dark-green text-white">
-                Inscription
-              </Button>
-            </NavLink>
+            </div>
+            
+            <div className="p-4 flex-1">
+              <h3 className="font-medium mb-3 text-sm text-gray-500">Explorer</h3>
+              <nav className="space-y-2 mb-6">
+                <MobileNavItem 
+                  href="/map" 
+                  icon={<MapPin className="h-5 w-5 text-eco-green" />} 
+                  label="Carte interactive" 
+                  onClick={(e) => { 
+                    handleMapClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/trip-planner" 
+                  icon={<MapPin className="h-5 w-5 text-eco-blue" />} 
+                  label="Planificateur d'itinéraires" 
+                  onClick={(e) => { 
+                    handleTripPlannerClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/dashboard" 
+                  icon={<BarChart className="h-5 w-5 text-eco-green" />} 
+                  label="Tableau de bord" 
+                  onClick={(e) => { 
+                    handleDashboardClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/statistics" 
+                  icon={<BarChart2 className="h-5 w-5 text-eco-blue" />} 
+                  label="Statistiques" 
+                  onClick={(e) => { 
+                    handleStatisticsClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/carbon-calculator" 
+                  icon={<Calculator className="h-5 w-5 text-eco-green" />} 
+                  label="Calculateur d'empreinte" 
+                  onClick={toggleMobileMenu}
+                />
+              </nav>
+              
+              <Separator className="my-4" />
+              
+              <h3 className="font-medium mb-3 text-sm text-gray-500">Communauté</h3>
+              <nav className="space-y-2 mb-6">
+                <MobileNavItem 
+                  href="/community" 
+                  icon={<Users className="h-5 w-5 text-eco-green" />} 
+                  label="Forum" 
+                  onClick={(e) => { 
+                    handleCommunityClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/challenges" 
+                  icon={<Trophy className="h-5 w-5 text-yellow-500" />} 
+                  label="Défis écologiques" 
+                  onClick={(e) => { 
+                    handleChallengesClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/rewards" 
+                  icon={<Trophy className="h-5 w-5 text-eco-blue" />} 
+                  label="Récompenses" 
+                  onClick={(e) => { 
+                    handleRewardsClick(e); 
+                    toggleMobileMenu(); 
+                  }}
+                />
+                <MobileNavItem 
+                  href="/guide" 
+                  icon={<BookOpen className="h-5 w-5 text-eco-green" />} 
+                  label="Guide écologique" 
+                  onClick={toggleMobileMenu}
+                />
+              </nav>
+            </div>
+            
+            <div className="mt-auto p-4 border-t border-gray-100">
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <MobileNavItem 
+                    href="/profile" 
+                    label="Profil" 
+                    onClick={(e) => { 
+                      handleProfileClick(e); 
+                      toggleMobileMenu(); 
+                    }}
+                  />
+                  <MobileNavItem 
+                    href="/notifications" 
+                    label="Notifications" 
+                    onClick={(e) => { 
+                      handleNotificationsClick(e); 
+                      toggleMobileMenu(); 
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-2">
+                  <Button asChild variant="outline" className="w-full">
+                    <NavLink to="/signin" onClick={toggleMobileMenu}>
+                      Connexion
+                    </NavLink>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <NavLink to="/signup" onClick={toggleMobileMenu}>
+                      Inscription
+                    </NavLink>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
-    </>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 };
+
+interface MobileNavItemProps {
+  href: string;
+  label: string;
+  icon?: React.ReactNode;
+  onClick?: (e: React.MouseEvent) => void;
+}
+
+const MobileNavItem = ({ href, label, icon, onClick }: MobileNavItemProps) => (
+  <NavLink 
+    to={href} 
+    className="flex items-center p-3 rounded-md hover:bg-gray-100 transition-colors" 
+    onClick={onClick}
+  >
+    {icon && <span className="mr-3">{icon}</span>}
+    <span>{label}</span>
+  </NavLink>
+);
 
 export default NavbarMobile;
