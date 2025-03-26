@@ -104,7 +104,7 @@ const Dashboard = () => {
   return (
     <Layout title="Tableau de bord">
       <div className="min-h-screen bg-gray-50 pt-6">
-        <header className="bg-white shadow mb-6">
+        {/* <header className="bg-white shadow mb-6">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center space-x-2 text-eco-green">
               <Leaf className="h-6 w-6" />
@@ -115,6 +115,8 @@ const Dashboard = () => {
             </Button>
           </div>
         </header>
+        This section is not usedful for now.
+         */}
 
         <main className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-white rounded-lg p-6 shadow">

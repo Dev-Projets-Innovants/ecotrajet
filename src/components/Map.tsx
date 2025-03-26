@@ -162,16 +162,6 @@ const MapPreview = () => {
   return (
     <section id="map" className="py-20 bg-white relative overflow-hidden">
       <div className="container max-w-7xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-16">
-          <div className="inline-block px-3 py-1 rounded-full bg-eco-light-green text-eco-green text-sm font-medium mb-4">
-            Carte Interactive
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Trouvez facilement les options écologiques</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Localisez en temps réel les stations Vélib', les bornes de recharge électrique et planifiez vos trajets écologiques.
-          </p>
-        </div>
-        
         <div 
           ref={mapRef}
           className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl animate-on-scroll"
