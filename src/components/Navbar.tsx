@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, BookOpen } from 'lucide-react';
+import { Leaf, Menu, X, BookOpen, Award } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,13 +34,11 @@ const Navbar = () => {
     >
       <div className="container max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 text-eco-green">
             <Leaf className="h-6 w-6 transition-transform duration-500 hover:rotate-12" />
             <span className="text-xl font-semibold tracking-tight">ÉcoTrajet</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <div className="flex items-center space-x-6">
               <a href="#map" className="text-sm font-medium hover:text-eco-green transition-colors">Carte</a>
@@ -50,7 +47,10 @@ const Navbar = () => {
                 <BookOpen className="h-4 w-4" />
                 Guide
               </Link>
-              <a href="#rewards" className="text-sm font-medium hover:text-eco-green transition-colors">Récompenses</a>
+              <Link to="/rewards" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
+                <Award className="h-4 w-4" />
+                Récompenses
+              </Link>
             </div>
             <div className="flex items-center space-x-3">
               <Link to="/signin">
@@ -66,7 +66,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <button 
             className="md:hidden flex items-center text-gray-700" 
             onClick={toggleMobileMenu}
@@ -81,7 +80,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div 
         className={`fixed inset-0 bg-white z-40 pt-20 px-6 md:hidden transition-all duration-300 ease-in-out transform ${
           mobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
@@ -94,7 +92,14 @@ const Navbar = () => {
             <BookOpen className="h-5 w-5" />
             Guide
           </Link>
-          <a href="#rewards" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green" onClick={toggleMobileMenu}>Récompenses</a>
+          <Link 
+            to="/rewards" 
+            className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
+            onClick={toggleMobileMenu}
+          >
+            <Award className="h-5 w-5" />
+            Récompenses
+          </Link>
           
           <div className="flex flex-col w-full space-y-3 pt-4">
             <Link to="/signin" onClick={toggleMobileMenu}>
