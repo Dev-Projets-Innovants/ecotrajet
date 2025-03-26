@@ -1,20 +1,97 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { getVelibStations, VelibStation, startAutoRefresh } from '@/services/velibService';
+import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Bike, Navigation, MapPin, Search, Layers } from 'lucide-react';
+
+// Correction pour les icônes Leaflet (problème connu)
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Styles personnalisés pour l'icône de marker
+const customIcon = new L.Icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Icône personnalisée pour les vélos (couleur verte)
+const bikeIcon = new L.Icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  className: 'bike-marker' // Classe CSS pour personnalisation
+});
+
+// Composant pour géolocaliser l'utilisateur
+const LocationButton = () => {
+  const map = useMap();
+
+  const handleClick = () => {
+    map.locate({ setView: true, maxZoom: 16 });
+  };
+
+  return (
+    <Button 
+      onClick={handleClick} 
+      className="absolute bottom-20 right-2 z-[1000] bg-white border border-gray-300 shadow-md hover:bg-gray-100 text-gray-700" 
+      size="icon"
+    >
+      <Navigation className="h-5 w-5" />
+    </Button>
+  );
+};
+
+// Composant pour sauvegarder la position et le zoom de la carte
+const SaveMapState = () => {
+  const map = useMapEvents({
+    moveend: () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      localStorage.setItem('mapState', JSON.stringify({
+        center: [center.lat, center.lng],
+        zoom
+      }));
+    }
+  });
+
+  return null;
+};
 
 const MapPreview = () => {
+  const [stations, setStations] = useState<VelibStation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [initialMapState, setInitialMapState] = useState<{center: [number, number], zoom: number}>({
+    center: [48.856614, 2.3522219], // Paris par défaut
+    zoom: 13
+  });
   const mapRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<HTMLDivElement>(null);
 
-  // Simulated data for Vélib stations
-  const stations = [
-    { id: 1, name: 'Station Hôtel de Ville', lat: 48.857, lng: 2.351, bikes: 8 },
-    { id: 2, name: 'Station République', lat: 48.867, lng: 2.363, bikes: 12 },
-    { id: 3, name: 'Station Bastille', lat: 48.853, lng: 2.369, bikes: 5 },
-    { id: 4, name: 'Station Châtelet', lat: 48.858, lng: 2.348, bikes: 10 },
-    { id: 5, name: 'Station Saint-Lazare', lat: 48.875, lng: 2.325, bikes: 7 },
-  ];
-
   useEffect(() => {
+    // Récupération de l'état sauvegardé de la carte
+    const savedState = localStorage.getItem('mapState');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        setInitialMapState(state);
+      } catch (e) {
+        console.error("Erreur lors de la lecture de l'état de la carte:", e);
+      }
+    }
+
+    // Animation au scroll
     const observerOptions = {
       threshold: 0.1,
       root: null,
@@ -33,9 +110,53 @@ const MapPreview = () => {
     if (mapRef.current) observer.observe(mapRef.current);
     if (animationRef.current) observer.observe(animationRef.current);
 
+    // Charger les stations Vélib'
+    const loadStations = async () => {
+      setIsLoading(true);
+      try {
+        const velibStations = await getVelibStations({limit: 150});
+        setStations(velibStations);
+      } catch (error) {
+        console.error("Erreur lors du chargement des stations:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les stations Vélib'. Réessayez plus tard.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadStations();
+
+    // Configurer le rafraîchissement automatique des données
+    const stopAutoRefresh = startAutoRefresh(setStations);
+
+    // Géolocaliser l'utilisateur
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation([latitude, longitude]);
+        
+        // Si aucun état sauvegardé, centrer sur l'utilisateur
+        if (!savedState) {
+          setInitialMapState({
+            center: [latitude, longitude],
+            zoom: 15
+          });
+        }
+      },
+      (error) => {
+        console.log("Erreur de géolocalisation:", error);
+        // On utilise Paris par défaut (déjà configuré dans initialMapState)
+      }
+    );
+
     return () => {
       if (mapRef.current) observer.unobserve(mapRef.current);
       if (animationRef.current) observer.unobserve(animationRef.current);
+      stopAutoRefresh();
     };
   }, []);
 
@@ -54,61 +175,79 @@ const MapPreview = () => {
         
         <div 
           ref={mapRef}
-          className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl animate-on-scroll bg-eco-light-blue"
+          className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl animate-on-scroll"
         >
-          {/* Simulated Map UI */}
-          <div className="absolute inset-0 bg-eco-light-blue overflow-hidden">
-            {/* Map grid lines */}
-            <div className="absolute inset-0" style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)',
-              backgroundSize: '40px 40px'
-            }}></div>
-            
-            {/* Decorative elements */}
-            <div className="absolute left-1/4 top-1/4 w-24 h-24 rounded-full bg-eco-light-green opacity-40"></div>
-            <div className="absolute right-1/3 bottom-1/3 w-32 h-32 rounded-full bg-eco-light-green opacity-30"></div>
-            
-            {/* Simulated stations */}
-            {stations.map((station) => (
-              <div 
-                key={station.id}
-                className="absolute w-10 h-10 glass-card rounded-full flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
-                style={{
-                  left: `${((station.lng - 2.32) / 0.06) * 100}%`,
-                  top: `${((station.lat - 48.85) / 0.05) * 100}%`,
-                  animation: `pulse-gentle ${2 + (station.id % 3)}s infinite`,
-                  animationDelay: `${station.id * 0.2}s`
-                }}
-                title={`${station.name} - ${station.bikes} vélos disponibles`}
-              >
-                <span className="bg-eco-green text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
-                  {station.bikes}
-                </span>
-              </div>
-            ))}
-            
-            {/* Map overlay gradient */}
-            <div className="absolute inset-0 map-overlay pointer-events-none"></div>
-            
-            {/* Map UI elements */}
-            <div className="absolute top-4 right-4 glass-card rounded-lg p-2 text-sm">
-              <div className="flex items-center space-x-2 font-medium">
-                <span className="w-3 h-3 bg-eco-green rounded-full"></span>
-                <span>Vélib disponibles</span>
-              </div>
-              <div className="flex items-center space-x-2 mt-1 font-medium">
-                <span className="w-3 h-3 bg-eco-blue rounded-full"></span>
-                <span>Bornes de recharge</span>
-              </div>
+          {isLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-eco-light-blue">
+              <div className="text-eco-green">Chargement de la carte...</div>
             </div>
-            
-            <div className="absolute bottom-4 left-4 glass-card rounded-lg p-3 text-sm">
-              <div className="flex items-center space-x-4">
-                <button className="w-8 h-8 rounded-full glass-card flex items-center justify-center">+</button>
-                <button className="w-8 h-8 rounded-full glass-card flex items-center justify-center">-</button>
+          ) : (
+            <MapContainer 
+              center={initialMapState.center} 
+              zoom={initialMapState.zoom} 
+              style={{ height: '100%', width: '100%', borderRadius: '1rem' }}
+              zoomControl={false}
+              attributionControl={false}
+            >
+              {/* Couche de carte principale */}
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                className="map-tiles"
+              />
+              
+              {/* Stations Vélib */}
+              {stations.map((station) => (
+                <Marker 
+                  key={station.stationcode} 
+                  position={[station.coordonnees_geo.lat, station.coordonnees_geo.lon]}
+                  icon={bikeIcon}
+                >
+                  <Popup>
+                    <div className="font-medium mb-1">{station.name}</div>
+                    <div className="text-sm text-gray-600 mb-2">
+                      {station.numbikesavailable} vélos disponibles
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-eco-green"></div>
+                        <span>{station.mechanical} mécaniques</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-eco-blue"></div>
+                        <span>{station.ebike} électriques</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {station.numdocksavailable} emplacements libres
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+              
+              {/* Marqueur de position de l'utilisateur */}
+              {userLocation && (
+                <Marker position={userLocation} icon={customIcon}>
+                  <Popup>
+                    Vous êtes ici
+                  </Popup>
+                </Marker>
+              )}
+              
+              {/* Contrôles personnalisés */}
+              <ZoomControl position="topright" />
+              <LocationButton />
+              <SaveMapState />
+              
+              {/* Légende */}
+              <div className="absolute top-4 right-4 bg-white p-3 shadow-md rounded-lg z-[1000] text-sm">
+                <div className="flex items-center space-x-2 font-medium">
+                  <Bike className="h-4 w-4 text-eco-green" />
+                  <span>Vélib disponibles</span>
+                </div>
               </div>
-            </div>
-          </div>
+            </MapContainer>
+          )}
         </div>
         
         <div 
@@ -116,7 +255,7 @@ const MapPreview = () => {
           className="text-center mt-8 animate-on-scroll"
         >
           <p className="text-sm text-gray-500">
-            Ceci est une prévisualisation simplifiée. Inscrivez-vous pour accéder à la carte interactive complète.
+            Données mises à jour en temps réel. Inscrivez-vous pour accéder à plus de fonctionnalités.
           </p>
         </div>
       </div>
