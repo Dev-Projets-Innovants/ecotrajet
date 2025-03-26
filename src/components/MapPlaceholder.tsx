@@ -16,8 +16,10 @@ const MapPlaceholder = () => {
           </p>
         </div>
         
-        <div className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl mb-10">
-          <Map />
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl mb-10">
+            <Map />
+          </div>
         </div>
         
         <div className="text-center">
