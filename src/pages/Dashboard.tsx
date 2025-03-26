@@ -13,7 +13,7 @@ import {
   Target,
   TrendingUp
 } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -170,33 +170,33 @@ const Dashboard = () => {
               <div className="h-[300px]">
                 <ChartContainer
                   config={{
-                    trips: { color: "#4CAF50" },
+                    trips: { 
+                      color: "#4CAF50",
+                      label: "Trajets"
+                    },
                   }}
                 >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={monthlyTripsData}
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <ChartTooltip
-                        content={
-                          <ChartTooltipContent
-                            formatter={(value) => [`${value} trajets`, "Trajets"]}
-                          />
-                        }
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="trips"
-                        stroke="#4CAF50"
-                        fill="#E8F5E9"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <AreaChart
+                    data={monthlyTripsData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent />
+                      }
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="trips"
+                      name="trips"
+                      stroke="#4CAF50"
+                      fill="#E8F5E9"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
                 </ChartContainer>
               </div>
             </CardContent>
