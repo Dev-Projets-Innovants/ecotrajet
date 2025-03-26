@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -45,6 +45,9 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Check if there's a redirect path in the location state
+  const from = location.state?.from || "/dashboard";
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -60,11 +63,14 @@ const SignUp = () => {
 
   function onSubmit(data: SignUpFormValues) {
     console.log(data);
-    // Ici, vous connecteriez normalement avec votre backend
+    // Set authentication state in localStorage (In a real app, this would involve a backend)
+    localStorage.setItem('isAuthenticated', 'true');
+    
     toast.success("Inscription réussie!");
     setTimeout(() => {
-      navigate("/dashboard");
-    }, 1500);
+      // Navigate to the redirect path or dashboard
+      navigate(from);
+    }, 1000);
   }
 
   return (

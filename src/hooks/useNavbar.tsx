@@ -1,7 +1,9 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useNavbar = (isAuthenticated: boolean) => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -41,6 +43,7 @@ export const useNavbar = (isAuthenticated: boolean) => {
     return true;
   };
 
+  // Handlers for different navigation items
   const handleProfileClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
       e.preventDefault();

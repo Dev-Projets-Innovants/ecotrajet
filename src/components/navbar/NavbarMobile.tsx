@@ -4,7 +4,10 @@ import NavLink from './NavLink';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
-import { X, Menu, MapPin, BarChart, Users, Trophy, BarChart2, Calculator, BookOpen } from 'lucide-react';
+import { 
+  X, Menu, MapPin, BarChart, Users, Trophy, BarChart2, 
+  Calculator, BookOpen, LogOut, UserCircle, Bell
+} from 'lucide-react';
 
 interface NavbarMobileProps {
   mobileMenuOpen: boolean;
@@ -19,6 +22,7 @@ interface NavbarMobileProps {
   handleTripPlannerClick: (e: React.MouseEvent) => void;
   handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
+  handleLogout: () => void;
 }
 
 const NavbarMobile = ({
@@ -33,7 +37,8 @@ const NavbarMobile = ({
   handleNotificationsClick,
   handleTripPlannerClick,
   handleStatisticsClick,
-  handleChallengesClick
+  handleChallengesClick,
+  handleLogout
 }: NavbarMobileProps) => {
   return (
     <div className="md:hidden">
@@ -141,9 +146,10 @@ const NavbarMobile = ({
             
             <div className="mt-auto p-4 border-t border-gray-100">
               {isAuthenticated ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <MobileNavItem 
                     href="/profile" 
+                    icon={<UserCircle className="h-5 w-5 text-eco-green" />}
                     label="Profil" 
                     onClick={(e) => { 
                       handleProfileClick(e); 
@@ -151,13 +157,25 @@ const NavbarMobile = ({
                     }}
                   />
                   <MobileNavItem 
-                    href="/notifications" 
+                    href="/notifications"
+                    icon={<Bell className="h-5 w-5 text-eco-green" />}
                     label="Notifications" 
                     onClick={(e) => { 
                       handleNotificationsClick(e); 
                       toggleMobileMenu(); 
                     }}
                   />
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-3 flex items-center justify-center"
+                    onClick={() => {
+                      handleLogout();
+                      toggleMobileMenu();
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Déconnexion
+                  </Button>
                 </div>
               ) : (
                 <div className="flex flex-col space-y-2">

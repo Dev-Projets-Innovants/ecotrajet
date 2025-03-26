@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { useNavbar } from '@/hooks/useNavbar';
 import NavbarLogo from './navbar/NavbarLogo';
@@ -7,10 +8,16 @@ import NavbarDesktop from './navbar/NavbarDesktop';
 import NavbarMobile from './navbar/NavbarMobile';
 import UserAuthDialog from './auth/UserAuthDialog';
 import { Button } from './ui/button';
+import { toast } from '@/hooks/use-toast';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   // Simulating authentication state - in a real app, this would come from your auth provider
-  const isAuthenticated = false;
+  // For now, we'll use localStorage to simulate auth state
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
 
   const {
     isScrolled,
@@ -29,6 +36,17 @@ const Navbar = () => {
     handleStatisticsClick,
     handleChallengesClick
   } = useNavbar(isAuthenticated);
+
+  // Function to handle user logout
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
+    navigate('/');
+    toast({
+      title: "Déconnexion réussie",
+      description: "Vous avez été déconnecté avec succès."
+    });
+  };
 
   return (
     <>
@@ -52,6 +70,7 @@ const Navbar = () => {
               handleTripPlannerClick={handleTripPlannerClick}
               handleStatisticsClick={handleStatisticsClick}
               handleChallengesClick={handleChallengesClick}
+              handleLogout={handleLogout}
             />
 
             <div className="flex items-center space-x-4">
@@ -59,7 +78,7 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={handleNotificationsClick}
+                  onClick={() => navigate('/notifications')}
                   className="relative"
                 >
                   <Bell className="h-5 w-5" />
@@ -82,6 +101,7 @@ const Navbar = () => {
                 handleTripPlannerClick={handleTripPlannerClick}
                 handleStatisticsClick={handleStatisticsClick}
                 handleChallengesClick={handleChallengesClick}
+                handleLogout={handleLogout}
               />
             </div>
           </div>

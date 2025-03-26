@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { 
   Dialog,
   DialogContent,
@@ -25,6 +25,10 @@ const UserAuthDialog = ({
   title = "Connexion requise",
   description = "Connectez-vous ou inscrivez-vous pour accéder à cette fonctionnalité.",
 }: UserAuthDialogProps) => {
+  const location = useLocation();
+  // Store the current path to redirect back after login
+  const currentPath = location.pathname;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -39,13 +43,13 @@ const UserAuthDialog = ({
         </DialogHeader>
         <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4 justify-center mt-4">
           <Button asChild className="flex items-center justify-center">
-            <Link to="/signin">
+            <Link to="/signin" state={{ from: currentPath }}>
               <LogIn className="mr-2 h-4 w-4" />
               Connexion
             </Link>
           </Button>
           <Button asChild variant="outline" className="flex items-center justify-center">
-            <Link to="/signup">
+            <Link to="/signup" state={{ from: currentPath }}>
               <UserPlus className="mr-2 h-4 w-4" />
               Inscription
             </Link>

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import NavLink from './NavLink';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +12,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator } from 'lucide-react';
+import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator, LogOut } from 'lucide-react';
 
 interface NavbarDesktopProps {
   isAuthenticated: boolean;
@@ -24,6 +25,7 @@ interface NavbarDesktopProps {
   handleTripPlannerClick: (e: React.MouseEvent) => void;
   handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
+  handleLogout: () => void;
 }
 
 const NavbarDesktop = ({
@@ -36,7 +38,8 @@ const NavbarDesktop = ({
   handleNotificationsClick,
   handleTripPlannerClick,
   handleStatisticsClick,
-  handleChallengesClick
+  handleChallengesClick,
+  handleLogout
 }: NavbarDesktopProps) => {
   return (
     <div className="hidden md:flex items-center space-x-6">
@@ -131,9 +134,17 @@ const NavbarDesktop = ({
       </NavigationMenu>
 
       {isAuthenticated ? (
-        <div className="flex items-center space-x-2">
-          <NavLink to="/profile" onClick={handleProfileClick}>Profil</NavLink>
-          <NavLink to="/notifications" onClick={handleNotificationsClick}>Notifications</NavLink>
+        <div className="flex items-center space-x-4">
+          <NavLink to="/profile" onClick={handleProfileClick}>
+            <Button variant="ghost">Profil</Button>
+          </NavLink>
+          <NavLink to="/notifications" onClick={handleNotificationsClick}>
+            <Button variant="ghost">Notifications</Button>
+          </NavLink>
+          <Button variant="ghost" onClick={handleLogout} className="flex items-center">
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
+          </Button>
         </div>
       ) : (
         <div className="flex items-center space-x-2">
