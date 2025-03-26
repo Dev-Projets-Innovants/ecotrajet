@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import {
@@ -28,16 +29,20 @@ const UserActivityChart: React.FC<UserActivityChartProps> = ({ data, config }) =
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Utilisateurs</CardTitle>
-        <CardDescription>Utilisateurs actifs vs nouveaux utilisateurs</CardDescription>
+        <CardTitle className="text-lg sm:text-xl">Utilisateurs</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">Utilisateurs actifs vs nouveaux utilisateurs</CardDescription>
       </CardHeader>
       <CardContent className="aspect-video">
         <ChartContainer config={config} className="h-full w-full">
           <>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis 
+                  dataKey="name" 
+                  className="text-[8px] sm:text-xs" 
+                  tick={{ fontSize: 10 }} 
+                />
+                <YAxis className="text-[8px] sm:text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="Actifs" name="users" fill="#10b981" />
                 <Bar dataKey="Nouveaux" name="newUsers" fill="#60a5fa" />

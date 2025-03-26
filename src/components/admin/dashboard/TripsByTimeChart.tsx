@@ -27,23 +27,32 @@ const TripsByTimeChart: React.FC<TripsByTimeChartProps> = ({ data, config }) => 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trajets par heure</CardTitle>
-        <CardDescription>Nombre de trajets par heure de la journée</CardDescription>
+        <CardTitle className="text-lg sm:text-xl">Trajets par heure</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">Nombre de trajets par heure de la journée</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="h-80">
-          <ChartContainer config={config}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="hour" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line type="monotone" dataKey="trips" name="trips" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
+      <CardContent className="aspect-video">
+        <ChartContainer config={config} className="h-full w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="hour" 
+                className="text-[8px] sm:text-xs" 
+                tick={{ fontSize: 10 }} 
+              />
+              <YAxis className="text-[8px] sm:text-xs" />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line 
+                type="monotone" 
+                dataKey="trips" 
+                name="trips" 
+                stroke="#f59e0b" 
+                strokeWidth={3} 
+                dot={{ r: 4 }} 
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   );

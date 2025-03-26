@@ -173,10 +173,15 @@ const Dashboard = () => {
                   <AreaChart
                     data={monthlyTripsData}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    className="text-xs sm:text-sm"
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis 
+                      dataKey="name" 
+                      className="text-[8px] sm:text-xs" 
+                      tick={{ fontSize: 10 }} 
+                    />
+                    <YAxis className="text-[8px] sm:text-xs" />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Area
                       type="monotone"

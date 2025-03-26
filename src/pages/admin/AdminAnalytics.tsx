@@ -173,16 +173,20 @@ const AdminAnalytics = () => {
           <TabsContent value="usage" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Utilisation par heure de la journée</CardTitle>
-                <CardDescription>Nombre d'utilisateurs actifs par heure</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Utilisation par heure de la journée</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Nombre d'utilisateurs actifs par heure</CardDescription>
               </CardHeader>
-              <CardContent className="aspect-video w-full">
+              <CardContent className="aspect-video">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RechartsLineChart data={hourlyUsageData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="hour" />
-                      <YAxis />
+                      <XAxis 
+                        dataKey="hour" 
+                        className="text-[8px] sm:text-xs" 
+                        tick={{ fontSize: 10 }} 
+                      />
+                      <YAxis className="text-[8px] sm:text-xs" />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Line 
                         type="monotone" 
@@ -200,16 +204,20 @@ const AdminAnalytics = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Utilisation par jour de la semaine</CardTitle>
-                <CardDescription>Nombre d'utilisateurs actifs par jour</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Utilisation par jour de la semaine</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Nombre d'utilisateurs actifs par jour</CardDescription>
               </CardHeader>
-              <CardContent className="aspect-video w-full">
+              <CardContent className="aspect-video">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RechartsBarChart data={dailyUsageData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="day" />
-                      <YAxis />
+                      <XAxis 
+                        dataKey="day" 
+                        className="text-[8px] sm:text-xs" 
+                        tick={{ fontSize: 10 }} 
+                      />
+                      <YAxis className="text-[8px] sm:text-xs" />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="users" name="usage" fill="#3b82f6" />
                     </RechartsBarChart>
@@ -222,16 +230,20 @@ const AdminAnalytics = () => {
           <TabsContent value="emissions" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Émissions CO2 économisées par mois</CardTitle>
-                <CardDescription>Total des émissions économisées en kg</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Émissions CO2 économisées par mois</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Total des émissions économisées en kg</CardDescription>
               </CardHeader>
-              <CardContent className="aspect-video w-full">
+              <CardContent className="aspect-video">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={emissionsSavedData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
+                      <XAxis 
+                        dataKey="month" 
+                        className="text-[8px] sm:text-xs" 
+                        tick={{ fontSize: 10 }} 
+                      />
+                      <YAxis className="text-[8px] sm:text-xs" />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Area 
                         type="monotone" 
@@ -251,16 +263,16 @@ const AdminAnalytics = () => {
           <TabsContent value="regions" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Utilisation par région</CardTitle>
-                <CardDescription>Répartition des utilisateurs actifs par ville</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Utilisation par région</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Répartition des utilisateurs actifs par ville</CardDescription>
               </CardHeader>
-              <CardContent className="aspect-video w-full">
+              <CardContent className="aspect-video">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RechartsBarChart data={usageByRegionData} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis type="number" />
-                      <YAxis type="category" dataKey="name" />
+                      <XAxis type="number" className="text-[8px] sm:text-xs" />
+                      <YAxis type="category" dataKey="name" className="text-[8px] sm:text-xs" />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="value" name="region" fill="#8b5cf6" />
                     </RechartsBarChart>
@@ -273,10 +285,10 @@ const AdminAnalytics = () => {
           <TabsContent value="transport" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Types de transport utilisés</CardTitle>
-                <CardDescription>Répartition des modes de transport écologiques</CardDescription>
+                <CardTitle className="text-lg sm:text-xl">Types de transport utilisés</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Répartition des modes de transport écologiques</CardDescription>
               </CardHeader>
-              <CardContent className="aspect-video w-full">
+              <CardContent className="aspect-video">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RechartsPieChart>
