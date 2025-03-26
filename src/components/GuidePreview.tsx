@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Shield, Leaf, Wrench, ArrowRight } from 'lucide-react';
+import { BookOpen, Shield, Leaf, Wrench, ArrowRight, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -20,7 +20,7 @@ const GuidePreview = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
           <Card className="transition-all duration-300 hover:shadow-md border-eco-light-green">
             <CardContent className="p-6 flex flex-col items-center text-center">
               <div className="p-3 rounded-full bg-eco-light-green mb-4">
@@ -67,6 +67,20 @@ const GuidePreview = () => {
                 Astuces pour maintenir votre vélo en parfait état.
               </p>
             </CardContent>
+          </Card>
+          
+          <Card className="transition-all duration-300 hover:shadow-md border-eco-light-green">
+            <Link to="/guide/tutorials">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="p-3 rounded-full bg-eco-light-green mb-4">
+                  <Video className="h-6 w-6 text-eco-green" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Tutoriels vidéo</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Apprenez par la pratique avec nos tutoriels vidéo détaillés.
+                </p>
+              </CardContent>
+            </Link>
           </Card>
         </div>
         
