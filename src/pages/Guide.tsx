@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -210,10 +209,10 @@ const Guide = () => {
                       </div>
                       
                       <div className="flex justify-center mt-8">
-                        <Link to="#">
+                        <Link to="/guide/share-experience">
                           <Button className="bg-eco-green hover:bg-eco-dark-green text-white">
-                            Voir le tutoriel complet
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            Partager votre expérience
+                            <MessageSquare className="ml-2 h-4 w-4" />
                           </Button>
                         </Link>
                       </div>
@@ -495,7 +494,7 @@ const Guide = () => {
                       </div>
                       
                       <div className="flex justify-center mt-8">
-                        <Link to="#">
+                        <Link to="/guide/share-experience">
                           <Button variant="outline" className="border-eco-green text-eco-green hover:bg-eco-light-green hover:text-eco-green">
                             Partager votre expérience
                             <MessageSquare className="ml-2 h-4 w-4" />
