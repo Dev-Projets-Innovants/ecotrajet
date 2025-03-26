@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -196,34 +195,35 @@ const MapPreview = () => {
                 className="map-tiles"
               />
               
-              {/* Stations Vélib */}
-              {stations.map((station) => (
-                <Marker 
-                  key={station.stationcode} 
-                  position={[station.coordonnees_geo.lat, station.coordonnees_geo.lon]}
-                  icon={bikeIcon}
-                >
-                  <Popup>
-                    <div className="font-medium mb-1">{station.name}</div>
-                    <div className="text-sm text-gray-600 mb-2">
-                      {station.numbikesavailable} vélos disponibles
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs mb-2">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-eco-green"></div>
-                        <span>{station.mechanical} mécaniques</span>
+              {stations
+                .filter(station => station.coordonnees_geo && station.coordonnees_geo.lat && station.coordonnees_geo.lon)
+                .map((station) => (
+                  <Marker 
+                    key={station.stationcode} 
+                    position={[station.coordonnees_geo.lat, station.coordonnees_geo.lon]}
+                    icon={bikeIcon}
+                  >
+                    <Popup>
+                      <div className="font-medium mb-1">{station.name || 'Station Vélib'}</div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {station.numbikesavailable} vélos disponibles
                       </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-eco-blue"></div>
-                        <span>{station.ebike} électriques</span>
+                      <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-eco-green"></div>
+                          <span>{station.mechanical || 0} mécaniques</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-eco-blue"></div>
+                          <span>{station.ebike || 0} électriques</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {station.numdocksavailable} emplacements libres
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+                      <div className="text-xs text-gray-500">
+                        {station.numdocksavailable} emplacements libres
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
               
               {/* Marqueur de position de l'utilisateur */}
               {userLocation && (
