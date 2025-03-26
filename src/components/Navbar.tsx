@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X } from 'lucide-react';
+import { Leaf, Menu, X, BookOpen } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,7 +46,10 @@ const Navbar = () => {
             <div className="flex items-center space-x-6">
               <a href="#map" className="text-sm font-medium hover:text-eco-green transition-colors">Carte</a>
               <a href="#dashboard" className="text-sm font-medium hover:text-eco-green transition-colors">Tableau de bord</a>
-              <a href="#guide" className="text-sm font-medium hover:text-eco-green transition-colors">Guide</a>
+              <Link to="/guide" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
+                <BookOpen className="h-4 w-4" />
+                Guide
+              </Link>
               <a href="#rewards" className="text-sm font-medium hover:text-eco-green transition-colors">Récompenses</a>
             </div>
             <div className="flex items-center space-x-3">
@@ -87,7 +90,10 @@ const Navbar = () => {
         <div className="flex flex-col space-y-6 items-center text-center">
           <a href="#map" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green" onClick={toggleMobileMenu}>Carte</a>
           <a href="#dashboard" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green" onClick={toggleMobileMenu}>Tableau de bord</a>
-          <a href="#guide" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green" onClick={toggleMobileMenu}>Guide</a>
+          <Link to="/guide" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" onClick={toggleMobileMenu}>
+            <BookOpen className="h-5 w-5" />
+            Guide
+          </Link>
           <a href="#rewards" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green" onClick={toggleMobileMenu}>Récompenses</a>
           
           <div className="flex flex-col w-full space-y-3 pt-4">

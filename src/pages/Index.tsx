@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import MapPreview from '@/components/Map';
 import Features from '@/components/Features';
+import GuidePreview from '@/components/GuidePreview';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 
@@ -61,6 +62,7 @@ const Index = () => {
         <Hero />
         <MapPreview />
         <Features />
+        <GuidePreview />
         <CallToAction />
       </main>
       <Footer />
