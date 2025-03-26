@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 
 const Footer = () => {
@@ -22,10 +23,10 @@ const Footer = () => {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Produit</h3>
             <ul className="space-y-2">
-              <li><a href="#map" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Carte</a></li>
-              <li><a href="#dashboard" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Tableau de bord</a></li>
-              <li><a href="#guide" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Guide</a></li>
-              <li><a href="#rewards" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Récompenses</a></li>
+              <li><Link to="/map" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Carte</Link></li>
+              <li><Link to="/dashboard" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Tableau de bord</Link></li>
+              <li><Link to="/guide" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Guide</Link></li>
+              <li><Link to="/rewards" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Récompenses</Link></li>
             </ul>
           </div>
           
@@ -42,9 +43,9 @@ const Footer = () => {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Légal</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Conditions d'utilisation</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Politique de confidentialité</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Mentions légales</a></li>
+              <li><Link to="/terms-of-use" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Conditions d'utilisation</Link></li>
+              <li><Link to="/privacy-policy" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Politique de confidentialité</Link></li>
+              <li><Link to="/legal-notice" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Mentions légales</Link></li>
               <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Cookies</a></li>
             </ul>
           </div>

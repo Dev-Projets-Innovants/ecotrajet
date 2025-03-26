@@ -32,6 +32,9 @@ import MapView from "./pages/MapView";
 import Statistics from "./pages/Statistics";
 import TripPlanner from "./pages/TripPlanner";
 import Challenges from "./pages/Challenges";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import LegalNotice from "./pages/LegalNotice";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +66,9 @@ const App = () => {
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/trip-planner" element={<TripPlanner />} />
             <Route path="/challenges" element={<Challenges />} />
+            <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/legal-notice" element={<LegalNotice />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminSignIn />} />
