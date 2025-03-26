@@ -2,7 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, BookOpen, Award, Settings } from 'lucide-react';
+import { 
+  Leaf, 
+  Menu, 
+  X, 
+  BookOpen, 
+  Award, 
+  Settings, 
+  Calculator, 
+  Users, 
+  User, 
+  Bell 
+} from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,6 +59,14 @@ const Navbar = () => {
                 <BookOpen className="h-4 w-4" />
                 Guide
               </Link>
+              <Link to="/carbon-calculator" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
+                <Calculator className="h-4 w-4" />
+                Calculateur
+              </Link>
+              <Link to="/community" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                Communauté
+              </Link>
               <Link to="/rewards" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
                 <Award className="h-4 w-4" />
                 Récompenses
@@ -58,6 +77,17 @@ const Navbar = () => {
               </Link>
             </div>
             <div className="flex items-center space-x-3">
+              <Link to="/notifications">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">3</span>
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
               <Link to="/signin">
                 <Button variant="ghost" className="text-sm px-4 py-2 h-9 rounded-full transition-all duration-300 hover:bg-eco-light-green hover:text-eco-green">
                   Connexion
@@ -97,6 +127,14 @@ const Navbar = () => {
             <BookOpen className="h-5 w-5" />
             Guide
           </Link>
+          <Link to="/carbon-calculator" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" onClick={toggleMobileMenu}>
+            <Calculator className="h-5 w-5" />
+            Calculateur
+          </Link>
+          <Link to="/community" className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" onClick={toggleMobileMenu}>
+            <Users className="h-5 w-5" />
+            Communauté
+          </Link>
           <Link 
             to="/rewards" 
             className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
@@ -104,6 +142,22 @@ const Navbar = () => {
           >
             <Award className="h-5 w-5" />
             Récompenses
+          </Link>
+          <Link 
+            to="/profile" 
+            className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
+            onClick={toggleMobileMenu}
+          >
+            <User className="h-5 w-5" />
+            Profil
+          </Link>
+          <Link 
+            to="/notifications" 
+            className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
+            onClick={toggleMobileMenu}
+          >
+            <Bell className="h-5 w-5" />
+            Notifications
           </Link>
           <Link 
             to="/admin" 

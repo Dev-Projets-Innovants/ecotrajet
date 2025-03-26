@@ -22,6 +22,10 @@ import AdminContent from "./pages/admin/AdminContent";
 import AdminChallenges from "./pages/admin/AdminChallenges";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import CarbonCalculator from "./pages/CarbonCalculator";
+import Community from "./pages/Community";
+import UserProfile from "./pages/UserProfile";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +47,10 @@ const App = () => {
             <Route path="/guide/tutorials" element={<TutorialVideos />} />
             <Route path="/guide/share-experience" element={<ShareExperience />} />
             <Route path="/rewards" element={<Rewards />} />
+            <Route path="/carbon-calculator" element={<CarbonCalculator />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/notifications" element={<Notifications />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminSignIn />} />

@@ -35,15 +35,20 @@ const UserActivityChart: React.FC<UserActivityChartProps> = ({ data, config }) =
       <CardContent>
         <div className="h-80">
           <ChartContainer config={config}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="Actifs" name="users" fill="#10b981" />
-                <Bar dataKey="Nouveaux" name="newUsers" fill="#60a5fa" />
-              </BarChart>
-            </ResponsiveContainer>
+            <>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="Actifs" name="users" fill="#10b981" />
+                  <Bar dataKey="Nouveaux" name="newUsers" fill="#60a5fa" />
+                </BarChart>
+              </ResponsiveContainer>
+              <ChartLegend>
+                <ChartLegendContent />
+              </ChartLegend>
+            </>
           </ChartContainer>
         </div>
       </CardContent>
