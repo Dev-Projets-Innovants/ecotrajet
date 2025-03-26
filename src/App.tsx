@@ -26,6 +26,7 @@ import CarbonCalculator from "./pages/CarbonCalculator";
 import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
 import Notifications from "./pages/Notifications";
+import MapView from "./pages/MapView";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/community" element={<Community />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/map" element={<MapView />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminSignIn />} />

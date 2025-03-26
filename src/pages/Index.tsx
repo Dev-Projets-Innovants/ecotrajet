@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import MapPreview from '@/components/Map';
+import MapPlaceholder from '@/components/MapPlaceholder';
 import Features from '@/components/Features';
 import GuidePreview from '@/components/GuidePreview';
 import CallToAction from '@/components/CallToAction';
@@ -60,7 +60,7 @@ const Index = () => {
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <MapPreview />
+        <MapPlaceholder />
         <Features />
         <GuidePreview />
         <CallToAction />
