@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, Map, BarChart3, LineChart, BarChart, PieChart } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -45,7 +44,6 @@ import {
 const AdminAnalytics = () => {
   const [periodFilter, setPeriodFilter] = useState('month');
 
-  // Mock data for charts
   const usageByRegionData = [
     { name: 'Paris', value: 2500 },
     { name: 'Lyon', value: 1800 },
@@ -152,7 +150,6 @@ const AdminAnalytics = () => {
       </div>
 
       <div className="grid gap-6">
-        {/* Tabs for different charts */}
         <Tabs defaultValue="usage" className="w-full">
           <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
             <TabsTrigger value="usage" className="flex items-center gap-2">
@@ -173,7 +170,6 @@ const AdminAnalytics = () => {
             </TabsTrigger>
           </TabsList>
           
-          {/* Usage Tab */}
           <TabsContent value="usage" className="space-y-6">
             <Card>
               <CardHeader>
@@ -183,22 +179,24 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="h-80">
                   <ChartContainer config={chartConfig}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsLineChart data={hourlyUsageData}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis dataKey="hour" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Line 
-                          type="monotone" 
-                          dataKey="users" 
-                          name="usage" 
-                          stroke="#3b82f6" 
-                          strokeWidth={3} 
-                          dot={{ r: 3 }} 
-                        />
-                      </RechartsLineChart>
-                    </ResponsiveContainer>
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsLineChart data={hourlyUsageData}>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                          <XAxis dataKey="hour" />
+                          <YAxis />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Line 
+                            type="monotone" 
+                            dataKey="users" 
+                            name="usage" 
+                            stroke="#3b82f6" 
+                            strokeWidth={3} 
+                            dot={{ r: 3 }} 
+                          />
+                        </RechartsLineChart>
+                      </ResponsiveContainer>
+                    </>
                   </ChartContainer>
                 </div>
               </CardContent>
@@ -212,23 +210,24 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="h-80">
                   <ChartContainer config={chartConfig}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsBarChart data={dailyUsageData}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis dataKey="day" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="users" name="usage" fill="#3b82f6" />
-                      </RechartsBarChart>
-                    </ResponsiveContainer>
-                    <ChartLegendContent />
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsBarChart data={dailyUsageData}>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                          <XAxis dataKey="day" />
+                          <YAxis />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Bar dataKey="users" name="usage" fill="#3b82f6" />
+                        </RechartsBarChart>
+                      </ResponsiveContainer>
+                      <ChartLegendContent />
+                    </>
                   </ChartContainer>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          {/* Emissions Tab */}
           <TabsContent value="emissions" className="space-y-6">
             <Card>
               <CardHeader>
@@ -238,30 +237,31 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="h-80">
                   <ChartContainer config={chartConfig}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={emissionsSavedData}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Area 
-                          type="monotone" 
-                          dataKey="amount" 
-                          name="emissions" 
-                          fill="#22c55e" 
-                          fillOpacity={0.3} 
-                          stroke="#22c55e" 
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                    <ChartLegendContent />
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={emissionsSavedData}>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Area 
+                            type="monotone" 
+                            dataKey="amount" 
+                            name="emissions" 
+                            fill="#22c55e" 
+                            fillOpacity={0.3} 
+                            stroke="#22c55e" 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                      <ChartLegendContent />
+                    </>
                   </ChartContainer>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          {/* Regions Tab */}
           <TabsContent value="regions" className="space-y-6">
             <Card>
               <CardHeader>
@@ -271,23 +271,24 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="h-80">
                   <ChartContainer config={chartConfig}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsBarChart data={usageByRegionData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis type="number" />
-                        <YAxis type="category" dataKey="name" />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="value" name="region" fill="#8b5cf6" />
-                      </RechartsBarChart>
-                    </ResponsiveContainer>
-                    <ChartLegendContent />
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsBarChart data={usageByRegionData} layout="vertical">
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                          <XAxis type="number" />
+                          <YAxis type="category" dataKey="name" />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Bar dataKey="value" name="region" fill="#8b5cf6" />
+                        </RechartsBarChart>
+                      </ResponsiveContainer>
+                      <ChartLegendContent />
+                    </>
                   </ChartContainer>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          {/* Transport Types Tab */}
           <TabsContent value="transport" className="space-y-6">
             <Card>
               <CardHeader>
@@ -297,26 +298,28 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="h-80 flex items-center justify-center">
                   <ChartContainer config={chartConfig}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsPieChart>
-                        <Pie
-                          data={transportTypeData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {transportTypeData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend />
-                      </RechartsPieChart>
-                    </ResponsiveContainer>
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Pie
+                            data={transportTypeData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {transportTypeData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                          <Legend />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
+                    </>
                   </ChartContainer>
                 </div>
               </CardContent>
