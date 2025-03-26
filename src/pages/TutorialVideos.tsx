@@ -59,9 +59,9 @@ const videos = [
   },
   {
     id: '5',
-    title: 'Comment utiliser l'application ÉcoTrajet',
-    description: 'Guide complet pour maîtriser toutes les fonctionnalités de l'application ÉcoTrajet et optimiser vos trajets.',
-    author: 'ÉcoTrajet Officiel',
+    title: 'Comment utiliser l\'application EcoTrajet',
+    description: 'Guide complet pour maîtriser toutes les fonctionnalités de l\'application EcoTrajet et optimiser vos trajets.',
+    author: 'EcoTrajet Officiel',
     likes: 932,
     comments: 47,
     shares: 36,
