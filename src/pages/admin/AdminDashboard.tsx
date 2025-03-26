@@ -1,25 +1,67 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   UserCheck, 
   Route, 
   Leaf, 
   Award,
-  TrendingUp
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatsCard from '@/components/admin/dashboard/StatsCard';
 import UserActivityChart from '@/components/admin/dashboard/UserActivityChart';
 import EmissionsChart from '@/components/admin/dashboard/EmissionsChart';
 import TripsByTimeChart from '@/components/admin/dashboard/TripsByTimeChart';
 import { useDashboardData } from '@/components/admin/dashboard/useDashboardData';
+import { toast } from '@/components/ui/toaster';
 
 const AdminDashboard = () => {
-  const { userActivityData, emissionsData, tripsByTimeData, chartConfig } = useDashboardData();
+  const { 
+    userActivityData, 
+    emissionsData, 
+    tripsByTimeData, 
+    chartConfig,
+    refetchData 
+  } = useDashboardData();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetchData();
+      toast({
+        title: "Données actualisées",
+        description: "Les données du tableau de bord ont été mises à jour.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'actualiser les données.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   return (
     <AdminLayout title="Tableau de bord">
       <div className="grid gap-6">
+        {/* Stats Cards Header with Refresh Button */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Statistiques</h2>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh} 
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </Button>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
