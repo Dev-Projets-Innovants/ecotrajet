@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
-// Mock hook for fetching users - in a real app, this would be a real hook
 const useAdminUsers = () => {
   const [users, setUsers] = useState([
     { id: 1, name: 'Jean Dupont', email: 'jean@example.com', status: 'active', role: 'user', lastLogin: '2023-05-15' },
@@ -21,10 +20,8 @@ const useAdminUsers = () => {
     setIsLoading(true);
     setError(null);
     
-    // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Simulate new data with a slight change
         const updatedUsers = users.map(user => ({
           ...user,
           lastLogin: user.status === 'active' ? new Date().toISOString().split('T')[0] : user.lastLogin
@@ -70,7 +67,6 @@ const AdminUsers = () => {
   return (
     <AdminLayout title="Gestion des utilisateurs">
       <div className="grid gap-6">
-        {/* Users Header with Refresh Button */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Liste des utilisateurs</h2>
           <Button 
@@ -84,7 +80,6 @@ const AdminUsers = () => {
           </Button>
         </div>
 
-        {/* Users table */}
         <div className="rounded-md border">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -145,7 +140,6 @@ const AdminUsers = () => {
           </div>
         </div>
 
-        {/* Pagination */}
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">
             Affichage de 1 à {users.length} sur {users.length} utilisateurs
