@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Leaf, ArrowRight, Google, Apple } from "lucide-react";
+import { Leaf, ArrowRight, Mail, Apple } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,8 +32,8 @@ const signUpSchema = z
       .regex(/[a-z]/, { message: "Le mot de passe doit contenir au moins une lettre minuscule" })
       .regex(/[0-9]/, { message: "Le mot de passe doit contenir au moins un chiffre" }),
     confirmPassword: z.string(),
-    acceptTerms: z.literal(true, {
-      errorMap: () => ({ message: "Vous devez accepter les conditions d'utilisation" }),
+    acceptTerms: z.boolean().refine(val => val === true, {
+      message: "Vous devez accepter les conditions d'utilisation",
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -193,7 +193,7 @@ const SignUp = () => {
 
         <div className="grid grid-cols-2 gap-4 mt-6">
           <Button variant="outline" className="w-full">
-            <Google className="mr-2 h-4 w-4" />
+            <Mail className="mr-2 h-4 w-4" />
             Google
           </Button>
           <Button variant="outline" className="w-full">

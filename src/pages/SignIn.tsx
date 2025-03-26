@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Google, Apple } from "lucide-react";
+import { ArrowRight, Mail, Apple } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -109,7 +109,7 @@ const SignIn = () => {
 
         <div className="grid grid-cols-2 gap-4 mt-6">
           <Button variant="outline" className="w-full">
-            <Google className="mr-2 h-4 w-4" />
+            <Mail className="mr-2 h-4 w-4" />
             Google
           </Button>
           <Button variant="outline" className="w-full">
