@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Leaf, Menu, X, BookOpen, Award } from 'lucide-react';
+import { Leaf, Menu, X, BookOpen, Award, Settings } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -51,6 +52,10 @@ const Navbar = () => {
                 <Award className="h-4 w-4" />
                 Récompenses
               </Link>
+              <Link to="/admin" className="text-sm font-medium hover:text-eco-green transition-colors flex items-center gap-1">
+                <Settings className="h-4 w-4" />
+                Admin
+              </Link>
             </div>
             <div className="flex items-center space-x-3">
               <Link to="/signin">
@@ -99,6 +104,14 @@ const Navbar = () => {
           >
             <Award className="h-5 w-5" />
             Récompenses
+          </Link>
+          <Link 
+            to="/admin" 
+            className="text-lg font-medium py-2 w-full border-b border-gray-100 hover:text-eco-green flex items-center justify-center gap-2" 
+            onClick={toggleMobileMenu}
+          >
+            <Settings className="h-5 w-5" />
+            Admin
           </Link>
           
           <div className="flex flex-col w-full space-y-3 pt-4">
