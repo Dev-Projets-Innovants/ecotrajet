@@ -12,7 +12,8 @@ import {
   Bike,
   Info,
   Award,
-  TrendingUp
+  TrendingUp,
+  PlayCircle
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,6 +21,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
+
+// Mock Article Data for linking purposes
+const articles = [
+  {
+    id: '1',
+    title: "L'impact du vélo sur la réduction de la pollution urbaine",
+  },
+  {
+    id: '2',
+    title: "Les bénéfices du vélo sur la santé physique et mentale",
+  },
+  {
+    id: '3',
+    title: "L'évolution des pistes cyclables à Paris",
+  },
+];
 
 const Guide = () => {
   const [activeCategory, setActiveCategory] = useState("getting-started");
@@ -40,6 +57,20 @@ const Guide = () => {
               <p className="text-lg text-gray-600 max-w-2xl mb-8">
                 Découvrez comment maximiser votre expérience ÉcoTrajet et contribuer à un avenir plus vert pour Paris.
               </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/guide/tutorials">
+                  <Button className="bg-eco-green hover:bg-eco-dark-green text-white">
+                    Voir les tutoriels
+                    <PlayCircle className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/guide/share-experience">
+                  <Button variant="outline" className="border-eco-green text-eco-green hover:bg-eco-light-green">
+                    Partager votre expérience
+                    <MessageSquare className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -611,7 +642,7 @@ const Guide = () => {
                   Découvrez nos contenus écologiques et inspirez-vous.
                 </p>
               </div>
-              <Link to="#">
+              <Link to="/guide">
                 <Button variant="outline" className="mt-4 md:mt-0 border-eco-green text-eco-green hover:bg-eco-light-green">
                   Voir tous les articles
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -620,65 +651,29 @@ const Guide = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-gray-400" />
+              {articles.map((article, index) => (
+                <Card key={article.id} className="overflow-hidden">
+                  <div className="h-48 bg-gray-200 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <FileText className="h-12 w-12 text-gray-400" />
+                    </div>
                   </div>
-                </div>
-                <CardHeader>
-                  <CardTitle>L'impact du vélo sur la réduction de la pollution urbaine</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    Une étude récente montre que si 10% des automobilistes parisiens passaient au vélo, la pollution de l'air diminuerait de 8% dans la capitale.
-                  </p>
-                  <Link to="#" className="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Lire l'article
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardContent>
-              </Card>
-              
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-gray-400" />
-                  </div>
-                </div>
-                <CardHeader>
-                  <CardTitle>Les bénéfices du vélo sur la santé physique et mentale</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    30 minutes de vélo par jour réduisent de 30% les risques de maladies cardiovasculaires et améliorent considérablement la santé mentale.
-                  </p>
-                  <Link to="#" className="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Lire l'article
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardContent>
-              </Card>
-              
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-gray-400" />
-                  </div>
-                </div>
-                <CardHeader>
-                  <CardTitle>L'évolution des pistes cyclables à Paris</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    En 5 ans, Paris a doublé la longueur de ses pistes cyclables, facilitant ainsi la mobilité verte et encourageant plus de citoyens à adopter le vélo.
-                  </p>
-                  <Link to="#" className="text-eco-green font-medium hover:underline inline-flex items-center">
-                    Lire l'article
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardContent>
-              </Card>
+                  <CardHeader>
+                    <CardTitle>{article.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {index === 0 ? "Une étude récente montre que si 10% des automobilistes parisiens passaient au vélo, la pollution de l'air diminuerait de 8% dans la capitale." : 
+                       index === 1 ? "30 minutes de vélo par jour réduisent de 30% les risques de maladies cardiovasculaires et améliorent considérablement la santé mentale." :
+                       "En 5 ans, Paris a doublé la longueur de ses pistes cyclables, facilitant ainsi la mobilité verte et encourageant plus de citoyens à adopter le vélo."}
+                    </p>
+                    <Link to={`/guide/article/${article.id}`} className="text-eco-green font-medium hover:underline inline-flex items-center">
+                      Lire l'article
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>

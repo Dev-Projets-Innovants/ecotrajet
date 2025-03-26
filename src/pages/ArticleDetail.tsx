@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Clock as ClockIcon, MessageSquare, Share2, BookmarkPlus, Heart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, MessageSquare, Share2, BookmarkPlus, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ const articles = [
   {
     id: '1',
     title: "L'impact du vélo sur la réduction de la pollution urbaine",
-    content: "Une étude récente montre que si 10% des automobilistes parisiens passaient au vélo, la pollution de l'air diminuerait de 8% dans la capitale.",
+    content: "Une étude récente menée par l'Institut Parisien de Recherche en Environnement Urbain (IPREU) montre que si 10% des automobilistes parisiens passaient au vélo pour leurs déplacements quotidiens, la pollution de l'air diminuerait de 8% dans la capitale.\n\nCette réduction significative s'explique par le fait que les voitures, même les plus récentes, émettent des particules fines et du dioxyde d'azote en quantité importante, particulièrement lors des courts trajets urbains où le moteur n'a pas le temps d'atteindre sa température optimale.\n\nLes bénéfices d'un transfert modal vers le vélo seraient multiples : amélioration de la qualité de l'air, réduction des émissions de CO2, diminution de la congestion routière et baisse des nuisances sonores.\n\nL'étude souligne également que l'infrastructure cyclable joue un rôle clé dans l'adoption du vélo comme mode de transport principal. Les villes qui investissent dans des pistes cyclables sécurisées et continues voient leur taux d'utilisation du vélo augmenter significativement.",
     author: 'Sophie Dubois',
     date: '2024-01-20',
     readTime: 5,
@@ -20,7 +21,7 @@ const articles = [
   {
     id: '2',
     title: "Les bénéfices du vélo sur la santé physique et mentale",
-    content: "30 minutes de vélo par jour réduisent de 30% les risques de maladies cardiovasculaires et améliorent considérablement la santé mentale.",
+    content: "Des recherches médicales récentes confirment que 30 minutes de vélo par jour réduisent de 30% les risques de maladies cardiovasculaires et améliorent considérablement la santé mentale.\n\nLe cyclisme régulier renforce le système immunitaire, améliore l'endurance cardiovasculaire et contribue au maintien d'un poids santé. Contrairement à la course à pied, le vélo est un sport à faible impact qui préserve les articulations tout en sollicitant efficacement les muscles des jambes, des fessiers et du tronc.\n\nSur le plan mental, l'exercice physique régulier stimule la production d'endorphines, souvent appelées « hormones du bonheur », qui réduisent naturellement le stress et l'anxiété. De plus, le vélo en extérieur augmente l'exposition à la lumière naturelle, ce qui aide à réguler les cycles de sommeil et à prévenir la dépression saisonnière.\n\nLes médecins recommandent de plus en plus la « prescription de vélo » comme complément thérapeutique pour certains patients souffrant de dépression légère à modérée, d'anxiété ou de troubles du sommeil.",
     author: 'Thomas Lemoine',
     date: '2024-02-15',
     readTime: 7,
@@ -30,7 +31,7 @@ const articles = [
   {
     id: '3',
     title: "L'évolution des pistes cyclables à Paris",
-    content: "En 5 ans, Paris a doublé la longueur de ses pistes cyclables, facilitant ainsi la mobilité verte et encourageant plus de citoyens à adopter le vélo.",
+    content: "En 5 ans, Paris a doublé la longueur de ses pistes cyclables, facilitant ainsi la mobilité verte et encourageant plus de citoyens à adopter le vélo comme mode de transport principal.\n\nCe développement rapide s'inscrit dans le plan « Paris Vélo 2026 », qui vise à créer un réseau cyclable complet et sécurisé dans toute la capitale. Les nouvelles pistes cyclables sont plus larges, mieux séparées du trafic automobile et conçues pour répondre aux besoins des cyclistes quotidiens.\n\nL'extension du réseau cyclable a déjà produit des résultats impressionnants : le nombre de déplacements à vélo a augmenté de 54% depuis 2019, et les compteurs vélo installés sur les grands axes enregistrent régulièrement des records de passage.\n\nLes quartiers périphériques, autrefois moins bien desservis, bénéficient désormais d'aménagements cyclables de qualité, ce qui contribue à démocratiser l'usage du vélo dans toute la ville. Les connexions avec les communes limitrophes ont également été améliorées, facilitant les déplacements entre Paris et sa banlieue.",
     author: 'Isabelle Girard',
     date: '2024-03-10',
     readTime: 6,
@@ -64,6 +65,12 @@ const ArticleDetail = () => {
     );
   }
 
+  const formatContent = (content) => {
+    return content.split('\n\n').map((paragraph, index) => (
+      <p key={index} className="text-gray-700 leading-relaxed mb-6">{paragraph}</p>
+    ));
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -83,7 +90,7 @@ const ArticleDetail = () => {
               <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center text-sm text-gray-500">
-                  <ClockIcon className="mr-1 h-4 w-4" />
+                  <Clock className="mr-1 h-4 w-4" />
                   <span>{article.readTime} min de lecture</span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -98,7 +105,8 @@ const ArticleDetail = () => {
                   </Button>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed mb-6">{article.content}</p>
+              
+              {formatContent(article.content)}
 
               <div className="border-t pt-6 flex justify-between items-center">
                 <div>
@@ -166,12 +174,12 @@ const ArticleDetail = () => {
           <section className="py-12">
             <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {articles.slice(0, 3).map(relatedArticle => (
+              {articles.filter(a => a.id !== id).slice(0, 3).map(relatedArticle => (
                 <div key={relatedArticle.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                   <img src={relatedArticle.imageUrl} alt={relatedArticle.title} className="w-full h-48 object-cover" />
                   <div className="p-4">
                     <h3 className="font-semibold text-lg mb-2">{relatedArticle.title}</h3>
-                    <p className="text-gray-600 text-sm line-clamp-3">{relatedArticle.content}</p>
+                    <p className="text-gray-600 text-sm line-clamp-3">{relatedArticle.content.split('\n\n')[0]}</p>
                     <Link to={`/guide/article/${relatedArticle.id}`} className="text-eco-green font-medium hover:underline inline-flex items-center mt-2">
                       Lire l'article
                       <ArrowRight className="ml-1 h-4 w-4" />
