@@ -59,9 +59,9 @@ const videos = [
   },
   {
     id: '5',
-    title: 'Comment utiliser l\'application EcoTrajet',
-    description: 'Guide complet pour maîtriser toutes les fonctionnalités de l\'application EcoTrajet et optimiser vos trajets.',
-    author: 'EcoTrajet Officiel',
+    title: 'Comment utiliser l\'application ÉcoTrajet',
+    description: 'Guide complet pour maîtriser toutes les fonctionnalités de l\'application ÉcoTrajet et optimiser vos trajets.',
+    author: 'ÉcoTrajet Officiel',
     likes: 932,
     comments: 47,
     shares: 36,
@@ -203,8 +203,8 @@ const TutorialVideos = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-8">
-        <div className="container mx-auto px-4 max-w-7xl">
+      <main className="flex-grow pt-24 pb-8 px-4">
+        <div className="container mx-auto max-w-7xl">
           <div className="mb-6 flex justify-between items-center">
             <Link to="/guide" className="inline-flex items-center text-eco-green hover:text-eco-dark-green">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -249,7 +249,7 @@ const TutorialVideos = () => {
             
             {/* Main video display area */}
             <div className="md:w-3/4 w-full">
-              <div className="bg-white rounded-xl shadow-md overflow-hidden h-[calc(100vh-180px)]">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden h-[calc(100vh-220px)]">
                 <ScrollArea ref={scrollContainerRef} className="h-full">
                   <div className="snap-y snap-mandatory h-full">
                     {videos.map((video, index) => (
