@@ -23,6 +23,7 @@ interface NavbarMobileProps {
   handleChallengesClick: (e: React.MouseEvent) => void;
   handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
+  textColorClass?: string;
 }
 
 const NavbarMobile = ({
@@ -38,13 +39,14 @@ const NavbarMobile = ({
   handleNotificationsClick,
   handleChallengesClick,
   handleAdminDashboardClick,
-  handleLogout
+  handleLogout,
+  textColorClass = "text-foreground"
 }: NavbarMobileProps) => {
   return (
     <div className="md:hidden">
       <Sheet open={mobileMenuOpen} onOpenChange={toggleMobileMenu}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Menu">
+          <Button variant="ghost" size="icon" aria-label="Menu" className={textColorClass}>
             <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>

@@ -26,6 +26,7 @@ interface NavbarDesktopProps {
   handleChallengesClick: (e: React.MouseEvent) => void;
   handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
+  textColorClass?: string;
 }
 
 const NavbarDesktop = ({
@@ -39,14 +40,15 @@ const NavbarDesktop = ({
   handleNotificationsClick,
   handleChallengesClick,
   handleAdminDashboardClick,
-  handleLogout
+  handleLogout,
+  textColorClass = "text-foreground"
 }: NavbarDesktopProps) => {
   return (
     <div className="hidden md:flex items-center space-x-6">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-transparent">Explorer</NavigationMenuTrigger>
+            <NavigationMenuTrigger className={`bg-transparent ${textColorClass}`}>Explorer</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                 <ListItem
@@ -77,7 +79,7 @@ const NavbarDesktop = ({
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-transparent">Communauté</NavigationMenuTrigger>
+            <NavigationMenuTrigger className={`bg-transparent ${textColorClass}`}>Communauté</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                 <ListItem 
@@ -120,28 +122,28 @@ const NavbarDesktop = ({
       {isAuthenticated ? (
         <div className="flex items-center space-x-4">
           {isAdmin && (
-            <NavLink to="/admin/dashboard" onClick={handleAdminDashboardClick}>
-              <Button variant="ghost" className="flex items-center">
+            <NavLink to="/admin/dashboard" onClick={handleAdminDashboardClick} className={textColorClass}>
+              <Button variant="ghost" className={`flex items-center ${textColorClass}`}>
                 <Shield className="mr-2 h-4 w-4" />
                 Admin
               </Button>
             </NavLink>
           )}
-          <NavLink to="/profile" onClick={handleProfileClick}>
-            <Button variant="ghost">Profil</Button>
+          <NavLink to="/profile" onClick={handleProfileClick} className={textColorClass}>
+            <Button variant="ghost" className={textColorClass}>Profil</Button>
           </NavLink>
-          <NavLink to="/notifications" onClick={handleNotificationsClick}>
-            <Button variant="ghost">Notifications</Button>
+          <NavLink to="/notifications" onClick={handleNotificationsClick} className={textColorClass}>
+            <Button variant="ghost" className={textColorClass}>Notifications</Button>
           </NavLink>
-          <Button variant="ghost" onClick={handleLogout} className="flex items-center">
+          <Button variant="ghost" onClick={handleLogout} className={`flex items-center ${textColorClass}`}>
             <LogOut className="mr-2 h-4 w-4" />
             Déconnexion
           </Button>
         </div>
       ) : (
         <div className="flex items-center space-x-2">
-          <NavLink to="/signin">
-            <Button variant="ghost">Connexion</Button>
+          <NavLink to="/signin" className={textColorClass}>
+            <Button variant="ghost" className={textColorClass}>Connexion</Button>
           </NavLink>
           <NavLink to="/signup">
             <Button>Inscription</Button>

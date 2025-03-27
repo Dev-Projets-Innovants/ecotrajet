@@ -61,6 +61,10 @@ const Navbar = () => {
     });
   };
 
+  // Determine if we're on the homepage to apply different text color
+  const isHomePage = location.pathname === '/';
+  const textColorClass = isHomePage && !isScrolled ? 'text-white' : 'text-foreground';
+
   return (
     <>
       <nav 
@@ -70,7 +74,7 @@ const Navbar = () => {
       >
         <div className="container max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
-            <NavbarLogo />
+            <NavbarLogo textColorClass={textColorClass} />
 
             <NavbarDesktop 
               isAuthenticated={isAuthenticated}
@@ -84,6 +88,7 @@ const Navbar = () => {
               handleChallengesClick={handleChallengesClick}
               handleAdminDashboardClick={handleAdminDashboardClick}
               handleLogout={handleLogout}
+              textColorClass={textColorClass}
             />
 
             <div className="flex items-center space-x-4">
@@ -92,7 +97,7 @@ const Navbar = () => {
                   variant="ghost" 
                   size="icon" 
                   onClick={() => navigate('/notifications')}
-                  className="relative"
+                  className={`relative ${textColorClass}`}
                 >
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
@@ -115,6 +120,7 @@ const Navbar = () => {
                 handleChallengesClick={handleChallengesClick}
                 handleAdminDashboardClick={handleAdminDashboardClick}
                 handleLogout={handleLogout}
+                textColorClass={textColorClass}
               />
             </div>
           </div>
