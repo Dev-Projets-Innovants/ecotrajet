@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, Bike, Bus, Car, TramFront } from 'lucide-react';
@@ -151,7 +150,7 @@ const Hero = () => {
           </motion.div>
           
           <motion.h1 
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance mb-6 text-black"
+            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance mb-6 text-black leading-[1.1]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
@@ -212,19 +211,6 @@ const Hero = () => {
             </motion.div>
           </motion.div>
         </div>
-        
-        <motion.div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 cursor-pointer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, y: [0, 10, 0] }}
-          transition={{ 
-            opacity: { delay: 1.5, duration: 0.7 },
-            y: { delay: 1.5, duration: 1.5, repeat: Infinity, ease: "easeInOut" }
-          }}
-          onClick={scrollToContent}
-        >
-          <ChevronDown className="text-black w-8 h-8" />
-        </motion.div>
       </div>
     </section>
   );
