@@ -80,6 +80,14 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Improve responsive typography */
+  h1 {
+    @apply text-balance;
+  }
+  p {
+    @apply text-pretty;
+  }
 }
 
 /* Couleurs personnalisées */
@@ -176,4 +184,18 @@
 /* Transitions douces pour l'overlay de la carte */
 .map-overlay {
   background: linear-gradient(to bottom, transparent 70%, rgba(255,255,255,0.7) 100%);
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Fix for dropdowns on mobile */
+.radix-dropdown-content {
+  z-index: 100;
+  background-color: white;
 }

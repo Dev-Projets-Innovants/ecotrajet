@@ -19,7 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="flex-1 pt-16">
+      <div className="flex-1 pt-16 md:pt-16">
         {children}
       </div>
       <Footer />

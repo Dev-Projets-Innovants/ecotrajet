@@ -27,7 +27,7 @@ const Hero = () => {
             </span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance mb-6 text-white leading-[1.1]">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance mb-6 text-white leading-[1.1]">
             Paris plus vert, <span className="relative inline-block">
               <span className="relative z-10 text-eco-green">trajet</span>
               <span className="absolute bottom-0 left-0 w-full h-3 bg-eco-light-green/60 rounded-lg -z-0"></span>
@@ -37,14 +37,14 @@ const Hero = () => {
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-white mb-10 leading-relaxed text-balance font-medium">
+          <p className="text-base md:text-lg lg:text-xl text-white mb-8 leading-relaxed text-balance font-medium px-2">
             ÉcoTrajet vous aide à réduire votre empreinte carbone en choisissant les options de transport les plus écologiques pour vos déplacements quotidiens à Paris.
           </p>
           
           <div className="flex justify-center items-center">
             <div className="w-full sm:w-auto">
               <Button 
-                className="group rounded-full px-6 py-6 h-12 w-full sm:w-auto bg-eco-green hover:bg-eco-dark-green text-white shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm"
+                className="group rounded-full px-4 py-5 h-12 w-full sm:w-auto bg-eco-green hover:bg-eco-dark-green text-white shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm"
                 asChild
               >
                 <Link to="/signup">
