@@ -32,7 +32,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
 
   return (
     <div className={`min-h-screen flex flex-col ${darkMode ? 'dark' : ''}`}>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={sidebarOpen}>
         <div className="flex flex-1 w-full">
           {/* Sidebar */}
           <AdminSidebar 
