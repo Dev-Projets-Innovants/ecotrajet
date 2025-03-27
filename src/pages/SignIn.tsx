@@ -26,6 +26,12 @@ const signInSchema = z.object({
 
 type SignInFormValues = z.infer<typeof signInSchema>;
 
+// Admin credentials constant to easily manage and remember
+export const ADMIN_CREDENTIALS = {
+  email: "admin@ecotrajet.fr",
+  password: "admin123"
+};
+
 const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,14 +48,27 @@ const SignIn = () => {
 
   function onSubmit(data: SignInFormValues) {
     console.log(data);
-    // Set authentication state in localStorage (In a real app, this would involve a backend)
+    
+    // Check if the user is an admin
+    const isAdmin = data.email === ADMIN_CREDENTIALS.email && 
+                    data.password === ADMIN_CREDENTIALS.password;
+    
+    // Set authentication state in localStorage
     localStorage.setItem('isAuthenticated', 'true');
     
-    toast.success("Connexion réussie!");
-    setTimeout(() => {
-      // Navigate to the redirect path or dashboard
-      navigate(from);
-    }, 1000);
+    // If admin user, redirect to admin dashboard
+    if (isAdmin) {
+      toast.success("Connexion administrateur réussie!");
+      setTimeout(() => {
+        navigate('/admin/dashboard');
+      }, 1000);
+    } else {
+      // Regular user flow
+      toast.success("Connexion réussie!");
+      setTimeout(() => {
+        navigate(from);
+      }, 1000);
+    }
   }
 
   return (
@@ -131,6 +150,13 @@ const SignIn = () => {
           S'inscrire
         </Link>
       </p>
+      
+      {/* Admin login hint - can be removed in production */}
+      <div className="mt-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-center">
+        <p className="font-medium text-gray-500 dark:text-gray-400">Pour accéder au panneau admin:</p>
+        <p className="text-gray-500 dark:text-gray-400">Email: {ADMIN_CREDENTIALS.email}</p>
+        <p className="text-gray-500 dark:text-gray-400">Mot de passe: {ADMIN_CREDENTIALS.password}</p>
+      </div>
     </AuthLayout>
   );
 };

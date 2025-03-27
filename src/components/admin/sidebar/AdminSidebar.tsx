@@ -16,7 +16,11 @@ import {
   Sun,
   Leaf
 } from "lucide-react";
-import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
+import { 
+  Sidebar, 
+  SidebarContent,
+  useSidebar
+} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import AdminNavigation from "./AdminNavigation";
 
@@ -36,13 +40,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   handleLogout,
 }) => {
   const navigate = useNavigate();
+  const { open } = useSidebar();
 
   return (
     <Sidebar 
       className={`${sidebarOpen ? 'w-64' : 'w-16'} duration-300 transition-width bg-white dark:bg-gray-900 z-50`}
       data-state={sidebarOpen ? "open" : "collapsed"}
     >
-      <div className="flex flex-col h-full">
+      <SidebarContent>
         {/* Logo et titre */}
         <div className="flex items-center justify-between h-16 px-3.5">
           <div className="flex items-center">
@@ -98,7 +103,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             </Button>
           </div>
         </div>
-      </div>
+      </SidebarContent>
     </Sidebar>
   );
 };

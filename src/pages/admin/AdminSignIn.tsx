@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
+import { ADMIN_CREDENTIALS } from '@/pages/SignIn';
 
 /**
  * Schéma de validation du formulaire
@@ -69,8 +70,8 @@ const AdminSignIn: React.FC = () => {
     // contre un service d'authentification
     console.log('Login attempt with:', data);
     
-    // Vérification des identifiants admin (admin@ecotrajet.fr / admin123)
-    if (data.email === 'admin@ecotrajet.fr' && data.password === 'admin123') {
+    // Vérification des identifiants admin
+    if (data.email === ADMIN_CREDENTIALS.email && data.password === ADMIN_CREDENTIALS.password) {
       // Notification de succès
       toast({
         title: "Connexion réussie",
@@ -123,7 +124,7 @@ const AdminSignIn: React.FC = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="admin@ecotrajet.fr" {...field} />
+                      <Input placeholder={ADMIN_CREDENTIALS.email} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -153,8 +154,8 @@ const AdminSignIn: React.FC = () => {
           {/* Informations de démonstration pour faciliter les tests */}
           <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
             <p>Pour la démonstration, utilisez :</p>
-            <p className="font-medium">Email: admin@ecotrajet.fr</p>
-            <p className="font-medium">Mot de passe: admin123</p>
+            <p className="font-medium">Email: {ADMIN_CREDENTIALS.email}</p>
+            <p className="font-medium">Mot de passe: {ADMIN_CREDENTIALS.password}</p>
           </div>
         </div>
         
