@@ -7,12 +7,11 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator, LogOut, Shield } from 'lucide-react';
+import { MapPin, BarChart, Trophy, Users, BookOpen, Calculator, LogOut, Shield } from 'lucide-react';
 
 interface NavbarDesktopProps {
   isAuthenticated: boolean;
@@ -76,14 +75,6 @@ const NavbarDesktop = ({
                   icon={<BarChart className="h-4 w-4 mr-2 text-eco-green" />}
                 >
                   Visualisez vos performances et votre impact environnemental.
-                </ListItem>
-                <ListItem 
-                  href="/statistics" 
-                  title="Statistiques" 
-                  onClick={handleStatisticsClick}
-                  icon={<BarChart2 className="h-4 w-4 mr-2 text-eco-blue" />}
-                >
-                  Analysez en profondeur vos habitudes de déplacement et leur impact.
                 </ListItem>
                 <ListItem 
                   href="/carbon-calculator" 

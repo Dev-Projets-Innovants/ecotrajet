@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { 
-  X, Menu, MapPin, BarChart, Users, Trophy, BarChart2, 
+  X, Menu, MapPin, BarChart, Users, Trophy, 
   Calculator, BookOpen, LogOut, UserCircle, Bell, Shield
 } from 'lucide-react';
 
@@ -88,15 +88,6 @@ const NavbarMobile = ({
                   label="Tableau de bord" 
                   onClick={(e) => { 
                     handleDashboardClick(e); 
-                    toggleMobileMenu(); 
-                  }}
-                />
-                <MobileNavItem 
-                  href="/statistics" 
-                  icon={<BarChart2 className="h-5 w-5 text-eco-blue" />} 
-                  label="Statistiques" 
-                  onClick={(e) => { 
-                    handleStatisticsClick(e); 
                     toggleMobileMenu(); 
                   }}
                 />
