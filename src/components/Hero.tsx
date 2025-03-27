@@ -19,12 +19,12 @@ const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center pt-16 pb-20 overflow-hidden">
       {/* Animated background with sustainable mobility elements */}
-      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden bg-gradient-to-b from-eco-light-blue/10 to-eco-light-green/20">
-        <div className="absolute inset-0 bg-black/10 z-10"></div>
+      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden bg-gradient-to-b from-eco-light-blue/40 to-eco-light-green/50">
+        <div className="absolute inset-0 bg-black/5 z-10"></div>
         
-        {/* Animated mobility icons */}
+        {/* Animated mobility icons - augmenté l'opacité */}
         <motion.div 
-          className="absolute top-1/4 left-1/4 text-eco-green opacity-10"
+          className="absolute top-1/4 left-1/4 text-eco-green opacity-30"
           animate={{ 
             x: [0, 100, 0], 
             y: [0, -50, 0],
@@ -36,11 +36,11 @@ const Hero = () => {
             ease: "linear" 
           }}
         >
-          <Bike size={120} strokeWidth={1} />
+          <Bike size={isMobile ? 80 : 120} strokeWidth={1.5} />
         </motion.div>
         
         <motion.div 
-          className="absolute bottom-1/3 right-1/4 text-eco-blue opacity-10"
+          className="absolute bottom-1/3 right-1/4 text-eco-blue opacity-30"
           animate={{ 
             x: [0, -120, 0], 
             y: [0, 60, 0],
@@ -53,11 +53,11 @@ const Hero = () => {
             delay: 2
           }}
         >
-          <Bus size={150} strokeWidth={1} />
+          <Bus size={isMobile ? 100 : 150} strokeWidth={1.5} />
         </motion.div>
         
         <motion.div 
-          className="absolute top-2/3 left-1/3 text-eco-light-green opacity-10"
+          className="absolute top-2/3 left-1/3 text-eco-light-green opacity-30"
           animate={{ 
             x: [0, 80, 0], 
             y: [0, 40, 0],
@@ -70,11 +70,11 @@ const Hero = () => {
             delay: 5
           }}
         >
-          <TramFront size={130} strokeWidth={1} />
+          <TramFront size={isMobile ? 90 : 130} strokeWidth={1.5} />
         </motion.div>
         
         <motion.div 
-          className="absolute top-1/2 right-1/3 text-eco-green opacity-10"
+          className="absolute top-1/2 right-1/3 text-eco-green opacity-30"
           animate={{ 
             x: [0, -60, 0], 
             y: [0, -70, 0],
@@ -87,15 +87,15 @@ const Hero = () => {
             delay: 8
           }}
         >
-          <Car size={110} strokeWidth={1} />
+          <Car size={isMobile ? 80 : 110} strokeWidth={1.5} />
         </motion.div>
         
-        {/* Eiffel Tower silhouette */}
+        {/* Eiffel Tower silhouette - augmenté l'opacité */}
         <motion.div 
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-64 h-96 opacity-10"
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-64 h-96 opacity-25"
           animate={{ 
             y: [5, 0, 5], 
-            opacity: [0.08, 0.12, 0.08]
+            opacity: [0.20, 0.30, 0.20]
           }}
           transition={{ 
             duration: 8,
@@ -112,7 +112,7 @@ const Hero = () => {
       {/* Overlay gradients animés pour ajouter de la profondeur */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <motion.div 
-          className="absolute top-1/4 left-1/3 w-64 h-64 bg-eco-light-green rounded-full mix-blend-overlay filter blur-3xl opacity-20"
+          className="absolute top-1/4 left-1/3 w-64 h-64 bg-eco-light-green rounded-full mix-blend-overlay filter blur-3xl opacity-40"
           animate={{ 
             y: [0, -20, 0], 
             scale: [1, 1.05, 1]
@@ -124,7 +124,7 @@ const Hero = () => {
           }}
         ></motion.div>
         <motion.div 
-          className="absolute top-1/2 right-1/4 w-72 h-72 bg-eco-light-blue rounded-full mix-blend-overlay filter blur-3xl opacity-20"
+          className="absolute top-1/2 right-1/4 w-72 h-72 bg-eco-light-blue rounded-full mix-blend-overlay filter blur-3xl opacity-40"
           animate={{ 
             y: [0, 20, 0], 
             scale: [1, 1.05, 1]
@@ -145,7 +145,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-eco-green/20 text-white border border-eco-green/30 backdrop-blur-sm mb-4 shadow-lg">
+            <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-eco-green/30 text-white border border-eco-green/40 backdrop-blur-sm mb-4 shadow-lg">
               Mobilité durable
             </span>
           </motion.div>
@@ -188,7 +188,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex justify-center items-center"
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -208,20 +208,6 @@ const Hero = () => {
                     <ArrowRight size={18} />
                   </motion.span>
                 </Link>
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto"
-            >
-              <Button 
-                variant="outline" 
-                className="rounded-full px-6 py-6 h-12 w-full sm:w-auto border-eco-green text-white hover:bg-eco-light-green/20 hover:text-white transition-all duration-300 backdrop-blur-sm"
-                onClick={scrollToContent}
-              >
-                En savoir plus
               </Button>
             </motion.div>
           </motion.div>
