@@ -1,4 +1,3 @@
-
 /**
  * Application principale ÉcoTrajet
  * 
@@ -36,6 +35,7 @@ import AdminContent from "./pages/admin/AdminContent";
 import AdminChallenges from "./pages/admin/AdminChallenges";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminRewards from "./pages/admin/AdminRewards";
 import CarbonCalculator from "./pages/CarbonCalculator";
 import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
@@ -57,61 +57,64 @@ const queryClient = new QueryClient();
  * Composant principal de l'application
  * Définit la structure globale et le routage
  */
-const App = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {/* Composants de notification pour les feedbacks utilisateur */}
-        <Toaster />
-        <Sonner />
-        
-        <BrowserRouter>
-          <Routes>
-            {/* Routes publiques */}
-            <Route path="/" element={<Index />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            
-            {/* Routes utilisateur authentifié */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/guide" element={<Guide />} />
-            <Route path="/guide/article/:id" element={<ArticleDetail />} />
-            <Route path="/guide/tutorials" element={<TutorialVideos />} />
-            <Route path="/guide/share-experience" element={<ShareExperience />} />
-            <Route path="/rewards" element={<Rewards />} />
-            <Route path="/carbon-calculator" element={<CarbonCalculator />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/map" element={<MapView />} />
-            
-            {/* Routes pour les fonctionnalités principales */}
-            <Route path="/statistics" element={<Statistics />} />
-            <Route path="/trip-planner" element={<TripPlanner />} />
-            <Route path="/challenges" element={<Challenges />} />
-            
-            {/* Pages d'information légale */}
-            <Route path="/terms-of-use" element={<TermsOfUse />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/legal-notice" element={<LegalNotice />} />
-            
-            {/* Routes d'administration (accès restreint) */}
-            <Route path="/admin" element={<AdminSignIn />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/content" element={<AdminContent />} />
-            <Route path="/admin/challenges" element={<AdminChallenges />} />
-            <Route path="/admin/analytics" element={<AdminAnalytics />} />
-            <Route path="/admin/notifications" element={<AdminNotifications />} />
-            
-            {/* Route de fallback pour les chemins inexistants */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <div className="App">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          {/* Composants de notification pour les feedbacks utilisateur */}
+          <Toaster />
+          <Sonner />
+          
+          <BrowserRouter>
+            <Routes>
+              {/* Routes publiques */}
+              <Route path="/" element={<Index />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              
+              {/* Routes utilisateur authentifié */}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/guide" element={<Guide />} />
+              <Route path="/guide/article/:id" element={<ArticleDetail />} />
+              <Route path="/guide/tutorials" element={<TutorialVideos />} />
+              <Route path="/guide/share-experience" element={<ShareExperience />} />
+              <Route path="/rewards" element={<Rewards />} />
+              <Route path="/carbon-calculator" element={<CarbonCalculator />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/map" element={<MapView />} />
+              
+              {/* Routes pour les fonctionnalités principales */}
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="/trip-planner" element={<TripPlanner />} />
+              <Route path="/challenges" element={<Challenges />} />
+              
+              {/* Pages d'information légale */}
+              <Route path="/terms-of-use" element={<TermsOfUse />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/legal-notice" element={<LegalNotice />} />
+              
+              {/* Routes d'administration (accès restreint) */}
+              <Route path="/admin" element={<AdminSignIn />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/rewards" element={<AdminRewards />} />
+              <Route path="/admin/challenges" element={<AdminChallenges />} />
+              <Route path="/admin/content" element={<AdminContent />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/notifications" element={<AdminNotifications />} />
+              
+              {/* Route de fallback pour les chemins inexistants */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </div>
   );
-};
+}
 
 export default App;

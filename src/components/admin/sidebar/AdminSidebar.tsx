@@ -1,28 +1,24 @@
 
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+/**
+ * Composant AdminSidebar
+ * 
+ * Ce composant représente la barre latérale du panneau d'administration.
+ * Il utilise le composant de navigation AdminNavigation pour afficher les liens
+ * et permet de basculer entre les états étendu et réduit.
+ */
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { 
-  BarChart3, 
-  Users, 
-  FileText, 
-  Award, 
-  BarChart, 
-  Bell, 
+  ChevronLeft, 
   LogOut, 
-  Menu, 
-  X, 
-  Sun, 
-  Moon,
-  Home
+  Moon, 
+  Sun,
+  Leaf
 } from "lucide-react";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar/sidebar-content";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import AdminNavigation from "./AdminNavigation";
 
 interface AdminSidebarProps {
   sidebarOpen: boolean;
@@ -37,147 +33,73 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   darkMode,
   toggleSidebar,
   toggleDarkMode,
-  handleLogout
+  handleLogout,
 }) => {
-  const location = useLocation();
-
-  const menuItems = [
-    { path: "/admin/dashboard", icon: BarChart3, label: "Tableau de bord" },
-    { path: "/admin/users", icon: Users, label: "Utilisateurs" },
-    { path: "/admin/content", icon: FileText, label: "Contenu" },
-    { path: "/admin/challenges", icon: Award, label: "Défis & Récompenses" },
-    { path: "/admin/analytics", icon: BarChart, label: "Analyse" },
-    { path: "/admin/notifications", icon: Bell, label: "Notifications" },
-  ];
-
-  const isActive = (path: string) => location.pathname === path;
+  const navigate = useNavigate();
 
   return (
-    <aside
-      className={`fixed inset-y-0 left-0 transform ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } z-20 transition-transform duration-300 ease-in-out md:relative md:translate-x-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col ${
-        sidebarOpen ? "w-64" : "w-0 md:w-16"
-      }`}
+    <Sidebar 
+      className={`${sidebarOpen ? 'w-64' : 'w-16'} duration-300 transition-width bg-white dark:bg-gray-900 z-50`}
+      data-state={sidebarOpen ? "open" : "collapsed"}
     >
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
-        {sidebarOpen && (
-          <Link to="/admin/dashboard" className="text-lg font-bold text-eco-green dark:text-white">
-            Admin ÉcoTrajet
-          </Link>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="md:hidden"
-        >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-        </Button>
-      </div>
-      <div className="flex flex-col flex-1 py-4 overflow-y-auto">
-        <nav className="flex-1 px-2 space-y-1">
-          {menuItems.map((item) => (
-            <TooltipProvider key={item.path}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                      isActive(item.path)
-                        ? "bg-eco-light-green text-eco-green dark:bg-eco-dark-green/20 dark:text-eco-light-green"
-                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                    } ${!sidebarOpen && "justify-center"}`}
-                  >
-                    <item.icon
-                      className={`flex-shrink-0 ${
-                        sidebarOpen ? "mr-3 h-5 w-5" : "h-6 w-6"
-                      }`}
-                    />
-                    {sidebarOpen && <span>{item.label}</span>}
-                  </Link>
-                </TooltipTrigger>
-                {!sidebarOpen && (
-                  <TooltipContent side="right">
-                    <p>{item.label}</p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          ))}
-        </nav>
-        <div className="px-2 mt-4 space-y-2">
-          <Separator className="my-2 dark:bg-gray-800" />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size={sidebarOpen ? "default" : "icon"}
-                  onClick={toggleDarkMode}
-                  className={`w-full justify-${sidebarOpen ? "start" : "center"} text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800`}
-                >
-                  {darkMode ? (
-                    <Sun className={`${sidebarOpen ? "mr-2" : ""} h-5 w-5`} />
-                  ) : (
-                    <Moon className={`${sidebarOpen ? "mr-2" : ""} h-5 w-5`} />
-                  )}
-                  {sidebarOpen && <span>Mode {darkMode ? "clair" : "sombre"}</span>}
-                </Button>
-              </TooltipTrigger>
-              {!sidebarOpen && (
-                <TooltipContent side="right">
-                  <p>Mode {darkMode ? "clair" : "sombre"}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link to="/">
-                  <Button
-                    variant="ghost"
-                    size={sidebarOpen ? "default" : "icon"}
-                    className={`w-full justify-${sidebarOpen ? "start" : "center"} text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800`}
-                  >
-                    <Home className={`${sidebarOpen ? "mr-2" : ""} h-5 w-5`} />
-                    {sidebarOpen && <span>Retour au site</span>}
-                  </Button>
-                </Link>
-              </TooltipTrigger>
-              {!sidebarOpen && (
-                <TooltipContent side="right">
-                  <p>Retour au site</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size={sidebarOpen ? "default" : "icon"}
-                  onClick={handleLogout}
-                  className={`w-full justify-${sidebarOpen ? "start" : "center"} text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20`}
-                >
-                  <LogOut className={`${sidebarOpen ? "mr-2" : ""} h-5 w-5`} />
-                  {sidebarOpen && <span>Déconnexion</span>}
-                </Button>
-              </TooltipTrigger>
-              {!sidebarOpen && (
-                <TooltipContent side="right">
-                  <p>Déconnexion</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
+      <SidebarContent>
+        {/* Logo et titre */}
+        <div className="flex items-center justify-between h-16 px-3.5">
+          <div className="flex items-center">
+            <Leaf className="h-6 w-6 text-eco-green" />
+            {sidebarOpen && (
+              <span className="ml-2 font-semibold text-lg">ÉcoTrajet Admin</span>
+            )}
+          </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleSidebar}
+            className="hidden md:flex"
+            aria-label={sidebarOpen ? "Réduire le menu" : "Étendre le menu"}
+          >
+            <ChevronLeft className={`h-5 w-5 transition-transform ${sidebarOpen ? '' : 'rotate-180'}`} />
+          </Button>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation principale */}
+        <div className="px-3 mt-3">
+          <AdminNavigation isSidebarCollapsed={!sidebarOpen} />
+        </div>
+
+        {/* Pied de la sidebar avec contrôles */}
+        <div className="mt-auto px-3 mb-4">
+          <div className="space-y-2">
+            <Button 
+              variant="ghost" 
+              className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
+              onClick={toggleDarkMode}
+            >
+              {darkMode ? (
+                <>
+                  <Sun className="h-5 w-5" />
+                  {sidebarOpen && <span className="ml-2">Mode clair</span>}
+                </>
+              ) : (
+                <>
+                  <Moon className="h-5 w-5" />
+                  {sidebarOpen && <span className="ml-2">Mode sombre</span>}
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5" />
+              {sidebarOpen && <span className="ml-2">Déconnexion</span>}
+            </Button>
+          </div>
+        </div>
+      </SidebarContent>
+    </Sidebar>
   );
 };
 
