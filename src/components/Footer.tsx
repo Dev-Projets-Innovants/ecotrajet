@@ -46,7 +46,7 @@ const Footer = () => {
               <li><Link to="/terms-of-use" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Conditions d'utilisation</Link></li>
               <li><Link to="/privacy-policy" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Politique de confidentialité</Link></li>
               <li><Link to="/legal-notice" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Mentions légales</Link></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Cookies</a></li>
+              <li><Link to="/our-story" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Notre Histoire</Link></li>
             </ul>
           </div>
         </div>
