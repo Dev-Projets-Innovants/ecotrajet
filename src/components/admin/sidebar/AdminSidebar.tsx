@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -90,25 +89,23 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               )}
             </Button>
             
-            <div className="flex space-x-2">
-              <Button 
-                variant="ghost" 
-                className={`flex-1 ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
-                onClick={handleHomeNavigation}
-              >
-                <Home className="h-5 w-5" />
-                {sidebarOpen && <span className="ml-2">Accueil</span>}
-              </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
+              onClick={handleHomeNavigation}
+            >
+              <Home className="h-5 w-5" />
+              {sidebarOpen && <span className="ml-2">Accueil</span>}
+            </Button>
 
-              <Button 
-                variant="ghost" 
-                className={`flex-1 ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
-                onClick={handleLogout}
-              >
-                <LogOut className="h-5 w-5" />
-                {sidebarOpen && <span className="ml-2">Déconnexion</span>}
-              </Button>
-            </div>
+            <Button 
+              variant="ghost" 
+              className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5" />
+              {sidebarOpen && <span className="ml-2">Déconnexion</span>}
+            </Button>
           </div>
         </div>
       </SidebarContent>
@@ -117,4 +114,3 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 };
 
 export default AdminSidebar;
-
