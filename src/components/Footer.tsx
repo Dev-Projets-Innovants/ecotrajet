@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,7 +11,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <div className="flex items-center space-x-2 text-eco-green mb-4">
-              <Leaf className="h-5 w-5" />
+              <img 
+                src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+                alt="ÉcoTrajet Logo" 
+                className="h-8 w-8" 
+              />
               <span className="text-lg font-semibold">ÉcoTrajet</span>
             </div>
             <p className="text-sm text-gray-500 mb-6">

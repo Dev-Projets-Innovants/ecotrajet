@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -5,7 +6,6 @@ import {
   LogOut, 
   Moon, 
   Sun,
-  Leaf,
   Home
 } from "lucide-react";
 import { 
@@ -47,7 +47,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Logo et titre */}
         <div className="flex items-center justify-between h-16 px-3.5">
           <div className="flex items-center">
-            <Leaf className="h-6 w-6 text-eco-green" />
+            <img 
+              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              alt="ÉcoTrajet Logo" 
+              className="h-8 w-8 text-eco-green" 
+            />
             {sidebarOpen && (
               <span className="ml-2 font-semibold text-lg">ÉcoTrajet Admin</span>
             )}

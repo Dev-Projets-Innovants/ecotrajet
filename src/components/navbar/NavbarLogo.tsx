@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavbarLogoProps {
@@ -13,7 +12,11 @@ const NavbarLogo = ({ textColorClass = "text-eco-green" }: NavbarLogoProps) => {
   
   return (
     <Link to="/" className={`flex items-center space-x-2 ${textColorClass}`}>
-      <Leaf className="h-5 w-5 md:h-6 md:w-6 transition-transform duration-500 hover:rotate-12" />
+      <img 
+        src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+        alt="ÉcoTrajet Logo" 
+        className="h-8 w-8 md:h-10 md:w-10 transition-transform duration-500 hover:rotate-12" 
+      />
       <span className={`text-lg md:text-xl font-semibold tracking-tight ${isMobile ? 'max-w-24 truncate' : ''}`}>ÉcoTrajet</span>
     </Link>
   );
