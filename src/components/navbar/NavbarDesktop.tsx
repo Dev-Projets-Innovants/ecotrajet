@@ -12,10 +12,11 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator, LogOut } from 'lucide-react';
+import { MapPin, BarChart, BarChart2, Trophy, Users, BookOpen, Calculator, LogOut, Shield } from 'lucide-react';
 
 interface NavbarDesktopProps {
   isAuthenticated: boolean;
+  isAdmin?: boolean;
   handleMapClick: (e: React.MouseEvent) => void;
   handleDashboardClick: (e: React.MouseEvent) => void;
   handleCommunityClick: (e: React.MouseEvent) => void;
@@ -25,11 +26,13 @@ interface NavbarDesktopProps {
   handleTripPlannerClick: (e: React.MouseEvent) => void;
   handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
+  handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
 }
 
 const NavbarDesktop = ({
   isAuthenticated,
+  isAdmin = false,
   handleMapClick,
   handleDashboardClick,
   handleCommunityClick,
@@ -39,6 +42,7 @@ const NavbarDesktop = ({
   handleTripPlannerClick,
   handleStatisticsClick,
   handleChallengesClick,
+  handleAdminDashboardClick,
   handleLogout
 }: NavbarDesktopProps) => {
   return (
@@ -135,6 +139,14 @@ const NavbarDesktop = ({
 
       {isAuthenticated ? (
         <div className="flex items-center space-x-4">
+          {isAdmin && (
+            <NavLink to="/admin/dashboard" onClick={handleAdminDashboardClick}>
+              <Button variant="ghost" className="flex items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                Admin
+              </Button>
+            </NavLink>
+          )}
           <NavLink to="/profile" onClick={handleProfileClick}>
             <Button variant="ghost">Profil</Button>
           </NavLink>

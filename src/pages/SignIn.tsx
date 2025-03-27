@@ -55,6 +55,8 @@ const SignIn = () => {
     
     // Set authentication state in localStorage
     localStorage.setItem('isAuthenticated', 'true');
+    // Store the user email to identify admin later
+    localStorage.setItem('userEmail', data.email);
     
     // If admin user, redirect to admin dashboard
     if (isAdmin) {

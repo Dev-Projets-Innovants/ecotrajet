@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell } from 'lucide-react';
+import { Bell, Shield } from 'lucide-react';
 import { useNavbar } from '@/hooks/useNavbar';
 import NavbarLogo from './navbar/NavbarLogo';
 import NavbarDesktop from './navbar/NavbarDesktop';
@@ -9,6 +9,7 @@ import NavbarMobile from './navbar/NavbarMobile';
 import UserAuthDialog from './auth/UserAuthDialog';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
+import { ADMIN_CREDENTIALS } from '@/pages/SignIn';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -17,6 +18,12 @@ const Navbar = () => {
   // For now, we'll use localStorage to simulate auth state
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
+  // Check if the current user is an admin based on the email in localStorage
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const userEmail = localStorage.getItem('userEmail');
+    return userEmail === ADMIN_CREDENTIALS.email;
   });
 
   const {
@@ -37,10 +44,17 @@ const Navbar = () => {
     handleChallengesClick
   } = useNavbar(isAuthenticated);
 
+  // Function to handle navigation to admin dashboard
+  const handleAdminDashboardClick = () => {
+    navigate('/admin/dashboard');
+  };
+
   // Function to handle user logout
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userEmail');
     setIsAuthenticated(false);
+    setIsAdmin(false);
     navigate('/');
     toast({
       title: "Déconnexion réussie",
@@ -61,6 +75,7 @@ const Navbar = () => {
 
             <NavbarDesktop 
               isAuthenticated={isAuthenticated}
+              isAdmin={isAdmin}
               handleMapClick={handleMapClick}
               handleDashboardClick={handleDashboardClick}
               handleCommunityClick={handleCommunityClick}
@@ -70,6 +85,7 @@ const Navbar = () => {
               handleTripPlannerClick={handleTripPlannerClick}
               handleStatisticsClick={handleStatisticsClick}
               handleChallengesClick={handleChallengesClick}
+              handleAdminDashboardClick={handleAdminDashboardClick}
               handleLogout={handleLogout}
             />
 
@@ -92,6 +108,7 @@ const Navbar = () => {
                 mobileMenuOpen={mobileMenuOpen}
                 toggleMobileMenu={toggleMobileMenu}
                 isAuthenticated={isAuthenticated}
+                isAdmin={isAdmin}
                 handleMapClick={handleMapClick}
                 handleDashboardClick={handleDashboardClick}
                 handleCommunityClick={handleCommunityClick}
@@ -101,6 +118,7 @@ const Navbar = () => {
                 handleTripPlannerClick={handleTripPlannerClick}
                 handleStatisticsClick={handleStatisticsClick}
                 handleChallengesClick={handleChallengesClick}
+                handleAdminDashboardClick={handleAdminDashboardClick}
                 handleLogout={handleLogout}
               />
             </div>

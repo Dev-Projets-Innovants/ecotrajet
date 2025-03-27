@@ -6,13 +6,14 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { 
   X, Menu, MapPin, BarChart, Users, Trophy, BarChart2, 
-  Calculator, BookOpen, LogOut, UserCircle, Bell
+  Calculator, BookOpen, LogOut, UserCircle, Bell, Shield
 } from 'lucide-react';
 
 interface NavbarMobileProps {
   mobileMenuOpen: boolean;
   toggleMobileMenu: () => void;
   isAuthenticated: boolean;
+  isAdmin?: boolean;
   handleMapClick: (e: React.MouseEvent) => void;
   handleDashboardClick: (e: React.MouseEvent) => void;
   handleCommunityClick: (e: React.MouseEvent) => void;
@@ -22,6 +23,7 @@ interface NavbarMobileProps {
   handleTripPlannerClick: (e: React.MouseEvent) => void;
   handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
+  handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
 }
 
@@ -29,6 +31,7 @@ const NavbarMobile = ({
   mobileMenuOpen,
   toggleMobileMenu,
   isAuthenticated,
+  isAdmin = false,
   handleMapClick,
   handleDashboardClick,
   handleCommunityClick,
@@ -38,6 +41,7 @@ const NavbarMobile = ({
   handleTripPlannerClick,
   handleStatisticsClick,
   handleChallengesClick,
+  handleAdminDashboardClick,
   handleLogout
 }: NavbarMobileProps) => {
   return (
@@ -147,6 +151,17 @@ const NavbarMobile = ({
             <div className="mt-auto p-4 border-t border-gray-100">
               {isAuthenticated ? (
                 <div className="space-y-3">
+                  {isAdmin && (
+                    <MobileNavItem 
+                      href="/admin/dashboard" 
+                      icon={<Shield className="h-5 w-5 text-red-500" />}
+                      label="Tableau de bord admin" 
+                      onClick={() => { 
+                        handleAdminDashboardClick?.(); 
+                        toggleMobileMenu(); 
+                      }}
+                    />
+                  )}
                   <MobileNavItem 
                     href="/profile" 
                     icon={<UserCircle className="h-5 w-5 text-eco-green" />}
