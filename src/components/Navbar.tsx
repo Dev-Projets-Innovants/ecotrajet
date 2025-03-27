@@ -39,7 +39,6 @@ const Navbar = () => {
     handleCommunityClick,
     handleMapClick,
     handleDashboardClick,
-    handleTripPlannerClick,
     handleStatisticsClick,
     handleChallengesClick
   } = useNavbar(isAuthenticated);
@@ -82,8 +81,6 @@ const Navbar = () => {
               handleRewardsClick={handleRewardsClick}
               handleProfileClick={handleProfileClick}
               handleNotificationsClick={handleNotificationsClick}
-              handleTripPlannerClick={handleTripPlannerClick}
-              handleStatisticsClick={handleStatisticsClick}
               handleChallengesClick={handleChallengesClick}
               handleAdminDashboardClick={handleAdminDashboardClick}
               handleLogout={handleLogout}
@@ -115,8 +112,6 @@ const Navbar = () => {
                 handleRewardsClick={handleRewardsClick}
                 handleProfileClick={handleProfileClick}
                 handleNotificationsClick={handleNotificationsClick}
-                handleTripPlannerClick={handleTripPlannerClick}
-                handleStatisticsClick={handleStatisticsClick}
                 handleChallengesClick={handleChallengesClick}
                 handleAdminDashboardClick={handleAdminDashboardClick}
                 handleLogout={handleLogout}

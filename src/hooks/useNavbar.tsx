@@ -86,13 +86,6 @@ export const useNavbar = (isAuthenticated: boolean) => {
     }
   };
 
-  const handleTripPlannerClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      handleProtectedAction("le planificateur d'itinéraires");
-    }
-  };
-
   const handleStatisticsClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
       e.preventDefault();
@@ -121,7 +114,6 @@ export const useNavbar = (isAuthenticated: boolean) => {
     handleCommunityClick,
     handleMapClick,
     handleDashboardClick,
-    handleTripPlannerClick,
     handleStatisticsClick,
     handleChallengesClick
   };

@@ -23,8 +23,6 @@ interface NavbarDesktopProps {
   handleRewardsClick: (e: React.MouseEvent) => void;
   handleProfileClick: (e: React.MouseEvent) => void;
   handleNotificationsClick: (e: React.MouseEvent) => void;
-  handleTripPlannerClick: (e: React.MouseEvent) => void;
-  handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
   handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
@@ -39,8 +37,6 @@ const NavbarDesktop = ({
   handleRewardsClick,
   handleProfileClick,
   handleNotificationsClick,
-  handleTripPlannerClick,
-  handleStatisticsClick,
   handleChallengesClick,
   handleAdminDashboardClick,
   handleLogout
@@ -60,14 +56,6 @@ const NavbarDesktop = ({
                   icon={<MapPin className="h-4 w-4 mr-2 text-eco-green" />}
                 >
                   Explorez les options de mobilité écologique sur notre carte interactive.
-                </ListItem>
-                <ListItem 
-                  href="/trip-planner" 
-                  title="Planificateur d'itinéraires" 
-                  onClick={handleTripPlannerClick}
-                  icon={<MapPin className="h-4 w-4 mr-2 text-eco-blue" />}
-                >
-                  Trouvez les meilleurs itinéraires écologiques pour vos déplacements.
                 </ListItem>
                 <ListItem 
                   href="/dashboard" 

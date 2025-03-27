@@ -20,8 +20,6 @@ interface NavbarMobileProps {
   handleRewardsClick: (e: React.MouseEvent) => void;
   handleProfileClick: (e: React.MouseEvent) => void;
   handleNotificationsClick: (e: React.MouseEvent) => void;
-  handleTripPlannerClick: (e: React.MouseEvent) => void;
-  handleStatisticsClick: (e: React.MouseEvent) => void;
   handleChallengesClick: (e: React.MouseEvent) => void;
   handleAdminDashboardClick?: () => void;
   handleLogout: () => void;
@@ -38,8 +36,6 @@ const NavbarMobile = ({
   handleRewardsClick,
   handleProfileClick,
   handleNotificationsClick,
-  handleTripPlannerClick,
-  handleStatisticsClick,
   handleChallengesClick,
   handleAdminDashboardClick,
   handleLogout
@@ -70,15 +66,6 @@ const NavbarMobile = ({
                   label="Carte interactive" 
                   onClick={(e) => { 
                     handleMapClick(e); 
-                    toggleMobileMenu(); 
-                  }}
-                />
-                <MobileNavItem 
-                  href="/trip-planner" 
-                  icon={<MapPin className="h-5 w-5 text-eco-blue" />} 
-                  label="Planificateur d'itinéraires" 
-                  onClick={(e) => { 
-                    handleTripPlannerClick(e); 
                     toggleMobileMenu(); 
                   }}
                 />

@@ -44,7 +44,6 @@ import Notifications from "./pages/Notifications";
 import MapView from "./pages/MapView";
 
 // Pages d'information légale et des fonctionnalités principales
-import TripPlanner from "./pages/TripPlanner";
 import Challenges from "./pages/Challenges";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -88,7 +87,6 @@ function App() {
               <Route path="/map" element={<MapView />} />
               
               {/* Routes pour les fonctionnalités principales */}
-              <Route path="/trip-planner" element={<TripPlanner />} />
               <Route path="/challenges" element={<Challenges />} />
               
               {/* Pages d'information légale */}
