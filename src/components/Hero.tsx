@@ -1,23 +1,13 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown, Bike, Bus, Car, TramFront } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
-  
-  useEffect(() => {
-    // Autoplay vidéo quand le composant est monté
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.log("Lecture automatique de la vidéo impossible:", error);
-      });
-    }
-  }, []);
 
   const scrollToContent = () => {
     const contentSection = document.getElementById('features');
@@ -28,21 +18,95 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center pt-16 pb-20 overflow-hidden">
-      {/* Vidéo en arrière-plan */}
-      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
-        <div className="absolute inset-0 bg-black/30 z-10"></div>
-        <video
-          ref={videoRef}
-          className="absolute w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/video-poster.jpg"
+      {/* Animated background with sustainable mobility elements */}
+      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden bg-gradient-to-b from-eco-light-blue/10 to-eco-light-green/20">
+        <div className="absolute inset-0 bg-black/10 z-10"></div>
+        
+        {/* Animated mobility icons */}
+        <motion.div 
+          className="absolute top-1/4 left-1/4 text-eco-green opacity-10"
+          animate={{ 
+            x: [0, 100, 0], 
+            y: [0, -50, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear" 
+          }}
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-city-traffic-at-night-9561-large.mp4" type="video/mp4" />
-          Votre navigateur ne prend pas en charge la lecture de vidéos.
-        </video>
+          <Bike size={120} strokeWidth={1} />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute bottom-1/3 right-1/4 text-eco-blue opacity-10"
+          animate={{ 
+            x: [0, -120, 0], 
+            y: [0, 60, 0],
+            rotate: [0, -8, 0]
+          }}
+          transition={{ 
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear",
+            delay: 2
+          }}
+        >
+          <Bus size={150} strokeWidth={1} />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute top-2/3 left-1/3 text-eco-light-green opacity-10"
+          animate={{ 
+            x: [0, 80, 0], 
+            y: [0, 40, 0],
+            rotate: [0, 12, 0]
+          }}
+          transition={{ 
+            duration: 18,
+            repeat: Infinity,
+            ease: "linear",
+            delay: 5
+          }}
+        >
+          <TramFront size={130} strokeWidth={1} />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute top-1/2 right-1/3 text-eco-green opacity-10"
+          animate={{ 
+            x: [0, -60, 0], 
+            y: [0, -70, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{ 
+            duration: 22,
+            repeat: Infinity,
+            ease: "linear",
+            delay: 8
+          }}
+        >
+          <Car size={110} strokeWidth={1} />
+        </motion.div>
+        
+        {/* Eiffel Tower silhouette */}
+        <motion.div 
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-64 h-96 opacity-10"
+          animate={{ 
+            y: [5, 0, 5], 
+            opacity: [0.08, 0.12, 0.08]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut" 
+          }}
+        >
+          <svg viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path fill="currentColor" className="text-eco-dark-green" d="M50,0 L60,100 L70,100 L75,150 L80,150 L85,180 L15,180 L20,150 L25,150 L30,100 L40,100 Z M40,180 L60,180 L58,200 L42,200 Z" />
+          </svg>
+        </motion.div>
       </div>
       
       {/* Overlay gradients animés pour ajouter de la profondeur */}
