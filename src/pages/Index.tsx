@@ -32,20 +32,25 @@ const Index = () => {
      * en cliquant sur les liens d'ancre (#section) avec une animation fluide
      */
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      // Ajoute un écouteur d'événement à chaque lien d'ancre
       anchor.addEventListener('click', function (e) {
-        e.preventDefault();
+        e.preventDefault();  // Empêche le comportement par défaut du navigateur
         
+        // Récupère l'attribut href du lien
         const href = this.getAttribute('href');
-        if (!href) return;
+        if (!href) return;  // Sort si l'attribut href n'existe pas
         
+        // Trouve l'élément cible via son sélecteur
         const targetElement = document.querySelector(href);
-        if (!targetElement) return;
+        if (!targetElement) return;  // Sort si l'élément cible n'existe pas
         
+        // Calcule la position de l'élément par rapport au haut de la page
         const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
         
+        // Effectue le défilement avec animation
         window.scrollTo({
           top: offsetTop,
-          behavior: 'smooth'
+          behavior: 'smooth'  // Animation fluide
         });
       });
     });
@@ -56,13 +61,17 @@ const Index = () => {
      * et ajoute une classe 'visible' pour déclencher des animations CSS
      */
     const animateOnScroll = () => {
+      // Sélectionne tous les éléments avec la classe 'animate-on-scroll'
       const elements = document.querySelectorAll('.animate-on-scroll');
       
+      // Pour chaque élément, vérifie sa position par rapport au viewport
       elements.forEach(element => {
         const elementPosition = element.getBoundingClientRect().top;
         const viewportHeight = window.innerHeight;
         
+        // Si l'élément est suffisamment visible dans le viewport
         if (elementPosition < viewportHeight - 100) {
+          // Ajoute la classe pour déclencher l'animation
           element.classList.add('visible');
         }
       });
@@ -82,14 +91,28 @@ const Index = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Barre de navigation en haut de la page */}
       <Navbar />
+      
+      {/* Contenu principal avec sections */}
       <main className="flex-grow">
+        {/* Section héros avec présentation principale */}
         <Hero />
+        
+        {/* Aperçu de la carte interactive */}
         <MapPlaceholder />
+        
+        {/* Présentation des fonctionnalités */}
         <Features />
+        
+        {/* Aperçu du guide écologique */}
         <GuidePreview />
+        
+        {/* Appel à l'action pour l'inscription */}
         <CallToAction />
       </main>
+      
+      {/* Pied de page avec informations complémentaires */}
       <Footer />
     </div>
   );

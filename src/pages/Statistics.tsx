@@ -36,6 +36,7 @@ const Statistics = () => {
         
         {/* Navigation par onglets pour les différentes périodes */}
         <Tabs defaultValue="overview" className="mb-6">
+          {/* Barre d'onglets responsive */}
           <TabsList className="grid w-full grid-cols-4 md:w-[600px]">
             <TabsTrigger value="overview">Vue générale</TabsTrigger>
             <TabsTrigger value="daily">Quotidien</TabsTrigger>
