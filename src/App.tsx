@@ -1,4 +1,18 @@
 
+/**
+ * Application principale ÉcoTrajet
+ * 
+ * Ce fichier est le point d'entrée de l'application. Il configure:
+ * - Les fournisseurs globaux (QueryClient, TooltipProvider)
+ * - Les composants de notification (Toaster)
+ * - Le routeur et toutes les routes de l'application
+ * 
+ * L'application est divisée en sections principales:
+ * - Pages publiques accessibles sans authentification
+ * - Pages utilisateur nécessitant une authentification
+ * - Pages administrateur avec accès restreint
+ */
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,7 +42,7 @@ import UserProfile from "./pages/UserProfile";
 import Notifications from "./pages/Notifications";
 import MapView from "./pages/MapView";
 
-// New pages
+// Pages d'information légale et des fonctionnalités principales
 import Statistics from "./pages/Statistics";
 import TripPlanner from "./pages/TripPlanner";
 import Challenges from "./pages/Challenges";
@@ -36,20 +50,30 @@ import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
 
+// Initialisation du client React Query pour la gestion des requêtes API et du cache
 const queryClient = new QueryClient();
 
+/**
+ * Composant principal de l'application
+ * Définit la structure globale et le routage
+ */
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        {/* Composants de notification pour les feedbacks utilisateur */}
         <Toaster />
         <Sonner />
+        
         <BrowserRouter>
           <Routes>
+            {/* Routes publiques */}
             <Route path="/" element={<Index />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            
+            {/* Routes utilisateur authentifié */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/guide" element={<Guide />} />
             <Route path="/guide/article/:id" element={<ArticleDetail />} />
@@ -62,15 +86,17 @@ const App = () => {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/map" element={<MapView />} />
             
-            {/* New routes */}
+            {/* Routes pour les fonctionnalités principales */}
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/trip-planner" element={<TripPlanner />} />
             <Route path="/challenges" element={<Challenges />} />
+            
+            {/* Pages d'information légale */}
             <Route path="/terms-of-use" element={<TermsOfUse />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/legal-notice" element={<LegalNotice />} />
             
-            {/* Admin Routes */}
+            {/* Routes d'administration (accès restreint) */}
             <Route path="/admin" element={<AdminSignIn />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
@@ -79,7 +105,7 @@ const App = () => {
             <Route path="/admin/analytics" element={<AdminAnalytics />} />
             <Route path="/admin/notifications" element={<AdminNotifications />} />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Route de fallback pour les chemins inexistants */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

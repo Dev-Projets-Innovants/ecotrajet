@@ -1,13 +1,4 @@
 
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { getVelibStations, VelibStation, startAutoRefresh } from '@/services/velibService';
-import { toast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { Bike, Navigation, MapPin, Search, Layers } from 'lucide-react';
-
 /**
  * Composant Map.tsx
  * 
@@ -22,6 +13,15 @@ import { Bike, Navigation, MapPin, Search, Layers } from 'lucide-react';
  * - Sauvegarde de l'état de la carte (position, zoom)
  * - Rafraîchissement automatique des données en temps réel
  */
+
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { getVelibStations, VelibStation, startAutoRefresh } from '@/services/velibService';
+import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Bike, Navigation, MapPin, Search, Layers } from 'lucide-react';
 
 // Correction pour les icônes Leaflet (problème connu)
 import icon from 'leaflet/dist/images/marker-icon.png';
