@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Leaf, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -95,7 +95,11 @@ const AdminSignIn: React.FC = () => {
         {/* En-tête de page */}
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center text-eco-green mb-2">
-            <Leaf className="h-8 w-8 mr-2" />
+            <img 
+              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              alt="ÉcoTrajet Logo" 
+              className="h-8 w-8 mr-2" 
+            />
             <span className="text-2xl font-bold">ÉcoTrajet</span>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">

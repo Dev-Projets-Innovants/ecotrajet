@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Leaf, LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 
 interface UserAuthDialogProps {
   open: boolean;
@@ -34,7 +34,11 @@ const UserAuthDialog = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-eco-light-green mb-4">
-            <Leaf className="h-6 w-6 text-eco-green" />
+            <img 
+              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              alt="ÉcoTrajet Logo" 
+              className="h-8 w-8" 
+            />
           </div>
           <DialogTitle className="text-center">{title}</DialogTitle>
           <DialogDescription className="text-center">

@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Leaf } from "lucide-react";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -15,7 +14,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
       <div className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-10">
         <div className="absolute top-6 left-6">
           <Link to="/" className="flex items-center space-x-2 text-eco-green">
-            <Leaf className="h-6 w-6 transition-transform duration-500 hover:rotate-12" />
+            <img 
+              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              alt="ÉcoTrajet Logo" 
+              className="h-8 w-8 transition-transform duration-500 hover:rotate-12" 
+            />
             <span className="text-xl font-semibold tracking-tight">ÉcoTrajet</span>
           </Link>
         </div>
