@@ -15,7 +15,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
         <div className="absolute top-6 left-6">
           <Link to="/" className="flex items-center space-x-2 text-eco-green">
             <img 
-              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              src="/logo.svg" 
               alt="ÉcoTrajet Logo" 
               className="h-8 w-8 transition-transform duration-500 hover:rotate-12" 
             />

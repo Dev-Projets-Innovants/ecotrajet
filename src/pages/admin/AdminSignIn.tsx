@@ -96,7 +96,7 @@ const AdminSignIn: React.FC = () => {
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center text-eco-green mb-2">
             <img 
-              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              src="/logo.svg" 
               alt="ÉcoTrajet Logo" 
               className="h-8 w-8 mr-2" 
             />

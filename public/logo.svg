@@ -1,0 +1,12 @@
+
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Circle -->
+  <circle cx="75" cy="75" r="70" fill="#F7F9FA" stroke="#15803D" stroke-width="4"/>
+  
+  <!-- Leaf Symbol -->
+  <path d="M110 53C95 38 75 38 60 53C45 68 45 98 60 113C75 128 110 128 110 53Z" fill="#15803D"/>
+  <path d="M60 113C70 103 75 88 75 73" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Road/Path -->
+  <path d="M38 85C54 85 58 65 75 65C92 65 96 85 112 85" stroke="#15803D" stroke-width="6" stroke-linecap="round"/>
+</svg>

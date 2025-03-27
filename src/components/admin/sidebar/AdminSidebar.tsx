@@ -48,7 +48,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <div className="flex items-center justify-between h-16 px-3.5">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              src="/logo.svg" 
               alt="ÉcoTrajet Logo" 
               className="h-8 w-8 text-eco-green" 
             />

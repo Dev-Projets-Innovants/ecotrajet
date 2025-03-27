@@ -13,7 +13,7 @@ const NavbarLogo = ({ textColorClass = "text-eco-green" }: NavbarLogoProps) => {
   return (
     <Link to="/" className={`flex items-center space-x-2 ${textColorClass}`}>
       <img 
-        src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+        src="/logo.svg" 
         alt="ÉcoTrajet Logo" 
         className="h-8 w-8 md:h-10 md:w-10 transition-transform duration-500 hover:rotate-12" 
       />

@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="flex items-center space-x-2 text-eco-green mb-4">
               <img 
-                src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+                src="/logo.svg" 
                 alt="ÉcoTrajet Logo" 
                 className="h-8 w-8" 
               />

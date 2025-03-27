@@ -35,7 +35,7 @@ const UserAuthDialog = ({
         <DialogHeader>
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-eco-light-green mb-4">
             <img 
-              src="/lovable-uploads/fc091af3-d175-476f-ac30-141c16238a09.png" 
+              src="/logo.svg" 
               alt="ÉcoTrajet Logo" 
               className="h-8 w-8" 
             />
