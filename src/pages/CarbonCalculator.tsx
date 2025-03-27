@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import TripsHistory from '@/components/carbon-calculator/TripsHistory';
 import EmissionsStats from '@/components/carbon-calculator/EmissionsStats';
+import { CalendarIcon } from '@/components/carbon-calculator/CalendarIcon';
 
 // Types pour les trajets
 export type Trip = {
