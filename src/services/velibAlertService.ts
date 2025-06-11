@@ -65,24 +65,30 @@ export async function createUserAlert(
 
     const mockUserId = getCurrentUserId();
 
-    // Pour le moment, on stocke les alertes localement en attendant l'implémentation complète
-    // Dans une vraie application, ces données iraient dans Supabase avec l'authentification appropriée
-    const alert = {
-      id: 'alert-' + Date.now(),
-      user_id: mockUserId,
-      stationcode,
-      alert_type: alertType,
-      threshold,
-      user_email: userEmail,
-      notification_frequency: notificationFrequency,
-      is_active: true,
-      created_at: new Date().toISOString()
-    };
+    // Insérer l'alerte dans Supabase
+    const { data, error } = await supabase
+      .from('user_alerts')
+      .insert({
+        user_id: mockUserId,
+        stationcode,
+        alert_type: alertType,
+        threshold,
+        user_email: userEmail,
+        notification_frequency: notificationFrequency,
+        is_active: true
+      })
+      .select()
+      .single();
 
-    // Stocker temporairement dans localStorage
-    const existingAlerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
-    existingAlerts.push(alert);
-    localStorage.setItem('userAlerts', JSON.stringify(existingAlerts));
+    if (error) {
+      console.error('Error creating alert:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'alerte.",
+        variant: "destructive",
+      });
+      return false;
+    }
 
     toast({
       title: "Alerte créée",
@@ -94,6 +100,11 @@ export async function createUserAlert(
     return true;
   } catch (error) {
     console.error('Unexpected error creating alert:', error);
+    toast({
+      title: "Erreur",
+      description: "Une erreur inattendue s'est produite.",
+      variant: "destructive",
+    });
     return false;
   }
 }
@@ -106,12 +117,21 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
       return [];
     }
 
-    // Récupérer les alertes depuis localStorage pour le moment
-    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
     const currentUserId = getCurrentUserId();
     
-    // Filtrer par utilisateur actuel
-    return alerts.filter((alert: any) => alert.user_id === currentUserId);
+    // Récupérer les alertes depuis Supabase
+    const { data, error } = await supabase
+      .from('user_alerts')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('Error fetching alerts:', error);
+      return [];
+    }
+
+    return data || [];
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
     return [];
@@ -130,14 +150,24 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
       return false;
     }
 
-    // Supprimer de localStorage
-    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
     const currentUserId = getCurrentUserId();
-    const updatedAlerts = alerts.filter((alert: any) => 
-      !(alert.id === alertId && alert.user_id === currentUserId)
-    );
-    
-    localStorage.setItem('userAlerts', JSON.stringify(updatedAlerts));
+
+    // Supprimer l'alerte de Supabase
+    const { error } = await supabase
+      .from('user_alerts')
+      .update({ is_active: false })
+      .eq('id', alertId)
+      .eq('user_id', currentUserId);
+
+    if (error) {
+      console.error('Error deleting alert:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'alerte.",
+        variant: "destructive",
+      });
+      return false;
+    }
 
     toast({
       title: "Alerte supprimée",
@@ -156,9 +186,28 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
  */
 export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
   try {
-    // Pour le moment, retourner un historique vide ou simulé
-    const mockHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-    return mockHistory;
+    if (!isUserAuthenticated()) {
+      return [];
+    }
+
+    const currentUserEmail = localStorage.getItem('userEmail');
+    if (!currentUserEmail) {
+      return [];
+    }
+
+    // Récupérer l'historique depuis Supabase
+    const { data, error } = await supabase
+      .from('alert_notifications_history')
+      .select('*')
+      .eq('email', currentUserEmail)
+      .order('sent_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching notification history:', error);
+      return [];
+    }
+
+    return data || [];
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
