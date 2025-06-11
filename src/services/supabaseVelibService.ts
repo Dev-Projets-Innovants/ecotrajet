@@ -26,11 +26,11 @@ export interface UserAlert {
   stationcode: string;
   alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available';
   threshold: number;
-  is_active: boolean;
-  created_at: string;
-  user_email?: string;
-  notification_frequency?: 'immediate' | 'hourly' | 'daily';
-  last_notification_sent?: string;
+  is_active: boolean | null;
+  created_at: string | null;
+  user_email?: string | null;
+  notification_frequency?: 'immediate' | 'hourly' | 'daily' | null;
+  last_notification_sent?: string | null;
 }
 
 export interface UserFavoriteStation {
@@ -41,14 +41,14 @@ export interface UserFavoriteStation {
 
 export interface AlertNotificationHistory {
   id: string;
-  alert_id: string;
-  sent_at: string;
+  alert_id: string | null;
+  sent_at: string | null;
   email: string;
-  station_name: string;
-  alert_type: string;
-  threshold: number;
-  current_value: number;
-  email_status: 'sent' | 'failed' | 'pending';
+  station_name: string | null;
+  alert_type: string | null;
+  threshold: number | null;
+  current_value: number | null;
+  email_status: 'sent' | 'failed' | 'pending' | null;
 }
 
 /**
@@ -206,7 +206,8 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
 
     return (data || []).map(alert => ({
       ...alert,
-      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available'
+      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available',
+      notification_frequency: alert.notification_frequency as 'immediate' | 'hourly' | 'daily' | null
     }));
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
@@ -254,7 +255,10 @@ export async function getAlertNotificationHistory(): Promise<AlertNotificationHi
       return [];
     }
 
-    return data || [];
+    return (data || []).map(notification => ({
+      ...notification,
+      email_status: notification.email_status as 'sent' | 'failed' | 'pending' | null
+    }));
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
