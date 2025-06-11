@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ interface VelibStationDetailsProps {
 const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [alertThreshold, setAlertThreshold] = useState(1);
-  const [alertType, setAlertType] = useState<'bikes_available' | 'docks_available' | 'ebikes_available'>('bikes_available');
+  const [alertType, setAlertType] = useState<'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes'>('bikes_available');
   const [userEmail, setUserEmail] = useState('');
   const [notificationFrequency, setNotificationFrequency] = useState<'immediate' | 'hourly' | 'daily'>('immediate');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -143,6 +142,7 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
       case 'bikes_available': return 'Vélos disponibles';
       case 'docks_available': return 'Places libres';
       case 'ebikes_available': return 'Vélos électriques';
+      case 'mechanical_bikes': return 'Vélos mécaniques';
       default: return type;
     }
   };
@@ -192,16 +192,9 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
           </div>
         </div>
 
-        {/* Statut de la station */}
-        <div className="flex items-center space-x-2 text-sm">
-          <div className={`w-2 h-2 rounded-full ${station.is_installed ? 'bg-green-500' : 'bg-red-500'}`} />
-          <span>
-            {station.is_installed ? 'Station active' : 'Station hors service'}
-          </span>
-        </div>
-
-        {/* Informations complémentaires */}
+        {/* Informations complémentaires avec vélos mécaniques */}
         <div className="text-xs text-gray-500 space-y-1">
+          <div>Vélos mécaniques: {station.mechanical || 0}</div>
           <div>Capacité totale: {station.capacity} emplacements</div>
           {station.nom_arrondissement_communes && (
             <div>Secteur: {station.nom_arrondissement_communes}</div>
@@ -209,6 +202,14 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
           {station.last_updated && (
             <div>Mis à jour: {new Date(station.last_updated).toLocaleTimeString()}</div>
           )}
+        </div>
+
+        {/* Statut de la station */}
+        <div className="flex items-center space-x-2 text-sm">
+          <div className={`w-2 h-2 rounded-full ${station.is_installed ? 'bg-green-500' : 'bg-red-500'}`} />
+          <span>
+            {station.is_installed ? 'Station active' : 'Station hors service'}
+          </span>
         </div>
 
         {/* Section création d'alerte par email */}
@@ -242,6 +243,7 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="bikes_available">Vélos disponibles</SelectItem>
+                  <SelectItem value="mechanical_bikes">Vélos mécaniques</SelectItem>
                   <SelectItem value="ebikes_available">Vélos électriques</SelectItem>
                   <SelectItem value="docks_available">Places libres</SelectItem>
                 </SelectContent>

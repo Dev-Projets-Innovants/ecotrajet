@@ -83,6 +83,7 @@ const VelibAlerts = () => {
       case 'bikes_available': return 'Vélos disponibles';
       case 'docks_available': return 'Places libres';
       case 'ebikes_available': return 'Vélos électriques';
+      case 'mechanical_bikes': return 'Vélos mécaniques';
       default: return type;
     }
   };
@@ -92,6 +93,7 @@ const VelibAlerts = () => {
       case 'bikes_available': return 'bg-green-100 text-green-800';
       case 'docks_available': return 'bg-blue-100 text-blue-800';
       case 'ebikes_available': return 'bg-purple-100 text-purple-800';
+      case 'mechanical_bikes': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };

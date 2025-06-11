@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
@@ -25,7 +24,7 @@ export interface VelibStationWithAvailability {
 export interface UserAlert {
   id: string;
   stationcode: string;
-  alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available';
+  alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes';
   threshold: number;
   is_active: boolean | null;
   created_at: string | null;
@@ -168,7 +167,7 @@ export async function triggerVelibSync(): Promise<boolean> {
  */
 export async function createUserAlert(
   stationcode: string,
-  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available',
+  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number,
   userEmail?: string,
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
@@ -292,7 +291,7 @@ export async function getAlertNotificationHistory(): Promise<AlertNotificationHi
 export async function sendTestAlert(
   stationcode: string,
   email: string,
-  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available',
+  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number
 ): Promise<boolean> {
   try {
