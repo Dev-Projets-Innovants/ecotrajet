@@ -1,5 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { Resend } from "npm:resend@4.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +24,7 @@ const getAlertTypeLabel = (type: string) => {
     case 'bikes_available': return 'vélos disponibles';
     case 'docks_available': return 'places libres';
     case 'ebikes_available': return 'vélos électriques';
+    case 'mechanical_bikes': return 'vélos mécaniques';
     default: return type;
   }
 };
@@ -70,7 +73,7 @@ const generateEmailHTML = (data: VelibAlertRequest) => {
                   </div>
                   
                   <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://ecotrajet.lovable.app/map" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; display: inline-block;">
+                    <a href="https://ecotrajet.lovable.app/" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; display: inline-block;">
                       📍 Voir sur la carte
                     </a>
                   </div>
@@ -102,72 +105,6 @@ const generateEmailHTML = (data: VelibAlertRequest) => {
   `;
 };
 
-const sendEmailWithGmail = async (to: string, subject: string, html: string) => {
-  const gmailUser = Deno.env.get("GMAIL_USER");
-  const gmailPassword = Deno.env.get("GMAIL_APP_PASSWORD");
-
-  if (!gmailUser || !gmailPassword) {
-    throw new Error("Gmail credentials not configured");
-  }
-
-  // Créer le message email au format MIME
-  const boundary = `boundary_${Date.now()}`;
-  const emailContent = [
-    `From: EcoTrajet <${gmailUser}>`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=utf-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    html,
-    ``,
-    `--${boundary}--`,
-  ].join('\r\n');
-
-  // Encoder en base64
-  const encodedEmail = btoa(emailContent);
-
-  // Authentification avec Gmail SMTP via API REST
-  const auth = btoa(`${gmailUser}:${gmailPassword}`);
-  
-  const response = await fetch('https://smtp.gmail.com:587/send', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      raw: encodedEmail,
-    }),
-  });
-
-  if (!response.ok) {
-    // Fallback: utiliser l'API Gmail directement
-    const gmailApiResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${gmailPassword}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        raw: encodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
-      }),
-    });
-
-    if (!gmailApiResponse.ok) {
-      throw new Error(`Failed to send email: ${response.status} ${response.statusText}`);
-    }
-
-    return await gmailApiResponse.json();
-  }
-
-  return await response.json();
-};
-
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -175,19 +112,52 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const alertData: VelibAlertRequest = await req.json();
-    console.log('Sending Velib alert email via Gmail:', alertData);
+    console.log('Sending Velib alert email:', alertData);
 
-    const emailResponse = await sendEmailWithGmail(
-      alertData.email,
-      `🚲 Alerte Vélib' - ${alertData.stationName}`,
-      generateEmailHTML(alertData)
-    );
+    // Initialiser Resend
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      throw new Error("RESEND_API_KEY not configured");
+    }
 
-    console.log("Alert email sent successfully via Gmail:", emailResponse);
+    const resend = new Resend(resendApiKey);
+
+    // Envoyer l'email avec Resend
+    const emailResponse = await resend.emails.send({
+      from: "EcoTrajet <noreply@ecotrajet.fr>",
+      to: [alertData.email],
+      subject: `🚲 Alerte Vélib' - ${alertData.stationName}`,
+      html: generateEmailHTML(alertData),
+    });
+
+    console.log("Alert email sent successfully:", emailResponse);
+
+    // Initialiser le client Supabase pour logger l'historique
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Logger dans l'historique des notifications
+      await supabase
+        .from('alert_notifications_history')
+        .insert({
+          alert_id: alertData.alertId.startsWith('test-') ? null : alertData.alertId,
+          email: alertData.email,
+          station_name: alertData.stationName,
+          alert_type: alertData.alertType,
+          threshold: alertData.threshold,
+          current_value: alertData.currentValue,
+          email_status: emailResponse.error ? 'failed' : 'sent'
+        });
+
+      console.log("Notification logged to history");
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
-      emailId: emailResponse.id || 'gmail-sent'
+      emailId: emailResponse.data?.id || 'sent'
     }), {
       status: 200,
       headers: {
@@ -196,7 +166,32 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error sending Velib alert email via Gmail:", error);
+    console.error("Error sending Velib alert email:", error);
+    
+    // Logger l'erreur si possible
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const alertData = await req.json();
+        
+        await supabase
+          .from('alert_notifications_history')
+          .insert({
+            email: alertData.email,
+            station_name: alertData.stationName,
+            alert_type: alertData.alertType,
+            threshold: alertData.threshold,
+            current_value: alertData.currentValue,
+            email_status: 'failed'
+          });
+      } catch (logError) {
+        console.error("Failed to log error:", logError);
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: false, 
