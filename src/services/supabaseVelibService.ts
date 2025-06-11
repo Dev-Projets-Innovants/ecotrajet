@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
@@ -29,12 +28,27 @@ export interface UserAlert {
   threshold: number;
   is_active: boolean;
   created_at: string;
+  user_email?: string;
+  notification_frequency?: 'immediate' | 'hourly' | 'daily';
+  last_notification_sent?: string;
 }
 
 export interface UserFavoriteStation {
   id: string;
   stationcode: string;
   created_at: string;
+}
+
+export interface AlertNotificationHistory {
+  id: string;
+  alert_id: string;
+  sent_at: string;
+  email: string;
+  station_name: string;
+  alert_type: string;
+  threshold: number;
+  current_value: number;
+  email_status: 'sent' | 'failed' | 'pending';
 }
 
 /**
@@ -138,7 +152,9 @@ export async function triggerVelibSync(): Promise<boolean> {
 export async function createUserAlert(
   stationcode: string,
   alertType: 'bikes_available' | 'docks_available' | 'ebikes_available',
-  threshold: number
+  threshold: number,
+  userEmail?: string,
+  notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -147,6 +163,8 @@ export async function createUserAlert(
         stationcode,
         alert_type: alertType,
         threshold,
+        user_email: userEmail,
+        notification_frequency: notificationFrequency,
         is_active: true
       });
 
@@ -162,7 +180,9 @@ export async function createUserAlert(
 
     toast({
       title: "Alerte créée",
-      description: "Vous serez notifié quand les conditions seront remplies.",
+      description: userEmail 
+        ? "Vous serez notifié par email quand les conditions seront remplies."
+        : "Alerte créée avec succès.",
     });
     
     return true;
@@ -184,7 +204,6 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
       return [];
     }
 
-    // Cast les types de la base de données vers notre interface
     return (data || []).map(alert => ({
       ...alert,
       alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available'
@@ -215,6 +234,89 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Unexpected error deleting alert:', error);
+    return false;
+  }
+}
+
+/**
+ * Récupère l'historique des notifications pour un utilisateur
+ */
+export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
+  try {
+    const { data, error } = await supabase
+      .from('alert_notifications_history')
+      .select('*')
+      .order('sent_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('Error fetching notification history:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Unexpected error fetching notification history:', error);
+    return [];
+  }
+}
+
+/**
+ * Envoie un email de test pour une alerte
+ */
+export async function sendTestAlert(
+  stationcode: string,
+  email: string,
+  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available',
+  threshold: number
+): Promise<boolean> {
+  try {
+    // Récupérer les informations de la station
+    const { data: stationData, error: stationError } = await supabase
+      .from('velib_stations')
+      .select('name')
+      .eq('stationcode', stationcode)
+      .single();
+
+    if (stationError || !stationData) {
+      toast({
+        title: "Erreur",
+        description: "Station introuvable.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    const { error } = await supabase.functions.invoke('send-velib-alert', {
+      body: {
+        email,
+        stationName: stationData.name,
+        stationCode: stationcode,
+        alertType,
+        threshold,
+        currentValue: threshold + 1, // Valeur de test
+        alertId: 'test-' + Date.now()
+      }
+    });
+
+    if (error) {
+      console.error('Error sending test alert:', error);
+      toast({
+        title: "Erreur d'envoi",
+        description: "Impossible d'envoyer l'email de test.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    toast({
+      title: "Email de test envoyé",
+      description: "Vérifiez votre boîte de réception.",
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Unexpected error sending test alert:', error);
     return false;
   }
 }

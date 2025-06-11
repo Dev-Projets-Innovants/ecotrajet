@@ -4,14 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Bell, Bike, ParkingCircle, Zap, AlertCircle } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Heart, Bell, Bike, ParkingCircle, Zap, AlertCircle, Mail, TestTube } from 'lucide-react';
 import { 
   VelibStationWithAvailability,
   createUserAlert,
   addFavoriteStation,
   removeFavoriteStation,
   getFavoriteStations,
-  subscribeToStationUpdates
+  subscribeToStationUpdates,
+  sendTestAlert
 } from '@/services/supabaseVelibService';
 import { toast } from '@/components/ui/use-toast';
 
@@ -23,25 +25,24 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
   const [isFavorite, setIsFavorite] = useState(false);
   const [alertThreshold, setAlertThreshold] = useState(1);
   const [alertType, setAlertType] = useState<'bikes_available' | 'docks_available' | 'ebikes_available'>('bikes_available');
+  const [userEmail, setUserEmail] = useState('');
+  const [notificationFrequency, setNotificationFrequency] = useState<'immediate' | 'hourly' | 'daily'>('immediate');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   useEffect(() => {
-    // Vérifier l'authentification
     const checkAuth = () => {
       const authenticated = localStorage.getItem('isAuthenticated') === 'true';
       setIsAuthenticated(authenticated);
     };
     checkAuth();
 
-    // Vérifier si la station est en favori
     if (isAuthenticated) {
       checkIfFavorite();
     }
 
-    // S'abonner aux mises à jour en temps réel de cette station
     const subscription = subscribeToStationUpdates(station.stationcode, (payload) => {
       console.log('Station update received:', payload);
-      // Ici on pourrait mettre à jour les données de la station en temps réel
     });
 
     return () => {
@@ -80,19 +81,53 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
   };
 
   const handleCreateAlert = async () => {
-    if (!isAuthenticated) {
+    if (!userEmail.trim()) {
       toast({
-        title: "Connexion requise",
-        description: "Vous devez être connecté pour créer des alertes.",
+        title: "Email requis",
+        description: "Veuillez saisir votre adresse email pour recevoir les notifications.",
         variant: "destructive",
       });
       return;
     }
 
-    const success = await createUserAlert(station.stationcode, alertType, alertThreshold);
+    if (!userEmail.includes('@')) {
+      toast({
+        title: "Email invalide",
+        description: "Veuillez saisir une adresse email valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const success = await createUserAlert(
+      station.stationcode, 
+      alertType, 
+      alertThreshold,
+      userEmail,
+      notificationFrequency
+    );
+    
     if (success) {
-      // Réinitialiser le formulaire
       setAlertThreshold(1);
+      setUserEmail('');
+    }
+  };
+
+  const handleSendTestAlert = async () => {
+    if (!userEmail.trim()) {
+      toast({
+        title: "Email requis",
+        description: "Veuillez saisir votre adresse email pour le test.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingTest(true);
+    try {
+      await sendTestAlert(station.stationcode, userEmail, alertType, alertThreshold);
+    } finally {
+      setIsSendingTest(false);
     }
   };
 
@@ -101,6 +136,24 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
     if (ratio > 0.6) return 'text-green-600';
     if (ratio > 0.3) return 'text-orange-600';
     return 'text-red-600';
+  };
+
+  const getAlertTypeLabel = (type: string) => {
+    switch (type) {
+      case 'bikes_available': return 'Vélos disponibles';
+      case 'docks_available': return 'Places libres';
+      case 'ebikes_available': return 'Vélos électriques';
+      default: return type;
+    }
+  };
+
+  const getFrequencyLabel = (freq: string) => {
+    switch (freq) {
+      case 'immediate': return 'Immédiat';
+      case 'hourly': return 'Toutes les heures';
+      case 'daily': return 'Une fois par jour';
+      default: return freq;
+    }
   };
 
   return (
@@ -158,18 +211,34 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
           )}
         </div>
 
-        {/* Section création d'alerte */}
-        {isAuthenticated && (
-          <div className="border-t pt-4 space-y-3">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium">Créer une alerte</span>
+        {/* Section création d'alerte par email */}
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="h-4 w-4 text-blue-500" />
+            <span className="text-sm font-medium">Alerte par email</span>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="email" className="text-xs text-gray-600">Votre email</Label>
+              <div className="flex items-center space-x-1 mt-1">
+                <Mail className="h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  className="flex-1 text-sm"
+                />
+              </div>
             </div>
             
-            <div className="space-y-2">
+            <div>
+              <Label className="text-xs text-gray-600">Type d'alerte</Label>
               <Select value={alertType} onValueChange={(value: any) => setAlertType(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Type d'alerte" />
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="bikes_available">Vélos disponibles</SelectItem>
@@ -177,26 +246,55 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
                   <SelectItem value="docks_available">Places libres</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <div className="flex items-center space-x-2">
-                <span className="text-sm">Seuil:</span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs text-gray-600">Seuil</Label>
                 <Input
                   type="number"
                   min="1"
                   max="50"
                   value={alertThreshold}
                   onChange={(e) => setAlertThreshold(parseInt(e.target.value) || 1)}
-                  className="w-20"
+                  className="mt-1"
                 />
               </div>
-              
-              <Button onClick={handleCreateAlert} size="sm" className="w-full">
+              <div>
+                <Label className="text-xs text-gray-600">Fréquence</Label>
+                <Select value={notificationFrequency} onValueChange={(value: any) => setNotificationFrequency(value)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="immediate">Immédiat</SelectItem>
+                    <SelectItem value="hourly">Toutes les heures</SelectItem>
+                    <SelectItem value="daily">Une fois par jour</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex space-x-2">
+              <Button onClick={handleCreateAlert} size="sm" className="flex-1">
                 <Bell className="h-4 w-4 mr-2" />
                 Créer l'alerte
               </Button>
+              <Button 
+                onClick={handleSendTestAlert} 
+                disabled={isSendingTest}
+                variant="outline" 
+                size="sm"
+              >
+                <TestTube className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="text-xs text-gray-500 bg-blue-50 p-2 rounded">
+              💡 Vous recevrez un email quand il y aura au moins {alertThreshold} {getAlertTypeLabel(alertType).toLowerCase()} disponible(s).
             </div>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

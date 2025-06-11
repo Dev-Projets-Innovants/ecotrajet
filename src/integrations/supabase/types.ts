@@ -9,14 +9,61 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alert_notifications_history: {
+        Row: {
+          alert_id: string | null
+          alert_type: string | null
+          current_value: number | null
+          email: string
+          email_status: string | null
+          id: string
+          sent_at: string | null
+          station_name: string | null
+          threshold: number | null
+        }
+        Insert: {
+          alert_id?: string | null
+          alert_type?: string | null
+          current_value?: number | null
+          email: string
+          email_status?: string | null
+          id?: string
+          sent_at?: string | null
+          station_name?: string | null
+          threshold?: number | null
+        }
+        Update: {
+          alert_id?: string | null
+          alert_type?: string | null
+          current_value?: number | null
+          email?: string
+          email_status?: string | null
+          id?: string
+          sent_at?: string | null
+          station_name?: string | null
+          threshold?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_notifications_history_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "user_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_alerts: {
         Row: {
           alert_type: string
           created_at: string | null
           id: string
           is_active: boolean | null
+          last_notification_sent: string | null
+          notification_frequency: string | null
           stationcode: string
           threshold: number
+          user_email: string | null
           user_id: string | null
         }
         Insert: {
@@ -24,8 +71,11 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_active?: boolean | null
+          last_notification_sent?: string | null
+          notification_frequency?: string | null
           stationcode: string
           threshold?: number
+          user_email?: string | null
           user_id?: string | null
         }
         Update: {
@@ -33,8 +83,11 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_active?: boolean | null
+          last_notification_sent?: string | null
+          notification_frequency?: string | null
           stationcode?: string
           threshold?: number
+          user_email?: string | null
           user_id?: string | null
         }
         Relationships: [
