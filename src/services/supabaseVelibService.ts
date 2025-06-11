@@ -52,6 +52,22 @@ export interface AlertNotificationHistory {
   email_status: 'sent' | 'failed' | 'pending' | null;
 }
 
+// Helper function to check if user is authenticated using the local storage method
+const isUserAuthenticated = (): boolean => {
+  return localStorage.getItem('isAuthenticated') === 'true';
+};
+
+// Helper function to get a mock user ID for the current session
+const getCurrentUserId = (): string => {
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail) {
+    // Generate a consistent mock user ID based on session
+    return 'mock-user-' + Math.random().toString(36).substring(2, 15);
+  }
+  // Use email as basis for consistent mock user ID
+  return 'user-' + btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+};
+
 /**
  * Récupère toutes les stations avec leur disponibilité la plus récente
  */
@@ -158,10 +174,8 @@ export async function createUserAlert(
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    // Vérifier que l'utilisateur est authentifié avec notre système local
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour créer une alerte.",
@@ -170,27 +184,26 @@ export async function createUserAlert(
       return false;
     }
 
-    const { error } = await supabase
-      .from('user_alerts')
-      .insert({
-        user_id: user.id, // Ajouter l'ID de l'utilisateur authentifié
-        stationcode,
-        alert_type: alertType,
-        threshold,
-        user_email: userEmail,
-        notification_frequency: notificationFrequency,
-        is_active: true
-      });
+    const mockUserId = getCurrentUserId();
 
-    if (error) {
-      console.error('Error creating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    // Pour le moment, on stocke les alertes localement en attendant l'implémentation complète
+    // Dans une vraie application, ces données iraient dans Supabase avec l'authentification appropriée
+    const alert = {
+      id: 'alert-' + Date.now(),
+      user_id: mockUserId,
+      stationcode,
+      alert_type: alertType,
+      threshold,
+      user_email: userEmail,
+      notification_frequency: notificationFrequency,
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
+
+    // Stocker temporairement dans localStorage
+    const existingAlerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    existingAlerts.push(alert);
+    localStorage.setItem('userAlerts', JSON.stringify(existingAlerts));
 
     toast({
       title: "Alerte créée",
@@ -209,29 +222,17 @@ export async function createUserAlert(
 export async function getUserAlerts(): Promise<UserAlert[]> {
   try {
     // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!isUserAuthenticated()) {
+      console.log('User not authenticated via localStorage');
+      return [];
+    }
+
+    // Récupérer les alertes depuis localStorage pour le moment
+    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    const currentUserId = getCurrentUserId();
     
-    if (authError || !user) {
-      console.error('User not authenticated');
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .select('*')
-      .eq('user_id', user.id) // Filtrer par l'ID de l'utilisateur
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching alerts:', error);
-      return [];
-    }
-
-    return (data || []).map(alert => ({
-      ...alert,
-      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available',
-      notification_frequency: alert.notification_frequency as 'immediate' | 'hourly' | 'daily' | null
-    }));
+    // Filtrer par utilisateur actuel
+    return alerts.filter((alert: any) => alert.user_id === currentUserId);
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
     return [];
@@ -241,9 +242,7 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
 export async function deleteUserAlert(alertId: string): Promise<boolean> {
   try {
     // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour supprimer une alerte.",
@@ -252,16 +251,14 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
       return false;
     }
 
-    const { error } = await supabase
-      .from('user_alerts')
-      .delete()
-      .eq('id', alertId)
-      .eq('user_id', user.id); // S'assurer que l'utilisateur ne peut supprimer que ses propres alertes
-
-    if (error) {
-      console.error('Error deleting alert:', error);
-      return false;
-    }
+    // Supprimer de localStorage
+    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    const currentUserId = getCurrentUserId();
+    const updatedAlerts = alerts.filter((alert: any) => 
+      !(alert.id === alertId && alert.user_id === currentUserId)
+    );
+    
+    localStorage.setItem('userAlerts', JSON.stringify(updatedAlerts));
 
     toast({
       title: "Alerte supprimée",
@@ -280,21 +277,9 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
  */
 export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
   try {
-    const { data, error } = await supabase
-      .from('alert_notifications_history')
-      .select('*')
-      .order('sent_at', { ascending: false })
-      .limit(50);
-
-    if (error) {
-      console.error('Error fetching notification history:', error);
-      return [];
-    }
-
-    return (data || []).map(notification => ({
-      ...notification,
-      email_status: notification.email_status as 'sent' | 'failed' | 'pending' | null
-    }));
+    // Pour le moment, retourner un historique vide ou simulé
+    const mockHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+    return mockHistory;
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
@@ -367,9 +352,7 @@ export async function sendTestAlert(
 export async function addFavoriteStation(stationcode: string): Promise<boolean> {
   try {
     // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour ajouter des favoris.",
@@ -378,22 +361,32 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
       return false;
     }
 
-    const { error } = await supabase
-      .from('user_favorite_stations')
-      .insert({ 
-        user_id: user.id, // Ajouter l'ID de l'utilisateur authentifié
-        stationcode 
-      });
+    const currentUserId = getCurrentUserId();
+    const favorite = {
+      id: 'fav-' + Date.now(),
+      user_id: currentUserId,
+      stationcode,
+      created_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error('Error adding favorite:', error);
+    // Stocker dans localStorage
+    const existingFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+    
+    // Vérifier si pas déjà en favoris
+    const alreadyExists = existingFavorites.some((fav: any) => 
+      fav.stationcode === stationcode && fav.user_id === currentUserId
+    );
+
+    if (alreadyExists) {
       toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter cette station aux favoris.",
-        variant: "destructive",
+        title: "Déjà en favoris",
+        description: "Cette station est déjà dans vos favoris.",
       });
-      return false;
+      return true;
     }
+
+    existingFavorites.push(favorite);
+    localStorage.setItem('userFavorites', JSON.stringify(existingFavorites));
 
     toast({
       title: "Favori ajouté",
@@ -410,9 +403,7 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
 export async function removeFavoriteStation(stationcode: string): Promise<boolean> {
   try {
     // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour gérer vos favoris.",
@@ -421,16 +412,13 @@ export async function removeFavoriteStation(stationcode: string): Promise<boolea
       return false;
     }
 
-    const { error } = await supabase
-      .from('user_favorite_stations')
-      .delete()
-      .eq('stationcode', stationcode)
-      .eq('user_id', user.id); // S'assurer que l'utilisateur ne peut supprimer que ses propres favoris
-
-    if (error) {
-      console.error('Error removing favorite:', error);
-      return false;
-    }
+    const currentUserId = getCurrentUserId();
+    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+    const updatedFavorites = favorites.filter((fav: any) => 
+      !(fav.stationcode === stationcode && fav.user_id === currentUserId)
+    );
+    
+    localStorage.setItem('userFavorites', JSON.stringify(updatedFavorites));
 
     toast({
       title: "Favori supprimé",
@@ -447,25 +435,16 @@ export async function removeFavoriteStation(stationcode: string): Promise<boolea
 export async function getFavoriteStations(): Promise<UserFavoriteStation[]> {
   try {
     // Vérifier que l'utilisateur est authentifié
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!isUserAuthenticated()) {
+      console.log('User not authenticated via localStorage');
+      return [];
+    }
+
+    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+    const currentUserId = getCurrentUserId();
     
-    if (authError || !user) {
-      console.error('User not authenticated');
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from('user_favorite_stations')
-      .select('*')
-      .eq('user_id', user.id) // Filtrer par l'ID de l'utilisateur
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching favorites:', error);
-      return [];
-    }
-
-    return data || [];
+    // Filtrer par utilisateur actuel
+    return favorites.filter((fav: any) => fav.user_id === currentUserId);
   } catch (error) {
     console.error('Unexpected error fetching favorites:', error);
     return [];
