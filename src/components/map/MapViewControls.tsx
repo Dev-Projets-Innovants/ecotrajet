@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MapControls from './MapControls';
 import RouteForm from './RouteForm';
-import Map from '@/components/Map';
+import SupabaseMap from '@/components/SupabaseMap';
 
 interface MapViewControlsProps {
   onTabChange?: (tab: string) => void;
@@ -25,12 +25,14 @@ const MapViewControls = ({ onTabChange }: MapViewControlsProps) => {
       onValueChange={handleTabChange}
     >
       <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-        <TabsTrigger value="map">Carte</TabsTrigger>
+        <TabsTrigger value="map">Carte Vélib'</TabsTrigger>
         <TabsTrigger value="routes">Itinéraires</TabsTrigger>
       </TabsList>
       
       <TabsContent value="map" className="space-y-4">
-        <MapControls />
+        <div className="bg-white rounded-xl shadow-lg">
+          <SupabaseMap />
+        </div>
       </TabsContent>
       
       <TabsContent value="routes" className="space-y-4">
@@ -44,7 +46,7 @@ const MapViewControls = ({ onTabChange }: MapViewControlsProps) => {
           
           <div className="md:col-span-2">
             <div className="relative rounded-xl overflow-hidden h-[600px]">
-              <Map />
+              <SupabaseMap />
             </div>
           </div>
         </div>
