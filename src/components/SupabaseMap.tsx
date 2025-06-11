@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -6,9 +5,9 @@ import 'leaflet/dist/leaflet.css';
 import { 
   getStationsWithAvailability, 
   triggerVelibSync,
-  VelibStationWithAvailability,
-  subscribeToStationUpdates
-} from '@/services/supabaseVelibService';
+  VelibStationWithAvailability
+} from '@/services/velibStationService';
+import { subscribeToStationUpdates } from '@/services/velibRealtimeService';
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

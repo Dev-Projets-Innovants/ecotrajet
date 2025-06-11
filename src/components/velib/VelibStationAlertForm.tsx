@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Bell, AlertCircle, Mail, TestTube } from 'lucide-react';
-import { createUserAlert, sendTestAlert } from '@/services/supabaseVelibService';
+import { createUserAlert, sendTestAlert } from '@/services/velibAlertService';
 import { toast } from '@/components/ui/use-toast';
 
 interface VelibStationAlertFormProps {

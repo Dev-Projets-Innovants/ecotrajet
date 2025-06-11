@@ -6,10 +6,10 @@ import {
   getUserAlerts, 
   deleteUserAlert, 
   UserAlert,
-  subscribeToUserAlerts,
   getAlertNotificationHistory,
   AlertNotificationHistory
-} from '@/services/supabaseVelibService';
+} from '@/services/velibAlertService';
+import { subscribeToUserAlerts } from '@/services/velibRealtimeService';
 import { toast } from '@/components/ui/use-toast';
 import AlertsHeader from '@/components/velib/alerts/AlertsHeader';
 import AuthRequired from '@/components/velib/alerts/AuthRequired';

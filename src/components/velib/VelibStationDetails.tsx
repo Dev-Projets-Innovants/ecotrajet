@@ -7,7 +7,8 @@ import {
   removeFavoriteStation,
   getFavoriteStations,
   subscribeToStationUpdates
-} from '@/services/supabaseVelibService';
+} from '@/services/velibFavoritesService';
+import { subscribeToStationUpdates as subscribeToUpdates } from '@/services/velibRealtimeService';
 import { toast } from '@/components/ui/use-toast';
 import VelibStationHeader from './VelibStationHeader';
 import VelibStationAvailability from './VelibStationAvailability';
@@ -34,7 +35,7 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
       checkIfFavorite();
     }
 
-    const subscription = subscribeToStationUpdates(station.stationcode, (payload) => {
+    const subscription = subscribeToUpdates(station.stationcode, (payload) => {
       console.log('Station update received:', payload);
     });
 
