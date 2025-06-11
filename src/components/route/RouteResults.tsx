@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Route, formatDuration, formatDistance } from '@/services/routingService';
-import { Clock, MapPin, Navigation, ArrowRight, Bike, AlertTriangle, Info } from 'lucide-react';
+import { Clock, MapPin, Navigation, ArrowUp, ArrowUpRight, ArrowRight, ArrowDownRight, ArrowDown, ArrowDownLeft, ArrowLeft, ArrowUpLeft, Bike, AlertTriangle, Info } from 'lucide-react';
 
 interface RouteResultsProps {
   route: Route | null;
@@ -39,26 +39,26 @@ const RouteResults = ({ route, isLoading, transportMode }: RouteResultsProps) =>
     );
   }
 
-  const getStepIcon = (type: string, index: number) => {
+  const getDirectionIcon = (type: string) => {
     switch (type) {
-      case 'start': return '🚴';
-      case 'arrive': return '🏁';
-      case 'turn-left': return '↰';
-      case 'turn-right': return '↱';
-      case 'continue': return '↑';
-      default: return `${index + 1}`;
+      case 'start': return <ArrowUp className="h-4 w-4 text-eco-green" />;
+      case 'arrive': return <MapPin className="h-4 w-4 text-eco-green" />;
+      case 'turn-left': return <ArrowLeft className="h-4 w-4 text-gray-600" />;
+      case 'turn-right': return <ArrowRight className="h-4 w-4 text-gray-600" />;
+      case 'continue': return <ArrowUp className="h-4 w-4 text-gray-600" />;
+      case 'turn-slight-left': return <ArrowUpLeft className="h-4 w-4 text-gray-600" />;
+      case 'turn-slight-right': return <ArrowUpRight className="h-4 w-4 text-gray-600" />;
+      default: return <ArrowUp className="h-4 w-4 text-gray-600" />;
     }
   };
 
-  const getAccessibilityInstruction = (instruction: string) => {
-    // Ajouter des instructions d'accessibilité plus détaillées
-    const accessibilityMap: { [key: string]: string } = {
-      'Dirigez-vous vers le sud': 'Prenez la direction sud. Attention aux voitures lors du démarrage.',
-      'Continuez tout droit': 'Maintenez votre trajectoire. Restez vigilant aux intersections.',
-      'Vous êtes arrivé à destination': 'Destination atteinte. Pensez à sécuriser votre vélo.'
-    };
-    
-    return accessibilityMap[instruction] || instruction;
+  const simplifyInstruction = (instruction: string, type: string) => {
+    // Simplifier les instructions pour qu'elles soient plus directes
+    if (type === 'start') return 'Départ';
+    if (type === 'arrive') return 'Destination atteinte';
+    if (instruction.includes('Dirigez-vous vers le sud')) return 'Dirigez-vous vers le sud';
+    if (instruction.includes('Continuez tout droit')) return 'Continuez tout droit';
+    return instruction;
   };
 
   return (
@@ -67,104 +67,87 @@ const RouteResults = ({ route, isLoading, transportMode }: RouteResultsProps) =>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bike className="h-5 w-5 text-eco-green" />
-            Itinéraire vélo calculé
+            Itinéraire vélo
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 mb-6">
-            <Badge variant="secondary" className="text-lg bg-eco-green/10 text-eco-green">
-              🚲 Vélo
-            </Badge>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="h-4 w-4" />
-              {formatDuration(route.duration)}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="h-4 w-4" />
-              {formatDistance(route.distance)}
-            </div>
-          </div>
-          
-          {/* Conseils de sécurité */}
-          <Card className="mb-6 border-amber-200 bg-amber-50">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-amber-800 mb-2">Conseils de sécurité</h4>
-                  <ul className="text-sm text-amber-700 space-y-1">
-                    <li>• Portez un casque et des vêtements visibles</li>
-                    <li>• Vérifiez vos freins et votre éclairage</li>
-                    <li>• Respectez le code de la route et les pistes cyclables</li>
-                    <li>• Restez vigilant aux ouvertures de portières</li>
-                  </ul>
+          {/* Résumé global style Google Maps */}
+          <div className="mb-6 p-4 bg-eco-green/5 rounded-lg border border-eco-green/20">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="bg-eco-green/10 text-eco-green">
+                  🚲 Vélo
+                </Badge>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Clock className="h-4 w-4 text-eco-green" />
+                  {formatDuration(route.duration)}
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <MapPin className="h-4 w-4 text-eco-green" />
+                  {formatDistance(route.distance)}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <div className="text-sm text-gray-600 mb-6 p-3 bg-blue-50 rounded-lg">
-            <Info className="h-4 w-4 inline mr-2 text-blue-600" />
-            {route.summary}
+            </div>
+            <p className="text-sm text-gray-600">{route.summary}</p>
           </div>
           
-          {/* Instructions détaillées et accessibles */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-lg flex items-center gap-2">
+          {/* Instructions style Google Maps - liste simple */}
+          <div className="space-y-2 mb-6">
+            <h4 className="font-medium text-lg flex items-center gap-2 mb-4">
               <Navigation className="h-5 w-5 text-eco-green" />
-              Instructions détaillées
+              Instructions
             </h4>
-            {route.steps.map((step, index) => (
-              <Card key={index} className="border-l-4 border-l-eco-green">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-eco-green text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-1">
-                      {getStepIcon(step.type, index)}
+            <div className="space-y-3">
+              {route.steps.map((step, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="flex-shrink-0">
+                    {getDirectionIcon(step.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 text-sm">
+                      {simplifyInstruction(step.instruction, step.type)}
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900 mb-1">
-                        {step.instruction}
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        {getAccessibilityInstruction(step.instruction)}
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {formatDistance(step.distance)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatDuration(step.duration)}
-                        </span>
-                      </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {formatDistance(step.distance)} • {formatDuration(step.duration)}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Navigation vocale */}
-          <Card className="mt-6 bg-eco-green/5 border-eco-green/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-eco-green/10 p-2 rounded-full">
-                  <Info className="h-4 w-4 text-eco-green" />
-                </div>
-                <div>
-                  <h5 className="font-medium text-eco-green">Navigation vocale</h5>
-                  <p className="text-sm text-gray-600">
-                    Activez la fonction de lecture d'écran de votre appareil pour entendre les instructions pendant votre trajet.
-                  </p>
-                </div>
+          {/* Conseils de sécurité - plus discrets */}
+          <details className="mb-6">
+            <summary className="flex items-center gap-2 cursor-pointer text-sm font-medium text-amber-700 hover:text-amber-800">
+              <AlertTriangle className="h-4 w-4" />
+              Conseils de sécurité vélo
+            </summary>
+            <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <ul className="text-sm text-amber-700 space-y-1">
+                <li>• Portez un casque et des vêtements visibles</li>
+                <li>• Vérifiez vos freins et votre éclairage</li>
+                <li>• Respectez le code de la route et les pistes cyclables</li>
+                <li>• Restez vigilant aux ouvertures de portières</li>
+              </ul>
+            </div>
+          </details>
+
+          {/* Navigation vocale - plus compacte */}
+          <div className="p-3 bg-eco-green/5 rounded-lg border border-eco-green/20">
+            <div className="flex items-center gap-2">
+              <Info className="h-4 w-4 text-eco-green flex-shrink-0" />
+              <div>
+                <span className="font-medium text-eco-green text-sm">Navigation vocale : </span>
+                <span className="text-sm text-gray-600">
+                  Activez la lecture d'écran pour entendre les instructions.
+                </span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Impact écologique spécifique au vélo */}
+      {/* Impact écologique - inchangé */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
