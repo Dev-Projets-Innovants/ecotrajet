@@ -184,7 +184,11 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
       return [];
     }
 
-    return data || [];
+    // Cast les types de la base de données vers notre interface
+    return (data || []).map(alert => ({
+      ...alert,
+      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available'
+    }));
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
     return [];

@@ -11,6 +11,7 @@ import {
 } from '@/services/supabaseVelibService';
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Bike, Navigation, RefreshCw } from 'lucide-react';
 import VelibStationDetails from './velib/VelibStationDetails';
 
