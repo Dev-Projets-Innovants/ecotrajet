@@ -1,49 +1,21 @@
 
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { UserAlert, AlertNotificationHistory } from "@/types/alerts";
+import { isUserAuthenticated, getCurrentUserId, getCurrentUserEmail } from "./auth/mockAuthService";
+import { 
+  createAlertInDatabase, 
+  fetchUserAlerts, 
+  deactivateAlert, 
+  fetchNotificationHistory,
+  getStationName 
+} from "./alerts/alertsRepository";
+import { sendAlertEmail } from "./alerts/emailService";
 
-export interface UserAlert {
-  id: string;
-  stationcode: string;
-  alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes';
-  threshold: number;
-  is_active: boolean | null;
-  created_at: string | null;
-  user_email?: string | null;
-  notification_frequency?: 'immediate' | 'hourly' | 'daily' | null;
-  last_notification_sent?: string | null;
-}
-
-export interface AlertNotificationHistory {
-  id: string;
-  alert_id: string | null;
-  sent_at: string | null;
-  email: string;
-  station_name: string | null;
-  alert_type: string | null;
-  threshold: number | null;
-  current_value: number | null;
-  email_status: 'sent' | 'failed' | 'pending' | null;
-}
-
-// Helper function to check if user is authenticated using the local storage method
-const isUserAuthenticated = (): boolean => {
-  return localStorage.getItem('isAuthenticated') === 'true';
-};
-
-// Helper function to get a mock user ID for the current session
-const getCurrentUserId = (): string => {
-  const userEmail = localStorage.getItem('userEmail');
-  if (!userEmail) {
-    // Generate a consistent mock user ID based on session
-    return 'mock-user-' + Math.random().toString(36).substring(2, 15);
-  }
-  // Use email as basis for consistent mock user ID
-  return 'user-' + btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-};
+// Re-export types for backward compatibility
+export type { UserAlert, AlertNotificationHistory };
 
 /**
- * Gestion des alertes utilisateur
+ * Crée une nouvelle alerte utilisateur
  */
 export async function createUserAlert(
   stationcode: string,
@@ -53,7 +25,6 @@ export async function createUserAlert(
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié avec notre système local
     if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
@@ -64,31 +35,7 @@ export async function createUserAlert(
     }
 
     const mockUserId = getCurrentUserId();
-
-    // Insérer l'alerte dans Supabase
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .insert({
-        user_id: mockUserId,
-        stationcode,
-        alert_type: alertType,
-        threshold,
-        user_email: userEmail,
-        notification_frequency: notificationFrequency,
-        is_active: true
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    await createAlertInDatabase(mockUserId, stationcode, alertType, threshold, userEmail, notificationFrequency);
 
     toast({
       title: "Alerte créée",
@@ -99,53 +46,39 @@ export async function createUserAlert(
     
     return true;
   } catch (error) {
-    console.error('Unexpected error creating alert:', error);
+    console.error('Error creating alert:', error);
     toast({
       title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
+      description: "Impossible de créer l'alerte.",
       variant: "destructive",
     });
     return false;
   }
 }
 
+/**
+ * Récupère les alertes de l'utilisateur
+ */
 export async function getUserAlerts(): Promise<UserAlert[]> {
   try {
-    // Vérifier que l'utilisateur est authentifié
     if (!isUserAuthenticated()) {
       console.log('User not authenticated via localStorage');
       return [];
     }
 
     const currentUserId = getCurrentUserId();
-    
-    // Récupérer les alertes depuis Supabase
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .select('*')
-      .eq('user_id', currentUserId)
-      .eq('is_active', true);
-
-    if (error) {
-      console.error('Error fetching alerts:', error);
-      return [];
-    }
-
-    // Type assertion pour convertir les données Supabase vers notre interface
-    return (data || []).map(alert => ({
-      ...alert,
-      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
-      notification_frequency: alert.notification_frequency as 'immediate' | 'hourly' | 'daily' | null
-    })) as UserAlert[];
+    return await fetchUserAlerts(currentUserId);
   } catch (error) {
-    console.error('Unexpected error fetching alerts:', error);
+    console.error('Error fetching alerts:', error);
     return [];
   }
 }
 
+/**
+ * Supprime une alerte utilisateur
+ */
 export async function deleteUserAlert(alertId: string): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié
     if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
@@ -156,23 +89,7 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
     }
 
     const currentUserId = getCurrentUserId();
-
-    // Supprimer l'alerte de Supabase
-    const { error } = await supabase
-      .from('user_alerts')
-      .update({ is_active: false })
-      .eq('id', alertId)
-      .eq('user_id', currentUserId);
-
-    if (error) {
-      console.error('Error deleting alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    await deactivateAlert(alertId, currentUserId);
 
     toast({
       title: "Alerte supprimée",
@@ -181,13 +98,18 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
     
     return true;
   } catch (error) {
-    console.error('Unexpected error deleting alert:', error);
+    console.error('Error deleting alert:', error);
+    toast({
+      title: "Erreur",
+      description: "Impossible de supprimer l'alerte.",
+      variant: "destructive",
+    });
     return false;
   }
 }
 
 /**
- * Récupère l'historique des notifications pour un utilisateur
+ * Récupère l'historique des notifications
  */
 export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
   try {
@@ -195,36 +117,20 @@ export async function getAlertNotificationHistory(): Promise<AlertNotificationHi
       return [];
     }
 
-    const currentUserEmail = localStorage.getItem('userEmail');
+    const currentUserEmail = getCurrentUserEmail();
     if (!currentUserEmail) {
       return [];
     }
 
-    // Récupérer l'historique depuis Supabase
-    const { data, error } = await supabase
-      .from('alert_notifications_history')
-      .select('*')
-      .eq('email', currentUserEmail)
-      .order('sent_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching notification history:', error);
-      return [];
-    }
-
-    // Type assertion pour convertir les données Supabase vers notre interface
-    return (data || []).map(notification => ({
-      ...notification,
-      email_status: notification.email_status as 'sent' | 'failed' | 'pending' | null
-    })) as AlertNotificationHistory[];
+    return await fetchNotificationHistory(currentUserEmail);
   } catch (error) {
-    console.error('Unexpected error fetching notification history:', error);
+    console.error('Error fetching notification history:', error);
     return [];
   }
 }
 
 /**
- * Envoie un email de test pour une alerte
+ * Envoie un email de test
  */
 export async function sendTestAlert(
   stationcode: string,
@@ -233,43 +139,8 @@ export async function sendTestAlert(
   threshold: number
 ): Promise<boolean> {
   try {
-    // Récupérer les informations de la station
-    const { data: stationData, error: stationError } = await supabase
-      .from('velib_stations')
-      .select('name')
-      .eq('stationcode', stationcode)
-      .single();
-
-    if (stationError || !stationData) {
-      toast({
-        title: "Erreur",
-        description: "Station introuvable.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    const { error } = await supabase.functions.invoke('send-velib-alert', {
-      body: {
-        email,
-        stationName: stationData.name,
-        stationCode: stationcode,
-        alertType,
-        threshold,
-        currentValue: threshold + 1, // Valeur de test
-        alertId: 'test-' + Date.now()
-      }
-    });
-
-    if (error) {
-      console.error('Error sending test alert:', error);
-      toast({
-        title: "Erreur d'envoi",
-        description: "Impossible d'envoyer l'email de test.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    const stationName = await getStationName(stationcode);
+    await sendAlertEmail(email, stationName, stationcode, alertType, threshold, threshold + 1, 'test-' + Date.now());
 
     toast({
       title: "Email de test envoyé",
@@ -278,7 +149,12 @@ export async function sendTestAlert(
     
     return true;
   } catch (error) {
-    console.error('Unexpected error sending test alert:', error);
+    console.error('Error sending test alert:', error);
+    toast({
+      title: "Erreur d'envoi",
+      description: "Impossible d'envoyer l'email de test.",
+      variant: "destructive",
+    });
     return false;
   }
 }
