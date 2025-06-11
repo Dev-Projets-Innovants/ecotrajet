@@ -16,7 +16,7 @@ const RouteImpact = ({ route }: RouteImpactProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-2xl mb-2">🌍</div>
             <div className="font-semibold text-green-700">CO₂ économisé</div>
@@ -32,14 +32,6 @@ const RouteImpact = ({ route }: RouteImpactProps) => {
               {Math.round(route.distance * 30)} cal
             </div>
             <div className="text-xs text-orange-600 mt-1">estimation</div>
-          </div>
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl mb-2">💰</div>
-            <div className="font-semibold text-blue-700">Économies</div>
-            <div className="text-blue-600 font-bold">
-              {(route.distance * 0.5).toFixed(1)}€
-            </div>
-            <div className="text-xs text-blue-600 mt-1">vs transport</div>
           </div>
         </div>
       </CardContent>
