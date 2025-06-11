@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
@@ -157,9 +158,22 @@ export async function createUserAlert(
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ): Promise<boolean> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour créer une alerte.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from('user_alerts')
       .insert({
+        user_id: user.id, // Ajouter l'ID de l'utilisateur authentifié
         stationcode,
         alert_type: alertType,
         threshold,
@@ -194,9 +208,18 @@ export async function createUserAlert(
 
 export async function getUserAlerts(): Promise<UserAlert[]> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('User not authenticated');
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('user_alerts')
       .select('*')
+      .eq('user_id', user.id) // Filtrer par l'ID de l'utilisateur
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -217,10 +240,23 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
 
 export async function deleteUserAlert(alertId: string): Promise<boolean> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour supprimer une alerte.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from('user_alerts')
       .delete()
-      .eq('id', alertId);
+      .eq('id', alertId)
+      .eq('user_id', user.id); // S'assurer que l'utilisateur ne peut supprimer que ses propres alertes
 
     if (error) {
       console.error('Error deleting alert:', error);
@@ -330,9 +366,24 @@ export async function sendTestAlert(
  */
 export async function addFavoriteStation(stationcode: string): Promise<boolean> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour ajouter des favoris.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from('user_favorite_stations')
-      .insert({ stationcode });
+      .insert({ 
+        user_id: user.id, // Ajouter l'ID de l'utilisateur authentifié
+        stationcode 
+      });
 
     if (error) {
       console.error('Error adding favorite:', error);
@@ -358,10 +409,23 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
 
 export async function removeFavoriteStation(stationcode: string): Promise<boolean> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour gérer vos favoris.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     const { error } = await supabase
       .from('user_favorite_stations')
       .delete()
-      .eq('stationcode', stationcode);
+      .eq('stationcode', stationcode)
+      .eq('user_id', user.id); // S'assurer que l'utilisateur ne peut supprimer que ses propres favoris
 
     if (error) {
       console.error('Error removing favorite:', error);
@@ -382,9 +446,18 @@ export async function removeFavoriteStation(stationcode: string): Promise<boolea
 
 export async function getFavoriteStations(): Promise<UserFavoriteStation[]> {
   try {
+    // Vérifier que l'utilisateur est authentifié
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('User not authenticated');
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('user_favorite_stations')
       .select('*')
+      .eq('user_id', user.id) // Filtrer par l'ID de l'utilisateur
       .order('created_at', { ascending: false });
 
     if (error) {
