@@ -65,6 +65,7 @@ export type Database = {
           threshold: number
           user_email: string | null
           user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           alert_type: string
@@ -77,6 +78,7 @@ export type Database = {
           threshold?: number
           user_email?: string | null
           user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           alert_type?: string
@@ -89,6 +91,7 @@ export type Database = {
           threshold?: number
           user_email?: string | null
           user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: [
           {

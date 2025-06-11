@@ -4,17 +4,25 @@ export const isUserAuthenticated = (): boolean => {
   return localStorage.getItem('isAuthenticated') === 'true';
 };
 
-export const getCurrentUserId = (): string => {
+export const getCurrentUserIdentifier = (): string => {
   const userEmail = localStorage.getItem('userEmail');
   if (!userEmail) {
-    // Générer un UUID valide pour les utilisateurs sans email
-    return crypto.randomUUID();
+    // Générer un identifiant unique pour les utilisateurs sans email
+    let anonymousId = localStorage.getItem('anonymousUserId');
+    if (!anonymousId) {
+      anonymousId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('anonymousUserId', anonymousId);
+    }
+    return anonymousId;
   }
   
-  // Créer un UUID déterministe basé sur l'email
-  // On utilise une approche simple pour générer un UUID à partir de l'email
-  const emailHash = btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
-  return `550e8400-e29b-41d4-a716-${emailHash.padEnd(12, '0').substring(0, 12)}`;
+  // Utiliser l'email comme identifiant unique
+  return userEmail;
+};
+
+export const getCurrentUserId = (): string => {
+  // Maintenir la compatibilité pour le code existant
+  return getCurrentUserIdentifier();
 };
 
 export const getCurrentUserEmail = (): string | null => {

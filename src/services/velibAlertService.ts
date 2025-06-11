@@ -1,6 +1,7 @@
+
 import { toast } from "@/components/ui/use-toast";
 import { UserAlert, AlertNotificationHistory } from "@/types/alerts";
-import { isUserAuthenticated, getCurrentUserId, getCurrentUserEmail } from "./auth/mockAuthService";
+import { isUserAuthenticated, getCurrentUserIdentifier, getCurrentUserEmail } from "./auth/mockAuthService";
 import { 
   createAlertInDatabase, 
   fetchUserAlerts, 
@@ -33,10 +34,10 @@ export async function createUserAlert(
       return false;
     }
 
-    const mockUserId = getCurrentUserId();
-    console.log('Creating alert for user:', mockUserId);
+    const userIdentifier = getCurrentUserIdentifier();
+    console.log('Creating alert for user identifier:', userIdentifier);
     
-    await createAlertInDatabase(mockUserId, stationcode, alertType, threshold, userEmail, notificationFrequency);
+    await createAlertInDatabase(userIdentifier, stationcode, alertType, threshold, userEmail, notificationFrequency);
 
     toast({
       title: "Alerte créée",
@@ -67,8 +68,8 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
       return [];
     }
 
-    const currentUserId = getCurrentUserId();
-    return await fetchUserAlerts(currentUserId);
+    const userIdentifier = getCurrentUserIdentifier();
+    return await fetchUserAlerts(userIdentifier);
   } catch (error) {
     console.error('Error fetching alerts:', error);
     return [];
@@ -89,8 +90,8 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
       return false;
     }
 
-    const currentUserId = getCurrentUserId();
-    await deactivateAlert(alertId, currentUserId);
+    const userIdentifier = getCurrentUserIdentifier();
+    await deactivateAlert(alertId, userIdentifier);
 
     toast({
       title: "Alerte supprimée",

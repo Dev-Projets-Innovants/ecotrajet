@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserAlert, AlertNotificationHistory } from "@/types/alerts";
 
 export async function createAlertInDatabase(
-  userId: string,
+  userIdentifier: string,
   stationcode: string,
   alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number,
@@ -11,7 +11,7 @@ export async function createAlertInDatabase(
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ) {
   console.log('Creating alert with data:', {
-    userId,
+    userIdentifier,
     stationcode,
     alertType,
     threshold,
@@ -22,7 +22,7 @@ export async function createAlertInDatabase(
   const { data, error } = await supabase
     .from('user_alerts')
     .insert({
-      user_id: userId,
+      user_identifier: userIdentifier,
       stationcode,
       alert_type: alertType,
       threshold,
@@ -42,11 +42,11 @@ export async function createAlertInDatabase(
   return data;
 }
 
-export async function fetchUserAlerts(userId: string): Promise<UserAlert[]> {
+export async function fetchUserAlerts(userIdentifier: string): Promise<UserAlert[]> {
   const { data, error } = await supabase
     .from('user_alerts')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_identifier', userIdentifier)
     .eq('is_active', true);
 
   if (error) {
@@ -67,12 +67,12 @@ export async function fetchUserAlerts(userId: string): Promise<UserAlert[]> {
   }));
 }
 
-export async function deactivateAlert(alertId: string, userId: string) {
+export async function deactivateAlert(alertId: string, userIdentifier: string) {
   const { error } = await supabase
     .from('user_alerts')
     .update({ is_active: false })
     .eq('id', alertId)
-    .eq('user_id', userId);
+    .eq('user_identifier', userIdentifier);
 
   if (error) {
     throw new Error(`Error deleting alert: ${error.message}`);
