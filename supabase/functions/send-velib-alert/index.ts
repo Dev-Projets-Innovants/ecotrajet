@@ -1,8 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -105,6 +102,72 @@ const generateEmailHTML = (data: VelibAlertRequest) => {
   `;
 };
 
+const sendEmailWithGmail = async (to: string, subject: string, html: string) => {
+  const gmailUser = Deno.env.get("GMAIL_USER");
+  const gmailPassword = Deno.env.get("GMAIL_APP_PASSWORD");
+
+  if (!gmailUser || !gmailPassword) {
+    throw new Error("Gmail credentials not configured");
+  }
+
+  // Créer le message email au format MIME
+  const boundary = `boundary_${Date.now()}`;
+  const emailContent = [
+    `From: EcoTrajet <${gmailUser}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    ``,
+    `--${boundary}`,
+    `Content-Type: text/html; charset=utf-8`,
+    `Content-Transfer-Encoding: quoted-printable`,
+    ``,
+    html,
+    ``,
+    `--${boundary}--`,
+  ].join('\r\n');
+
+  // Encoder en base64
+  const encodedEmail = btoa(emailContent);
+
+  // Authentification avec Gmail SMTP via API REST
+  const auth = btoa(`${gmailUser}:${gmailPassword}`);
+  
+  const response = await fetch('https://smtp.gmail.com:587/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      raw: encodedEmail,
+    }),
+  });
+
+  if (!response.ok) {
+    // Fallback: utiliser l'API Gmail directement
+    const gmailApiResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${gmailPassword}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        raw: encodedEmail.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+      }),
+    });
+
+    if (!gmailApiResponse.ok) {
+      throw new Error(`Failed to send email: ${response.status} ${response.statusText}`);
+    }
+
+    return await gmailApiResponse.json();
+  }
+
+  return await response.json();
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -112,20 +175,19 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const alertData: VelibAlertRequest = await req.json();
-    console.log('Sending Velib alert email:', alertData);
+    console.log('Sending Velib alert email via Gmail:', alertData);
 
-    const emailResponse = await resend.emails.send({
-      from: "EcoTrajet <alerts@ecotrajet.fr>",
-      to: [alertData.email],
-      subject: `🚲 Alerte Vélib' - ${alertData.stationName}`,
-      html: generateEmailHTML(alertData),
-    });
+    const emailResponse = await sendEmailWithGmail(
+      alertData.email,
+      `🚲 Alerte Vélib' - ${alertData.stationName}`,
+      generateEmailHTML(alertData)
+    );
 
-    console.log("Alert email sent successfully:", emailResponse);
+    console.log("Alert email sent successfully via Gmail:", emailResponse);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      emailId: emailResponse.data?.id 
+      emailId: emailResponse.id || 'gmail-sent'
     }), {
       status: 200,
       headers: {
@@ -134,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error sending Velib alert email:", error);
+    console.error("Error sending Velib alert email via Gmail:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 
