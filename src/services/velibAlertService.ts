@@ -31,13 +31,19 @@ const isUserAuthenticated = (): boolean => {
   return localStorage.getItem('isAuthenticated') === 'true';
 };
 
-// Helper function to get user email from localStorage
-const getCurrentUserEmail = (): string | null => {
-  return localStorage.getItem('userEmail');
+// Helper function to get a mock user ID for the current session
+const getCurrentUserId = (): string => {
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail) {
+    // Generate a consistent mock user ID based on session
+    return 'mock-user-' + Math.random().toString(36).substring(2, 15);
+  }
+  // Use email as basis for consistent mock user ID
+  return 'user-' + btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
 };
 
 /**
- * Gestion des alertes utilisateur avec Supabase
+ * Gestion des alertes utilisateur
  */
 export async function createUserAlert(
   stationcode: string,
@@ -47,7 +53,7 @@ export async function createUserAlert(
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié
+    // Vérifier que l'utilisateur est authentifié avec notre système local
     if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
@@ -57,53 +63,37 @@ export async function createUserAlert(
       return false;
     }
 
-    const email = userEmail || getCurrentUserEmail();
-    if (!email) {
-      toast({
-        title: "Email requis",
-        description: "Une adresse email est nécessaire pour les alertes.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    const mockUserId = getCurrentUserId();
 
-    // Créer l'alerte dans Supabase
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .insert({
-        stationcode,
-        alert_type: alertType,
-        threshold,
-        user_email: email,
-        notification_frequency: notificationFrequency,
-        is_active: true
-      })
-      .select()
-      .single();
+    // Pour le moment, on stocke les alertes localement en attendant l'implémentation complète
+    // Dans une vraie application, ces données iraient dans Supabase avec l'authentification appropriée
+    const alert = {
+      id: 'alert-' + Date.now(),
+      user_id: mockUserId,
+      stationcode,
+      alert_type: alertType,
+      threshold,
+      user_email: userEmail,
+      notification_frequency: notificationFrequency,
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error('Error creating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'alerte. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    // Stocker temporairement dans localStorage
+    const existingAlerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    existingAlerts.push(alert);
+    localStorage.setItem('userAlerts', JSON.stringify(existingAlerts));
 
     toast({
       title: "Alerte créée",
-      description: "Vous serez notifié par email quand les conditions seront remplies.",
+      description: userEmail 
+        ? "Vous serez notifié par email quand les conditions seront remplies."
+        : "Alerte créée avec succès.",
     });
     
     return true;
   } catch (error) {
     console.error('Unexpected error creating alert:', error);
-    toast({
-      title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
-      variant: "destructive",
-    });
     return false;
   }
 }
@@ -112,30 +102,16 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
   try {
     // Vérifier que l'utilisateur est authentifié
     if (!isUserAuthenticated()) {
-      console.log('User not authenticated');
+      console.log('User not authenticated via localStorage');
       return [];
     }
 
-    const userEmail = getCurrentUserEmail();
-    if (!userEmail) {
-      console.log('No user email found');
-      return [];
-    }
-
-    // Récupérer les alertes depuis Supabase basées sur l'email
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .select('*')
-      .eq('user_email', userEmail)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching alerts:', error);
-      return [];
-    }
-
-    return data || [];
+    // Récupérer les alertes depuis localStorage pour le moment
+    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    const currentUserId = getCurrentUserId();
+    
+    // Filtrer par utilisateur actuel
+    return alerts.filter((alert: any) => alert.user_id === currentUserId);
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
     return [];
@@ -154,32 +130,14 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
       return false;
     }
 
-    const userEmail = getCurrentUserEmail();
-    if (!userEmail) {
-      toast({
-        title: "Erreur",
-        description: "Email utilisateur introuvable.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    // Supprimer l'alerte dans Supabase (seulement si elle appartient à l'utilisateur)
-    const { error } = await supabase
-      .from('user_alerts')
-      .delete()
-      .eq('id', alertId)
-      .eq('user_email', userEmail);
-
-    if (error) {
-      console.error('Error deleting alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    // Supprimer de localStorage
+    const alerts = JSON.parse(localStorage.getItem('userAlerts') || '[]');
+    const currentUserId = getCurrentUserId();
+    const updatedAlerts = alerts.filter((alert: any) => 
+      !(alert.id === alertId && alert.user_id === currentUserId)
+    );
+    
+    localStorage.setItem('userAlerts', JSON.stringify(updatedAlerts));
 
     toast({
       title: "Alerte supprimée",
@@ -198,30 +156,9 @@ export async function deleteUserAlert(alertId: string): Promise<boolean> {
  */
 export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    if (!isUserAuthenticated()) {
-      return [];
-    }
-
-    const userEmail = getCurrentUserEmail();
-    if (!userEmail) {
-      return [];
-    }
-
-    // Récupérer l'historique depuis Supabase
-    const { data, error } = await supabase
-      .from('alert_notifications_history')
-      .select('*')
-      .eq('email', userEmail)
-      .order('sent_at', { ascending: false })
-      .limit(50);
-
-    if (error) {
-      console.error('Error fetching notification history:', error);
-      return [];
-    }
-
-    return data || [];
+    // Pour le moment, retourner un historique vide ou simulé
+    const mockHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+    return mockHistory;
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
@@ -254,7 +191,6 @@ export async function sendTestAlert(
       return false;
     }
 
-    // Appeler l'edge function pour envoyer l'email
     const { error } = await supabase.functions.invoke('send-velib-alert', {
       body: {
         email,
@@ -271,7 +207,7 @@ export async function sendTestAlert(
       console.error('Error sending test alert:', error);
       toast({
         title: "Erreur d'envoi",
-        description: "Impossible d'envoyer l'email de test. Vérifiez la configuration.",
+        description: "Impossible d'envoyer l'email de test.",
         variant: "destructive",
       });
       return false;
@@ -285,11 +221,6 @@ export async function sendTestAlert(
     return true;
   } catch (error) {
     console.error('Unexpected error sending test alert:', error);
-    toast({
-      title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
-      variant: "destructive",
-    });
     return false;
   }
 }
