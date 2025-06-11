@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -14,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Bike, Navigation, RefreshCw } from 'lucide-react';
 import VelibStationDetails from './velib/VelibStationDetails';
+import VelibStationSearch from './velib/VelibStationSearch';
 
 // Configuration des icônes Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -79,6 +79,22 @@ const SaveMapState = () => {
       }));
     }
   });
+  return null;
+};
+
+// Composant pour centrer la carte sur une station
+const MapController = ({ station }: { station: VelibStationWithAvailability | null }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (station) {
+      map.setView([station.coordonnees_geo_lat, station.coordonnees_geo_lon], 16, {
+        animate: true,
+        duration: 1
+      });
+    }
+  }, [station, map]);
+
   return null;
 };
 
@@ -184,6 +200,10 @@ const SupabaseMap = () => {
     }
   };
 
+  const handleStationSelect = (station: VelibStationWithAvailability) => {
+    setSelectedStation(station);
+  };
+
   return (
     <section id="supabase-map" className="py-20 bg-white relative overflow-hidden">
       <div className="container max-w-7xl mx-auto px-4 md:px-6">
@@ -205,6 +225,15 @@ const SupabaseMap = () => {
             <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
             {isSyncing ? 'Synchronisation...' : 'Synchroniser'}
           </Button>
+        </div>
+
+        {/* Barre de recherche */}
+        <div className="mb-6">
+          <VelibStationSearch 
+            stations={stations}
+            onStationSelect={handleStationSelect}
+            selectedStation={selectedStation}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -231,6 +260,9 @@ const SupabaseMap = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     className="map-tiles"
                   />
+                  
+                  {/* Contrôleur de carte pour centrer sur la station sélectionnée */}
+                  <MapController station={selectedStation} />
                   
                   {stations.map((station) => (
                     <Marker 
@@ -296,11 +328,12 @@ const SupabaseMap = () => {
               <VelibStationDetails station={selectedStation} />
             ) : (
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Sélectionnez une station</h3>
+                <h3 className="text-lg font-semibold mb-4">Rechercher ou sélectionner une station</h3>
                 <p className="text-gray-600 mb-4">
-                  Cliquez sur une station sur la carte pour voir ses détails et créer des alertes.
+                  Utilisez la barre de recherche ci-dessus ou cliquez sur une station sur la carte pour voir ses détails et créer des alertes.
                 </p>
                 <div className="space-y-2 text-sm text-gray-500">
+                  <div>• Recherche par nom ou arrondissement</div>
                   <div>• Données en temps réel</div>
                   <div>• Alertes personnalisées</div>
                   <div>• Stations favorites</div>
@@ -316,3 +349,5 @@ const SupabaseMap = () => {
 };
 
 export default SupabaseMap;
+
+</edits_to_apply>
