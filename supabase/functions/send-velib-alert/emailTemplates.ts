@@ -1,5 +1,14 @@
 
-import { VelibAlertRequest } from "../../../src/types/alerts.js";
+// Types locaux pour l'edge function (ne peut pas importer depuis src/)
+interface VelibAlertRequest {
+  email: string;
+  stationName: string;
+  stationCode: string;
+  alertType: string;
+  threshold: number;
+  currentValue: number;
+  alertId: string;
+}
 
 export const getAlertTypeLabel = (type: string): string => {
   switch (type) {
