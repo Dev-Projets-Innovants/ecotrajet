@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, MapPinOff, Route, Bike, Zap, Car, Navigation } from 'lucide-react';
+import { MapPin, MapPinOff, Navigation, Bike } from 'lucide-react';
 import { 
   calculateRoute, 
   GeocodingResult, 
@@ -22,6 +22,13 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
   const [endAddress, setEndAddress] = useState<GeocodingResult | null>(null);
   const [calculatedRoute, setCalculatedRoute] = useState<RouteType | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // Définir automatiquement le mode vélo
+  React.useEffect(() => {
+    if (!selectedTransportType) {
+      setSelectedTransportType("bike");
+    }
+  }, [selectedTransportType, setSelectedTransportType]);
 
   const handleStartAddressSelect = (address: GeocodingResult) => {
     setStartAddress(address);
@@ -49,42 +56,25 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
       return;
     }
 
-    if (!selectedTransportType) {
-      toast({
-        title: "Mode de transport manquant",
-        description: "Veuillez sélectionner un mode de transport.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsCalculating(true);
     try {
       const start: RouteCoordinate = { lat: startAddress.lat, lng: startAddress.lng };
       const end: RouteCoordinate = { lat: endAddress.lat, lng: endAddress.lng };
       
-      // Map transport types to routing profiles
-      const profileMap: { [key: string]: 'driving-car' | 'cycling-regular' | 'foot-walking' } = {
-        walking: 'foot-walking',
-        bike: 'cycling-regular',
-        public: 'foot-walking', // Pour les transports publics, on utilise la marche comme approximation
-        car: 'driving-car'
-      };
-
-      const profile = profileMap[selectedTransportType] || 'foot-walking';
-      const route = await calculateRoute(start, end, { profile });
+      // Utiliser uniquement le profil vélo
+      const route = await calculateRoute(start, end, { profile: 'cycling-regular' });
       
       setCalculatedRoute(route);
       
       toast({
-        title: "Itinéraire calculé",
+        title: "Itinéraire vélo calculé ✅",
         description: `Distance: ${(route.distance / 1000).toFixed(1)} km • Durée: ${Math.ceil(route.duration / 60)} min`,
       });
     } catch (error) {
       console.error('Erreur lors du calcul de l\'itinéraire:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de calculer l'itinéraire. Réessayez plus tard.",
+        description: "Impossible de calculer l'itinéraire vélo. Réessayez plus tard.",
         variant: "destructive",
       });
     } finally {
@@ -95,7 +85,7 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
   return (
     <div className="space-y-4">
       <AddressInput
-        placeholder="Point de départ"
+        placeholder="Point de départ (ex: Place de la République)"
         icon={<MapPin className="h-5 w-5 text-gray-400" />}
         onAddressSelect={handleStartAddressSelect}
         onCurrentLocation={() => {}}
@@ -103,63 +93,45 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
       />
       
       <AddressInput
-        placeholder="Destination"
+        placeholder="Destination (ex: Tour Eiffel)"
         icon={<MapPinOff className="h-5 w-5 text-gray-400" />}
         onAddressSelect={handleEndAddressSelect}
         value={endAddress?.display_name || ''}
       />
       
-      <div className="bg-white p-4 rounded-lg border">
-        <h3 className="font-medium mb-3">Mode de transport</h3>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="bg-white p-4 rounded-lg border border-eco-green/20">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <Bike className="h-6 w-6 text-eco-green" />
+          <h3 className="font-medium text-eco-green">Mode de transport : Vélo</h3>
+        </div>
+        <div className="text-center">
           <Button 
-            variant={selectedTransportType === "walking" ? "default" : "outline"} 
-            className="flex items-center justify-center gap-2"
-            onClick={() => setSelectedTransportType("walking")}
+            variant="default"
+            className="bg-eco-green hover:bg-eco-dark-green text-white px-8 py-2"
+            disabled
           >
-            <Route className="h-4 w-4" />
-            <span>À pied</span>
+            <Bike className="h-4 w-4 mr-2" />
+            <span>Vélo sélectionné</span>
           </Button>
-          <Button 
-            variant={selectedTransportType === "bike" ? "default" : "outline"} 
-            className="flex items-center justify-center gap-2"
-            onClick={() => setSelectedTransportType("bike")}
-          >
-            <Bike className="h-4 w-4" />
-            <span>Vélo</span>
-          </Button>
-          <Button 
-            variant={selectedTransportType === "public" ? "default" : "outline"} 
-            className="flex items-center justify-center gap-2"
-            onClick={() => setSelectedTransportType("public")}
-          >
-            <Zap className="h-4 w-4" />
-            <span>Transport</span>
-          </Button>
-          <Button 
-            variant={selectedTransportType === "car" ? "default" : "outline"} 
-            className="flex items-center justify-center gap-2"
-            onClick={() => setSelectedTransportType("car")}
-          >
-            <Car className="h-4 w-4" />
-            <span>Voiture</span>
-          </Button>
+          <p className="text-xs text-gray-500 mt-2">
+            Mode optimisé pour les trajets écologiques et la santé
+          </p>
         </div>
       </div>
       
       <Button 
-        className="w-full bg-eco-green hover:bg-eco-dark-green"
+        className="w-full bg-eco-green hover:bg-eco-dark-green text-white py-3"
         onClick={handleCalculateRoute}
-        disabled={isCalculating || !startAddress || !endAddress || !selectedTransportType}
+        disabled={isCalculating || !startAddress || !endAddress}
       >
         <Navigation className="h-4 w-4 mr-2" />
-        {isCalculating ? 'Calcul...' : 'Calculer l\'itinéraire'}
+        {isCalculating ? 'Calcul de l\'itinéraire vélo...' : 'Calculer l\'itinéraire vélo'}
       </Button>
       
       <RouteResults 
         route={calculatedRoute}
         isLoading={isCalculating}
-        transportMode={selectedTransportType || 'walking'}
+        transportMode="bike"
       />
     </div>
   );
