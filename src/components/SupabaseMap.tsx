@@ -349,3 +349,5 @@ const SupabaseMap = () => {
 };
 
 export default SupabaseMap;
+
+</edits_to_apply>

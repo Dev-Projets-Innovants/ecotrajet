@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  VelibStationWithAvailability,
+  VelibStationWithAvailability
+} from '@/services/velibStationService';
+import {
   addFavoriteStation,
   removeFavoriteStation,
-  getFavoriteStations,
-  subscribeToStationUpdates
+  getFavoriteStations
 } from '@/services/velibFavoritesService';
-import { subscribeToStationUpdates as subscribeToUpdates } from '@/services/velibRealtimeService';
+import { subscribeToStationUpdates } from '@/services/velibRealtimeService';
 import { toast } from '@/components/ui/use-toast';
 import VelibStationHeader from './VelibStationHeader';
 import VelibStationAvailability from './VelibStationAvailability';
@@ -35,7 +36,7 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
       checkIfFavorite();
     }
 
-    const subscription = subscribeToUpdates(station.stationcode, (payload) => {
+    const subscription = subscribeToStationUpdates(station.stationcode, (payload) => {
       console.log('Station update received:', payload);
     });
 
