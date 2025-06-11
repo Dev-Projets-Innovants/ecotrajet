@@ -46,7 +46,7 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
   };
 
   return (
-    <div className="relative mb-4 z-50">
+    <div className="relative mb-4" style={{ zIndex: 10000 }}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
@@ -59,7 +59,10 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
       </div>
 
       {showResults && filteredStations.length > 0 && (
-        <Card className="absolute top-full left-0 right-0 z-[9999] mt-1 max-h-96 overflow-y-auto shadow-xl border border-gray-200 bg-white">
+        <Card 
+          className="absolute top-full left-0 right-0 mt-1 max-h-96 overflow-y-auto shadow-xl border border-gray-200 bg-white"
+          style={{ zIndex: 10001 }}
+        >
           <CardContent className="p-0">
             {filteredStations.map((station) => (
               <Button
@@ -120,7 +123,10 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
       )}
 
       {showResults && filteredStations.length === 0 && searchTerm.length >= 2 && (
-        <Card className="absolute top-full left-0 right-0 z-[9999] mt-1 shadow-xl border border-gray-200 bg-white">
+        <Card 
+          className="absolute top-full left-0 right-0 mt-1 shadow-xl border border-gray-200 bg-white"
+          style={{ zIndex: 10001 }}
+        >
           <CardContent className="p-4 text-center text-gray-600">
             <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
             <p className="text-gray-700">Aucune station trouvée pour "{searchTerm}"</p>
