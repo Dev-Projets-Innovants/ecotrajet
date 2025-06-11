@@ -1,4 +1,3 @@
-
 /**
  * Application principale ÉcoTrajet
  * 
@@ -39,6 +38,7 @@ import CarbonCalculator from "./pages/CarbonCalculator";
 import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
 import MapView from "./pages/MapView";
+import VelibAlerts from "./pages/VelibAlerts";
 
 // Pages d'information légale et des fonctionnalités principales
 import Challenges from "./pages/Challenges";
@@ -79,6 +79,7 @@ function App() {
               <Route path="/community" element={<Community />} />
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/map" element={<MapView />} />
+              <Route path="/velib-alerts" element={<VelibAlerts />} />
               
               {/* Routes pour les fonctionnalités principales */}
               <Route path="/challenges" element={<Challenges />} />
