@@ -7,9 +7,14 @@ export const isUserAuthenticated = (): boolean => {
 export const getCurrentUserId = (): string => {
   const userEmail = localStorage.getItem('userEmail');
   if (!userEmail) {
-    return 'mock-user-' + Math.random().toString(36).substring(2, 15);
+    // Générer un UUID valide pour les utilisateurs sans email
+    return crypto.randomUUID();
   }
-  return 'user-' + btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+  
+  // Créer un UUID déterministe basé sur l'email
+  // On utilise une approche simple pour générer un UUID à partir de l'email
+  const emailHash = btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+  return `550e8400-e29b-41d4-a716-${emailHash.padEnd(12, '0').substring(0, 12)}`;
 };
 
 export const getCurrentUserEmail = (): string | null => {

@@ -10,6 +10,15 @@ export async function createAlertInDatabase(
   userEmail?: string,
   notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
 ) {
+  console.log('Creating alert with data:', {
+    userId,
+    stationcode,
+    alertType,
+    threshold,
+    userEmail,
+    notificationFrequency
+  });
+
   const { data, error } = await supabase
     .from('user_alerts')
     .insert({
@@ -25,9 +34,11 @@ export async function createAlertInDatabase(
     .single();
 
   if (error) {
-    throw new Error(`Error creating alert: ${error.message}`);
+    console.error('Database error details:', error);
+    throw new Error(`Error creating alert: ${error.message} (Code: ${error.code})`);
   }
 
+  console.log('Alert created successfully:', data);
   return data;
 }
 

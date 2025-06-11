@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { UserAlert, AlertNotificationHistory } from "@/types/alerts";
 import { isUserAuthenticated, getCurrentUserId, getCurrentUserEmail } from "./auth/mockAuthService";
@@ -35,6 +34,8 @@ export async function createUserAlert(
     }
 
     const mockUserId = getCurrentUserId();
+    console.log('Creating alert for user:', mockUserId);
+    
     await createAlertInDatabase(mockUserId, stationcode, alertType, threshold, userEmail, notificationFrequency);
 
     toast({
@@ -49,7 +50,7 @@ export async function createUserAlert(
     console.error('Error creating alert:', error);
     toast({
       title: "Erreur",
-      description: "Impossible de créer l'alerte.",
+      description: error instanceof Error ? error.message : "Impossible de créer l'alerte.",
       variant: "destructive",
     });
     return false;
