@@ -142,7 +142,9 @@ export async function sendTestAlert(
 ): Promise<boolean> {
   try {
     const stationName = await getStationName(stationcode);
-    await sendAlertEmail(email, stationName, stationcode, alertType, threshold, threshold + 1, 'test-' + Date.now());
+    // Générer un UUID valide pour le test au lieu d'un simple timestamp
+    const testAlertId = crypto.randomUUID();
+    await sendAlertEmail(email, stationName, stationcode, alertType, threshold, threshold + 1, testAlertId);
 
     toast({
       title: "Email de test envoyé",
