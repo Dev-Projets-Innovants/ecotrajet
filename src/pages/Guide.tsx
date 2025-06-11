@@ -13,7 +13,10 @@ import {
   Info,
   Award,
   TrendingUp,
-  PlayCircle
+  PlayCircle,
+  Play,
+  Clock,
+  Users
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -21,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
+import ShareExperienceModal from '@/components/modals/ShareExperienceModal';
 
 // Mock Article Data for linking purposes
 const articles = [
@@ -38,8 +42,45 @@ const articles = [
   },
 ];
 
+// Mock Tutorial Videos Data
+const tutorialVideos = [
+  {
+    id: 1,
+    title: "Comment déverrouiller un Vélib'",
+    description: "Apprenez à déverrouiller facilement un vélo Vélib' avec l'application ou le QR code.",
+    duration: "2:45",
+    views: 1250,
+    thumbnail: "/api/placeholder/300/200"
+  },
+  {
+    id: 2,
+    title: "Planifier son itinéraire écologique",
+    description: "Découvrez comment utiliser ÉcoTrajet pour planifier les trajets les plus verts.",
+    duration: "4:20",
+    views: 980,
+    thumbnail: "/api/placeholder/300/200"
+  },
+  {
+    id: 3,
+    title: "Sécurité à vélo en ville",
+    description: "Les règles essentielles pour rouler en sécurité dans les rues de Paris.",
+    duration: "3:15",
+    views: 2100,
+    thumbnail: "/api/placeholder/300/200"
+  },
+  {
+    id: 4,
+    title: "Entretien de base du vélo",
+    description: "Maintenez votre vélo en parfait état avec ces conseils d'entretien simples.",
+    duration: "5:30",
+    views: 750,
+    thumbnail: "/api/placeholder/300/200"
+  }
+];
+
 const Guide = () => {
   const [activeCategory, setActiveCategory] = useState("getting-started");
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -58,18 +99,21 @@ const Guide = () => {
                 Découvrez comment maximiser votre expérience ÉcoTrajet et contribuer à un avenir plus vert pour Paris.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/guide/tutorials">
-                  <Button className="bg-eco-green hover:bg-eco-dark-green text-white">
-                    Voir les tutoriels
-                    <PlayCircle className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/guide/share-experience">
-                  <Button variant="outline" className="border-eco-green text-eco-green hover:bg-eco-light-green">
-                    Partager votre expérience
-                    <MessageSquare className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <Button 
+                  className="bg-eco-green hover:bg-eco-dark-green text-white"
+                  onClick={() => setActiveCategory("tutorials")}
+                >
+                  Voir les tutoriels
+                  <PlayCircle className="ml-2 h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-eco-green text-eco-green hover:bg-eco-light-green"
+                  onClick={() => setShareModalOpen(true)}
+                >
+                  Partager votre expérience
+                  <MessageSquare className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>
@@ -78,7 +122,7 @@ const Guide = () => {
         {/* Categories Grid */}
         <section className="py-12">
           <div className="container max-w-7xl mx-auto px-4 md:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               {/* Category 1: Getting Started */}
               <Card 
                 className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
@@ -97,7 +141,25 @@ const Guide = () => {
                 </CardHeader>
               </Card>
               
-              {/* Category 2: Safety Tips */}
+              {/* Category 2: Tutorials */}
+              <Card 
+                className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
+                  activeCategory === "tutorials" ? "border-eco-green bg-eco-light-green/30" : ""
+                }`}
+                onClick={() => setActiveCategory("tutorials")}
+              >
+                <CardHeader className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 rounded-full bg-eco-light-green">
+                      <PlayCircle className="h-5 w-5 text-eco-green" />
+                    </div>
+                    <CardTitle>Tutoriels</CardTitle>
+                  </div>
+                  <CardDescription>Vidéos explicatives</CardDescription>
+                </CardHeader>
+              </Card>
+              
+              {/* Category 3: Safety Tips */}
               <Card 
                 className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
                   activeCategory === "safety" ? "border-eco-green bg-eco-light-green/30" : ""
@@ -115,7 +177,7 @@ const Guide = () => {
                 </CardHeader>
               </Card>
               
-              {/* Category 3: Maximize Eco Impact */}
+              {/* Category 4: Maximize Eco Impact */}
               <Card 
                 className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
                   activeCategory === "eco-impact" ? "border-eco-green bg-eco-light-green/30" : ""
@@ -133,7 +195,7 @@ const Guide = () => {
                 </CardHeader>
               </Card>
               
-              {/* Category 4: Bike Maintenance */}
+              {/* Category 5: Bike Maintenance */}
               <Card 
                 className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
                   activeCategory === "maintenance" ? "border-eco-green bg-eco-light-green/30" : ""
@@ -160,11 +222,17 @@ const Guide = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="p-6">
                 <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-                  <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8 bg-gray-100 p-1 rounded-lg">
+                  <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-8 bg-gray-100 p-1 rounded-lg">
                     <TabsTrigger value="getting-started" className="data-[state=active]:bg-eco-green data-[state=active]:text-white">
                       <span className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         <span className="hidden md:inline">Premiers pas</span>
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="tutorials" className="data-[state=active]:bg-eco-green data-[state=active]:text-white">
+                      <span className="flex items-center gap-2">
+                        <PlayCircle className="h-4 w-4" />
+                        <span className="hidden md:inline">Tutoriels</span>
                       </span>
                     </TabsTrigger>
                     <TabsTrigger value="safety" className="data-[state=active]:bg-eco-green data-[state=active]:text-white">
@@ -285,6 +353,58 @@ const Guide = () => {
                             </p>
                           </CardContent>
                         </Card>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  {/* NEW: Tutorials Content */}
+                  <TabsContent value="tutorials" className="space-y-8">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-4">Tutoriels vidéo</h2>
+                      <p className="text-gray-600 mb-6">
+                        Apprenez rapidement avec nos tutoriels vidéo étape par étape.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {tutorialVideos.map((video) => (
+                          <Card key={video.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="relative">
+                              <div className="h-48 bg-gradient-to-br from-eco-light-green to-eco-green flex items-center justify-center">
+                                <div className="bg-white/20 rounded-full p-4">
+                                  <Play className="h-8 w-8 text-white" />
+                                </div>
+                              </div>
+                              <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                {video.duration}
+                              </div>
+                            </div>
+                            <CardContent className="p-4">
+                              <h3 className="font-semibold mb-2">{video.title}</h3>
+                              <p className="text-gray-600 text-sm mb-3">{video.description}</p>
+                              <div className="flex items-center justify-between text-sm text-gray-500">
+                                <span className="flex items-center">
+                                  <Users className="h-4 w-4 mr-1" />
+                                  {video.views} vues
+                                </span>
+                                <span className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  {video.duration}
+                                </span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                      
+                      <div className="flex justify-center mt-8">
+                        <Button 
+                          variant="outline" 
+                          className="border-eco-green text-eco-green hover:bg-eco-light-green"
+                          onClick={() => setShareModalOpen(true)}
+                        >
+                          Partager votre expérience
+                          <MessageSquare className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </TabsContent>
@@ -680,6 +800,12 @@ const Guide = () => {
       </main>
       
       <Footer />
+      
+      {/* Share Experience Modal */}
+      <ShareExperienceModal 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen} 
+      />
     </div>
   );
 };

@@ -26,8 +26,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import Guide from "./pages/Guide";
 import ArticleDetail from "./pages/ArticleDetail";
-import TutorialVideos from "./pages/TutorialVideos";
-import ShareExperience from "./pages/ShareExperience";
 import Rewards from "./pages/Rewards";
 import AdminSignIn from "./pages/admin/AdminSignIn";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -40,7 +38,6 @@ import AdminRewards from "./pages/admin/AdminRewards";
 import CarbonCalculator from "./pages/CarbonCalculator";
 import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
-import Notifications from "./pages/Notifications";
 import MapView from "./pages/MapView";
 
 // Pages d'information légale et des fonctionnalités principales
@@ -48,7 +45,6 @@ import Challenges from "./pages/Challenges";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
-import OurStory from "./pages/OurStory";
 
 // Initialisation du client React Query pour la gestion des requêtes API et du cache
 const queryClient = new QueryClient();
@@ -78,13 +74,10 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/guide" element={<Guide />} />
               <Route path="/guide/article/:id" element={<ArticleDetail />} />
-              <Route path="/guide/tutorials" element={<TutorialVideos />} />
-              <Route path="/guide/share-experience" element={<ShareExperience />} />
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/carbon-calculator" element={<CarbonCalculator />} />
               <Route path="/community" element={<Community />} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route path="/notifications" element={<Notifications />} />
               <Route path="/map" element={<MapView />} />
               
               {/* Routes pour les fonctionnalités principales */}
@@ -94,7 +87,6 @@ function App() {
               <Route path="/terms-of-use" element={<TermsOfUse />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/legal-notice" element={<LegalNotice />} />
-              <Route path="/our-story" element={<OurStory />} />
               
               {/* Routes d'administration (accès restreint) */}
               <Route path="/admin" element={<AdminSignIn />} />

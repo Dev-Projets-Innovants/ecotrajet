@@ -7,6 +7,7 @@ import NavbarLogo from './navbar/NavbarLogo';
 import NavbarDesktop from './navbar/NavbarDesktop';
 import NavbarMobile from './navbar/NavbarMobile';
 import UserAuthDialog from './auth/UserAuthDialog';
+import NotificationsSidebar from './notifications/NotificationsSidebar';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 import { ADMIN_CREDENTIALS } from '@/pages/SignIn';
@@ -26,6 +27,8 @@ const Navbar = () => {
     return userEmail === ADMIN_CREDENTIALS.email;
   });
 
+  const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
+
   const {
     isScrolled,
     mobileMenuOpen,
@@ -34,7 +37,6 @@ const Navbar = () => {
     setAuthDialogOpen,
     toggleMobileMenu,
     handleProfileClick,
-    handleNotificationsClick,
     handleRewardsClick,
     handleCommunityClick,
     handleMapClick,
@@ -46,6 +48,16 @@ const Navbar = () => {
   // Function to handle navigation to admin dashboard
   const handleAdminDashboardClick = () => {
     navigate('/admin/dashboard');
+  };
+
+  // Function to handle notifications click
+  const handleNotificationsClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setAuthDialogOpen(true);
+      return;
+    }
+    setNotificationsSidebarOpen(true);
   };
 
   // Function to handle user logout
@@ -96,7 +108,7 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => navigate('/notifications')}
+                  onClick={handleNotificationsClick}
                   className={`relative ${textColorClass}`}
                 >
                   <Bell className="h-5 w-5" />
@@ -132,6 +144,11 @@ const Navbar = () => {
         onOpenChange={setAuthDialogOpen}
         title={authDialogConfig.title}
         description={authDialogConfig.description}
+      />
+
+      <NotificationsSidebar 
+        open={notificationsSidebarOpen}
+        onOpenChange={setNotificationsSidebarOpen}
       />
     </>
   );
