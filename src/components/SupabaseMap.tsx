@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -349,5 +350,3 @@ const SupabaseMap = () => {
 };
 
 export default SupabaseMap;
-
-</edits_to_apply>
