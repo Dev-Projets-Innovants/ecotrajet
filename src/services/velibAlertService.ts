@@ -131,7 +131,12 @@ export async function getUserAlerts(): Promise<UserAlert[]> {
       return [];
     }
 
-    return data || [];
+    // Type assertion pour convertir les données Supabase vers notre interface
+    return (data || []).map(alert => ({
+      ...alert,
+      alert_type: alert.alert_type as 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
+      notification_frequency: alert.notification_frequency as 'immediate' | 'hourly' | 'daily' | null
+    })) as UserAlert[];
   } catch (error) {
     console.error('Unexpected error fetching alerts:', error);
     return [];
@@ -207,7 +212,11 @@ export async function getAlertNotificationHistory(): Promise<AlertNotificationHi
       return [];
     }
 
-    return data || [];
+    // Type assertion pour convertir les données Supabase vers notre interface
+    return (data || []).map(notification => ({
+      ...notification,
+      email_status: notification.email_status as 'sent' | 'failed' | 'pending' | null
+    })) as AlertNotificationHistory[];
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
