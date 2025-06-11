@@ -65,7 +65,7 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
               <Button
                 key={station.stationcode}
                 variant="ghost"
-                className="w-full p-4 justify-start text-left h-auto hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                className="w-full p-4 justify-start text-left h-auto hover:bg-gray-50 border-b border-gray-100 last:border-b-0 text-gray-900"
                 onClick={() => handleStationClick(station)}
               >
                 <div className="flex items-start w-full space-x-3">
@@ -77,7 +77,7 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
                     </div>
                     
                     {station.nom_arrondissement_communes && (
-                      <div className="text-xs text-gray-500 mb-2">
+                      <div className="text-xs text-gray-600 mb-2">
                         {station.nom_arrondissement_communes}
                       </div>
                     )}
@@ -92,21 +92,21 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
                       
                       <div className="flex items-center space-x-1">
                         <div className="w-2 h-2 rounded-full bg-eco-blue"></div>
-                        <span className="text-gray-600">
+                        <span className="text-gray-700">
                           {station.ebike || 0} électriques
                         </span>
                       </div>
                       
                       <div className="flex items-center space-x-1">
                         <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                        <span className="text-gray-600">
+                        <span className="text-gray-700">
                           {station.numdocksavailable || 0} places
                         </span>
                       </div>
                     </div>
                     
                     {station.last_updated && (
-                      <div className="flex items-center space-x-1 text-xs text-gray-400 mt-1">
+                      <div className="flex items-center space-x-1 text-xs text-gray-500 mt-1">
                         <Clock className="h-3 w-3" />
                         <span>MAJ: {new Date(station.last_updated).toLocaleTimeString()}</span>
                       </div>
@@ -121,10 +121,10 @@ const VelibStationSearch = ({ stations, onStationSelect, selectedStation }: Veli
 
       {showResults && filteredStations.length === 0 && searchTerm.length >= 2 && (
         <Card className="absolute top-full left-0 right-0 z-[9999] mt-1 shadow-xl border border-gray-200 bg-white">
-          <CardContent className="p-4 text-center text-gray-500">
-            <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-            <p>Aucune station trouvée pour "{searchTerm}"</p>
-            <p className="text-xs mt-1">Essayez avec un nom de rue, quartier ou arrondissement</p>
+          <CardContent className="p-4 text-center text-gray-600">
+            <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-gray-700">Aucune station trouvée pour "{searchTerm}"</p>
+            <p className="text-xs mt-1 text-gray-600">Essayez avec un nom de rue, quartier ou arrondissement</p>
           </CardContent>
         </Card>
       )}
