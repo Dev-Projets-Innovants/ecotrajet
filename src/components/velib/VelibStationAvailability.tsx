@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bike, ParkingCircle, Zap } from 'lucide-react';
+import { Bike, ParkingCircle, Zap, Wrench } from 'lucide-react';
 
 interface VelibStationAvailabilityProps {
   numbikesavailable: number;
@@ -15,6 +15,8 @@ const VelibStationAvailability: React.FC<VelibStationAvailabilityProps> = ({
   numdocksavailable,
   capacity
 }) => {
+  const mechanical = numbikesavailable - ebike;
+  
   const getStatusColor = (available: number, total: number) => {
     const ratio = available / total;
     if (ratio > 0.6) return 'text-green-600';
@@ -23,7 +25,7 @@ const VelibStationAvailability: React.FC<VelibStationAvailabilityProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-3 text-sm">
+    <div className="grid grid-cols-2 gap-3 text-sm">
       <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
         <Bike className={`h-5 w-5 mb-1 ${getStatusColor(numbikesavailable || 0, capacity)}`} />
         <span className="font-medium">{numbikesavailable || 0}</span>
@@ -31,15 +33,21 @@ const VelibStationAvailability: React.FC<VelibStationAvailabilityProps> = ({
       </div>
       
       <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
-        <Zap className={`h-5 w-5 mb-1 ${getStatusColor(ebike || 0, numbikesavailable || 0)}`} />
-        <span className="font-medium">{ebike || 0}</span>
-        <span className="text-xs text-gray-500">Électriques</span>
-      </div>
-      
-      <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
         <ParkingCircle className={`h-5 w-5 mb-1 ${getStatusColor(numdocksavailable || 0, capacity)}`} />
         <span className="font-medium">{numdocksavailable || 0}</span>
         <span className="text-xs text-gray-500">Places</span>
+      </div>
+      
+      <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
+        <Wrench className={`h-5 w-5 mb-1 ${getStatusColor(mechanical || 0, numbikesavailable || 0)}`} />
+        <span className="font-medium">{mechanical || 0}</span>
+        <span className="text-xs text-gray-500">Mécaniques</span>
+      </div>
+      
+      <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
+        <Zap className={`h-5 w-5 mb-1 ${getStatusColor(ebike || 0, numbikesavailable || 0)}`} />
+        <span className="font-medium">{ebike || 0}</span>
+        <span className="text-xs text-gray-500">Électriques</span>
       </div>
     </div>
   );
