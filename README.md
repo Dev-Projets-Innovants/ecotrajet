@@ -26,29 +26,13 @@ Ce projet est construit avec un ensemble de technologies modernes:
 - **Leaflet**: Bibliothèque JavaScript pour les cartes interactives
 - **Supabase**: Base de données et authentification backend
 - **Vitest**: Framework de test unitaire moderne et rapide
-- **GitHub Actions**: CI/CD automatisé pour les tests et déploiements
+- **Docker**: Containerisation pour un environnement de développement cohérent
 
 ## Installation et démarrage
 
-### Option 1: Installation locale
+### 🚀 Option 1: Docker (Recommandé pour les équipes)
 
-```sh
-# Étape 1: Clonez le dépôt en utilisant l'URL Git du projet.
-git clone <YOUR_GIT_URL>
-
-# Étape 2: Naviguez vers le répertoire du projet.
-cd <YOUR_PROJECT_NAME>
-
-# Étape 3: Installez les dépendances nécessaires.
-npm i
-
-# Étape 4: Démarrez le serveur de développement avec rechargement automatique.
-npm run dev
-```
-
-### Option 2: Docker (Recommandé pour les équipes)
-
-**Démarrage rapide avec Docker:**
+**Démarrage ultra-rapide:**
 
 ```bash
 # 1. Cloner le projet
@@ -71,128 +55,52 @@ docker-compose --profile dev up --build ecotrajet-dev
 ```
 
 **Avantages Docker:**
-- ✅ **Pas d'installation Node.js** : Docker gère tout
-- ✅ **Environnement identique** : Même version Node, mêmes dépendances
-- ✅ **Démarrage rapide** : 3 commandes maximum
-- ✅ **Isolation** : Pas de conflit avec d'autres projets
+- ✅ **Zéro installation** : Pas besoin de Node.js local
+- ✅ **Environnement identique** : Même configuration pour toute l'équipe
+- ✅ **Démarrage instantané** : 3 commandes seulement
+- ✅ **Gestion automatique** : Fonctionne avec ou sans package-lock.json
+- ✅ **Isolation complète** : Aucun conflit avec d'autres projets
+- ✅ **Hot-reload intégré** : Modifications visibles immédiatement
 
-📋 **Pour plus de détails sur Docker, consultez [docs/docker-setup.md](docs/docker-setup.md)**
+📋 **Documentation Docker complète :** [docker-setup.md](docker-setup.md)
+
+### Option 2: Installation locale (développeurs avancés)
+
+**Prérequis :** Node.js 18+ et npm installés localement
+
+```bash
+# Étape 1: Cloner le dépôt
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
+
+# Étape 2: Installer les dépendances
+npm install
+
+# Étape 3: Configurer l'environnement
+cp .env.example .env
+# Éditer .env avec vos variables Supabase
+
+# Étape 4: Démarrer le serveur de développement
+npm run dev
+```
 
 ### Option 3: GitHub Codespaces
 
-- Accédez à la page principale de votre dépôt.
-- Cliquez sur le bouton "Code" (bouton vert) près du coin supérieur droit.
-- Sélectionnez l'onglet "Codespaces".
-- Cliquez sur "Nouveau codespace" pour lancer un nouvel environnement Codespace.
-
-### Modification directe sur GitHub
-
-- Naviguez vers le(s) fichier(s) souhaité(s).
-- Cliquez sur le bouton "Éditer" (icône de crayon) en haut à droite de la vue du fichier.
-- Apportez vos modifications et validez les changements.
-
-## Scripts disponibles
-
-```sh
-# Démarrer l'application en mode développement
-npm run dev
-
-# Construire l'application pour la production
-npm run build
-
-# Prévisualiser la version de production
-npm run preview
-
-# Lancer les tests unitaires
-npm run test
-
-# Lancer les tests en mode watch
-npm run test:watch
-
-# Générer un rapport de couverture des tests
-npm run test:coverage
-
-# Vérifier la syntaxe avec ESLint
-npm run lint
-
-# Vérifier les types TypeScript
-npm run type-check
-```
-
-## Architecture de l'application
-
-L'application est organisée selon la structure suivante:
-
-- **src/pages**: Contient toutes les pages de l'application
-- **src/components**: Composants réutilisables organisés par fonction
-  - **admin**: Composants spécifiques à l'interface d'administration
-  - **velib**: Composants pour la gestion des stations Vélib'
-  - **ui**: Composants d'interface utilisateur de base (shadcn/ui)
-- **src/hooks**: Hooks personnalisés pour la gestion de l'état et la logique
-- **src/services**: Services pour l'interaction avec les API externes
-- **src/lib**: Fonctions utilitaires et configurations
-- **src/styles**: Styles globaux et configurations de Tailwind CSS
-- **src/tests**: Tests unitaires et utilitaires de test
-- **docs**: Documentation technique et guides
-
-## Fonctionnalités principales
-
-### Interface utilisateur
-1. **Carte interactive**: Affiche les stations Vélib disponibles avec leurs détails
-2. **Planificateur de trajets**: Permet de planifier des itinéraires écologiques
-3. **Calculateur d'empreinte carbone**: Évalue l'impact environnemental des déplacements
-4. **Défis écologiques**: Challenges pour encourager la mobilité durable
-5. **Statistiques personnelles**: Suivi de l'impact environnemental des utilisateurs
-6. **Guide et tutoriels**: Ressources pédagogiques sur la mobilité durable
-
-### Panneau d'administration
-7. **Dashboard en temps réel**: Tableau de bord avec statistiques Vélib' actualisées
-8. **Gestion des utilisateurs**: Administration des comptes utilisateurs
-9. **Gestion du contenu**: Édition des guides et tutoriels
-10. **Système d'alertes**: Notifications automatiques par email
-11. **Analytics avancés**: Graphiques et métriques détaillées
-
-## Tests unitaires
-
-Le projet utilise **Vitest** pour les tests unitaires avec une couverture complète des composants critiques:
-
-### Composants testés
-- `OptimizedStatsCard`: Affichage des statistiques avec états de chargement
-- `DashboardFilters`: Filtres et contrôles du tableau de bord
-- Hook `useOptimizedVelibData`: Gestion des données Vélib' optimisée
-- Service `adminVelibService`: Récupération des données admin
-
-### Configuration des tests
-- **Framework**: Vitest avec environnement jsdom
-- **Mocking**: @testing-library/react pour les composants
-- **Couverture**: Rapports détaillés avec seuils de qualité
-- **CI/CD**: Intégration dans GitHub Actions
-
-Pour plus d'informations sur les tests, consultez `docs/testing-guide.md`.
-
-## CI/CD avec GitHub Actions
-
-Le projet dispose d'un pipeline automatisé qui s'exécute à chaque commit:
-
-### Étapes du workflow
-1. **Linting**: Vérification de la qualité du code avec ESLint
-2. **Type checking**: Validation des types TypeScript
-3. **Tests unitaires**: Exécution de la suite de tests complète
-4. **Build**: Construction de l'application pour la production
-
-### Déclencheurs
-- Push sur toutes les branches
-- Pull requests vers la branche principale
-- Workflow manuel depuis l'interface GitHub
-
-Le workflow est configuré dans `.github/workflows/test.yml` et utilise Node.js 18+ avec mise en cache des dépendances pour des performances optimales.
+- Accédez à la page principale de votre dépôt
+- Cliquez sur le bouton "Code" (bouton vert) 
+- Sélectionnez l'onglet "Codespaces"
+- Cliquez sur "Nouveau codespace"
 
 ## Configuration de l'environnement
 
 ### Variables d'environnement requises
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Configuration Supabase
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=votre_clé_anonyme_supabase
+
+# Environnement
+NODE_ENV=production
 ```
 
 ### Base de données Supabase
@@ -200,26 +108,151 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - Edge Functions pour la synchronisation des données en temps réel
 - Authentification et gestion des sessions utilisateurs
 
-## Documentation
+## Scripts disponibles
 
-- 📋 [Configuration Docker](docs/docker-setup.md) - Guide complet pour Docker
-- 🧪 [Guide des tests](docs/testing-guide.md) - Documentation des tests
-- 🏗️ [Architecture de la base de données](docs/database-architecture.md) - Structure des données
-- 🚀 [Guide CI/CD](docs/ci-cd-guide.md) - Intégration et déploiement continu
+```bash
+# Développement
+npm run dev              # Démarrer en mode développement
+npm run build           # Construire pour la production
+npm run preview         # Prévisualiser la version de production
+
+# Tests et qualité
+npm run test            # Lancer les tests unitaires
+npm run test:watch     # Tests en mode watch
+npm run test:coverage  # Rapport de couverture
+npm run lint           # Vérifier avec ESLint
+npm run type-check     # Vérifier les types TypeScript
+
+# Docker (alternative)
+docker-compose up --build                    # Production
+docker-compose --profile dev up ecotrajet-dev  # Développement
+```
+
+## Architecture de l'application
+
+L'application suit une architecture modulaire et maintenable :
+
+```
+src/
+├── pages/              # Pages de l'application
+├── components/         # Composants réutilisables
+│   ├── admin/         # Interface d'administration
+│   ├── velib/         # Gestion des stations Vélib'
+│   └── ui/            # Composants de base (shadcn/ui)
+├── hooks/             # Hooks personnalisés
+├── services/          # Services API et logique métier
+├── lib/               # Utilitaires et configurations
+├── tests/             # Tests unitaires
+└── docs/              # Documentation technique
+```
+
+## Fonctionnalités principales
+
+### Interface utilisateur
+1. **Carte interactive**: Stations Vélib' avec détails en temps réel
+2. **Planificateur de trajets**: Itinéraires écologiques optimisés
+3. **Calculateur d'empreinte carbone**: Impact environnemental des déplacements
+4. **Défis écologiques**: Gamification de la mobilité durable
+5. **Statistiques personnelles**: Suivi de l'impact individuel
+6. **Guides et tutoriels**: Ressources pédagogiques
+
+### Panneau d'administration
+7. **Dashboard temps réel**: Métriques Vélib' actualisées
+8. **Gestion utilisateurs**: Administration des comptes
+9. **Gestion de contenu**: Édition des guides et ressources
+10. **Système d'alertes**: Notifications automatiques
+11. **Analytics avancés**: Rapports et visualisations
+
+## Tests et qualité
+
+### Framework de test
+- **Vitest** avec environnement jsdom
+- **@testing-library/react** pour les composants
+- **Couverture de code** complète avec rapports
+
+### Composants testés
+- `OptimizedStatsCard`: Affichage des statistiques
+- `DashboardFilters`: Contrôles du tableau de bord  
+- `useOptimizedVelibData`: Hook de gestion des données
+- `adminVelibService`: Services d'administration
+
+### CI/CD automatisé
+Pipeline GitHub Actions avec :
+- Linting ESLint
+- Vérification TypeScript
+- Tests unitaires
+- Build de production
+
+## Documentation technique
+
+- 🐳 [Configuration Docker](docker-setup.md) - Setup et déploiement
+- 🧪 [Guide des tests](src/docs/testing-guide.md) - Tests et qualité
+- 🏗️ [Architecture BDD](src/docs/database-architecture.md) - Structure données  
+- 🚀 [Guide CI/CD](src/docs/ci-cd-guide.md) - Intégration continue
+
+## Déploiement
+
+### Développement
+```bash
+# Avec Docker (recommandé)
+docker-compose --profile dev up ecotrajet-dev
+
+# Local
+npm run dev
+```
+
+### Production  
+```bash
+# Avec Docker
+docker-compose up -d --build
+
+# Local
+npm run build && npm run preview
+```
+
+### Serveur
+```bash
+git pull origin main
+docker-compose up -d --build
+```
 
 ## Contribution
 
-1. Fork le projet
-2. Créez votre branche de fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Assurez-vous que tous les tests passent (`npm run test`)
-5. Push vers la branche (`git push origin feature/AmazingFeature`)
-6. Ouvrez une Pull Request
+1. **Fork** le projet
+2. **Créer** une branche feature (`git checkout -b feature/AmazingFeature`)
+3. **Développer** avec tests (`npm run test`)
+4. **Valider** la qualité (`npm run lint && npm run type-check`)
+5. **Commit** les changements (`git commit -m 'Add AmazingFeature'`)
+6. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+7. **Ouvrir** une Pull Request
+
+### Standards de qualité
+- Tests unitaires requis pour les nouvelles fonctionnalités
+- Couverture de code maintenue > 80%
+- Pas d'erreurs ESLint ou TypeScript
+- Documentation mise à jour
+
+## Support et ressources
+
+### Documentation
+- 📚 [Documentation complète](src/docs/) dans le projet
+- 🐳 [Guide Docker](docker-setup.md) pour l'environnement
+- 🧪 [Guide des tests](src/docs/testing-guide.md) pour la qualité
+
+### Support technique
+- 🐛 **Issues GitHub** pour les bugs et demandes
+- 💬 **Discussions** pour les questions générales
+- 📧 **Contact équipe** pour le support urgent
+
+### Liens utiles
+- [Supabase Documentation](https://supabase.com/docs)
+- [Vite Documentation](https://vitejs.dev/)
+- [shadcn/ui Components](https://ui.shadcn.com/)
 
 ## Licence
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## Support
+---
 
-Pour toute question ou support technique, consultez la documentation dans le dossier `docs/` ou créez une issue GitHub.
+**🌱 Rejoignez la révolution de la mobilité durable avec ÉcoTrajet !**

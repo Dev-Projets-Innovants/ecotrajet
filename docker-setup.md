@@ -1,87 +1,99 @@
 
 # Configuration Docker pour ÉcoTrajet
 
+## Vue d'ensemble
+
+Docker permet à votre équipe de lancer le projet ÉcoTrajet sans installer Node.js ou gérer les dépendances localement. Cette configuration garantit un environnement de développement identique pour tous.
+
 ## Prérequis
-- Docker installé sur votre machine
-- Docker Compose installé
+- **Docker Desktop** installé sur votre machine
+  - [Télécharger Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Docker Compose** (inclus avec Docker Desktop)
+- **Git** pour cloner le repository
 
 ## Démarrage rapide
 
-### 1. Production
+### 1. Installation initiale
+```bash
+# Cloner le repository
+git clone <votre-repo-url>
+cd ecotrajet
+
+# Créer le fichier d'environnement
+cp .env.example .env
+# Éditer .env avec vos vraies valeurs Supabase
+```
+
+### 2. Configuration des variables d'environnement
+
+Éditez le fichier `.env` avec vos valeurs :
+```env
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=votre_clé_anonyme_supabase
+NODE_ENV=production
+```
+
+### 3. Lancement du projet
+
+#### Mode Production
 ```bash
 # Construire et lancer l'application
 docker-compose up --build
 
-# En arrière-plan
+# En arrière-plan (détaché)
 docker-compose up -d --build
 ```
 
-L'application sera accessible sur http://localhost:8080
-
-### 2. Développement
+#### Mode Développement (avec hot-reload)
 ```bash
-# Lancer en mode développement avec hot-reload
+# Lancer en mode développement
 docker-compose --profile dev up --build ecotrajet-dev
 
 # En arrière-plan
 docker-compose --profile dev up -d --build ecotrajet-dev
 ```
 
-### 3. Variables d'environnement
+### 4. Accès à l'application
+Une fois lancé, l'application sera accessible sur :
+- **URL locale** : http://localhost:8080
 
-Créez un fichier `.env` à la racine du projet :
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+## Gestion automatique des dépendances
 
-## Résolution des problèmes courants
+### Fonctionnement intelligent
+Les Dockerfiles sont configurés pour gérer automatiquement :
+- ✅ **Avec package-lock.json** : Utilise `npm ci` (plus rapide et déterministe)
+- ✅ **Sans package-lock.json** : Utilise `npm install` (génère le lock file)
+- ✅ **Récupération automatique** : Pas de crash si le lock file est manquant
 
-### Fichier package-lock.json manquant
-Les Dockerfiles sont configurés pour gérer automatiquement l'absence du fichier `package-lock.json`. Si vous souhaitez générer ce fichier localement :
+### Générer package-lock.json localement (optionnel)
 ```bash
-# Générer le package-lock.json
+# Si vous souhaitez générer le fichier localement
 npm install
 
-# Puis lancer Docker
+# Puis lancer Docker normalement
 docker-compose up --build
-```
-
-### Port déjà utilisé
-```bash
-# Changer le port dans docker-compose.yml
-ports:
-  - "3000:8080"  # Port local:port conteneur
-```
-
-### Problème de cache
-```bash
-# Reconstruire complètement
-docker-compose down -v
-docker-compose build --no-cache
-docker-compose up
 ```
 
 ## Commandes utiles
 
 ### Gestion des conteneurs
 ```bash
-# Voir les conteneurs en cours
+# Voir l'état des conteneurs
 docker-compose ps
 
-# Arrêter les conteneurs
+# Arrêter tous les conteneurs
 docker-compose down
 
-# Supprimer les volumes aussi
+# Arrêter et supprimer les volumes
 docker-compose down -v
 
-# Reconstruire les images
+# Reconstruire sans cache
 docker-compose build --no-cache
 ```
 
 ### Logs et débogage
 ```bash
-# Voir les logs
+# Voir tous les logs
 docker-compose logs
 
 # Suivre les logs en temps réel
@@ -89,6 +101,7 @@ docker-compose logs -f
 
 # Logs d'un service spécifique
 docker-compose logs ecotrajet
+docker-compose logs ecotrajet-dev
 ```
 
 ### Accès au conteneur
@@ -98,51 +111,137 @@ docker-compose exec ecotrajet sh
 
 # Exécuter des commandes npm
 docker-compose exec ecotrajet npm run test
+docker-compose exec ecotrajet npm run build
 ```
 
-## Pour vos collègues
+## Résolution des problèmes
 
-Vos collègues peuvent maintenant lancer le projet en 3 étapes :
+### Erreurs courantes et solutions
 
-1. **Cloner le repository**
-   ```bash
-   git clone <votre-repo-url>
-   cd ecotrajet
-   ```
+#### Port déjà utilisé
+```bash
+# Modifier le port dans docker-compose.yml
+ports:
+  - "3000:8080"  # Port local:port conteneur
+```
 
-2. **Créer le fichier .env** (vous leur fournirez les valeurs)
-   ```bash
-   cp .env.example .env
-   # Éditer .env avec les bonnes valeurs
-   ```
+#### Problème de cache npm
+```bash
+# Reconstruire complètement
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up
+```
 
-3. **Lancer avec Docker**
-   ```bash
-   docker-compose up --build
-   ```
+#### Variables d'environnement manquantes
+```bash
+# Vérifier la configuration
+docker-compose config
 
-## Avantages pour votre équipe
+# Vérifier les variables dans le conteneur
+docker-compose exec ecotrajet env | grep VITE
+```
 
-- ✅ **Pas d'installation Node.js** : Docker gère tout
-- ✅ **Environnement identique** : Même version Node, mêmes dépendances
-- ✅ **Démarrage rapide** : 3 commandes maximum
-- ✅ **Gestion automatique** : Fonctionne avec ou sans package-lock.json
-- ✅ **Isolation** : Pas de conflit avec d'autres projets
-- ✅ **Hot-reload** : Modifications en temps réel en mode dev
+#### Build qui échoue
+```bash
+# Logs détaillés du build
+docker-compose build --progress=plain
+
+# Nettoyer et reconstruire
+docker system prune
+docker-compose build --no-cache
+```
+
+## Guide pour les nouveaux développeurs
+
+### Onboarding en 3 étapes
+```bash
+# 1. Cloner le projet
+git clone <votre-repo-url>
+cd ecotrajet
+
+# 2. Configurer l'environnement
+cp .env.example .env
+# Demander les vraies valeurs Supabase à l'équipe
+
+# 3. Lancer le projet
+docker-compose up --build
+```
+
+### Workflow de développement quotidien
+```bash
+# Développement avec hot-reload
+docker-compose --profile dev up ecotrajet-dev
+
+# Tests dans le conteneur
+docker-compose exec ecotrajet-dev npm run test
+
+# Build de production pour vérification
+docker-compose up --build ecotrajet
+```
 
 ## Déploiement sur serveur
 
-Pour déployer sur un serveur :
+### Production
 ```bash
 # Sur le serveur
 git pull origin main
 docker-compose up -d --build
+
+# Vérifier le statut
+docker-compose ps
+docker-compose logs -f
 ```
 
-L'application sera accessible via l'IP du serveur sur le port 8080.
+### Variables d'environnement serveur
+Créez un fichier `.env` sur le serveur avec les valeurs de production.
 
-## Notes techniques
+## Avantages pour l'équipe
 
-- Le build Docker gère automatiquement la présence ou l'absence du fichier package-lock.json
-- En production, seuls les fichiers build sont servis
-- Le fichier package-lock.json sera automatiquement généré lors du premier build Docker si absent
+### ✅ Simplicité
+- **Pas d'installation Node.js** : Docker gère tout
+- **Démarrage rapide** : 3 commandes maximum
+- **Gestion automatique** : Fonctionne avec ou sans package-lock.json
+
+### ✅ Consistance
+- **Environnement identique** : Même version Node, mêmes dépendances
+- **Isolation** : Pas de conflit avec d'autres projets
+- **Reproductibilité** : Builds identiques partout
+
+### ✅ Productivité
+- **Hot-reload** : Modifications en temps réel en mode dev
+- **Tests intégrés** : npm run test dans le conteneur
+- **CI/CD ready** : Même environnement qu'en production
+
+## Architecture technique
+
+### Services Docker
+- **ecotrajet** : Service de production avec build optimisé
+- **ecotrajet-dev** : Service de développement avec hot-reload
+
+### Volumes configurés
+- `./src:/app/src` : Code source synchronisé
+- `./public:/app/public` : Assets publics synchronisés
+- `/app/node_modules` : Dependencies isolées dans le conteneur
+
+### Optimisations
+- Build multi-stage pour réduire la taille des images
+- Cache npm pour des builds plus rapides
+- Gestion intelligente des lock files
+
+## Support
+
+### Ressources
+- 📋 [Documentation Docker officielle](https://docs.docker.com/)
+- 🚀 [Docker Compose CLI](https://docs.docker.com/compose/cli/)
+- 📖 [Documentation projet complète](src/docs/)
+
+### En cas de problème
+1. Consulter cette documentation
+2. Vérifier les logs : `docker-compose logs`
+3. Créer une issue GitHub
+4. Contacter l'équipe de développement
+
+---
+
+**🎉 Félicitations !** Votre équipe peut maintenant développer ÉcoTrajet sans souci d'environnement !
