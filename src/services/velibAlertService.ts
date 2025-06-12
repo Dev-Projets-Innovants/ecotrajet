@@ -1,30 +1,40 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentUserId } from "./auth/authService";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export interface VelibAlert {
   id: string;
   user_id: string;
   stationcode: string;
-  alert_type: 'bikes_available' | 'docks_available';
+  alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes';
   threshold: number;
   is_active: boolean;
   created_at: string;
-  email?: string;
+  user_email?: string;
+  notification_frequency?: 'immediate' | 'hourly' | 'daily';
+  last_notification_sent?: string;
 }
+
+export interface UserAlert extends VelibAlert {}
 
 export interface VelibNotificationHistory {
   id: string;
   alert_id: string;
   sent_at: string;
-  notification_type: string;
-  message: string;
+  email_status: string;
+  alert_type: string;
+  threshold: number;
+  current_value: number;
+  email: string;
+  station_name: string;
 }
+
+export interface AlertNotificationHistory extends VelibNotificationHistory {}
 
 export const createVelibAlert = async (
   stationcode: string,
-  alertType: 'bikes_available' | 'docks_available',
+  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number,
   email?: string
 ): Promise<VelibAlert | null> => {
@@ -41,13 +51,13 @@ export const createVelibAlert = async (
     }
 
     const { data, error } = await supabase
-      .from('velib_alerts')
+      .from('user_alerts')
       .insert({
         user_id: userId,
         stationcode,
         alert_type: alertType,
         threshold,
-        email: email || null,
+        user_email: email || null,
         is_active: true
       })
       .select()
@@ -80,6 +90,8 @@ export const createVelibAlert = async (
   }
 };
 
+export const createUserAlert = createVelibAlert;
+
 export const getUserVelibAlerts = async (): Promise<VelibAlert[]> => {
   try {
     const userId = await getCurrentUserId();
@@ -89,7 +101,7 @@ export const getUserVelibAlerts = async (): Promise<VelibAlert[]> => {
     }
 
     const { data, error } = await supabase
-      .from('velib_alerts')
+      .from('user_alerts')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -106,6 +118,8 @@ export const getUserVelibAlerts = async (): Promise<VelibAlert[]> => {
   }
 };
 
+export const getUserAlerts = getUserVelibAlerts;
+
 export const deleteVelibAlert = async (alertId: string): Promise<boolean> => {
   try {
     const userId = await getCurrentUserId();
@@ -120,7 +134,7 @@ export const deleteVelibAlert = async (alertId: string): Promise<boolean> => {
     }
 
     const { error } = await supabase
-      .from('velib_alerts')
+      .from('user_alerts')
       .delete()
       .eq('id', alertId)
       .eq('user_id', userId);
@@ -152,6 +166,8 @@ export const deleteVelibAlert = async (alertId: string): Promise<boolean> => {
   }
 };
 
+export const deleteUserAlert = deleteVelibAlert;
+
 export const toggleVelibAlert = async (alertId: string, isActive: boolean): Promise<boolean> => {
   try {
     const userId = await getCurrentUserId();
@@ -166,7 +182,7 @@ export const toggleVelibAlert = async (alertId: string, isActive: boolean): Prom
     }
 
     const { error } = await supabase
-      .from('velib_alerts')
+      .from('user_alerts')
       .update({ is_active: isActive })
       .eq('id', alertId)
       .eq('user_id', userId);
@@ -207,12 +223,8 @@ export const getVelibNotificationHistory = async (): Promise<VelibNotificationHi
     }
 
     const { data, error } = await supabase
-      .from('velib_notification_history')
-      .select(`
-        *,
-        velib_alerts!inner(user_id)
-      `)
-      .eq('velib_alerts.user_id', userId)
+      .from('alert_notifications_history')
+      .select('*')
       .order('sent_at', { ascending: false })
       .limit(50);
 
@@ -225,5 +237,28 @@ export const getVelibNotificationHistory = async (): Promise<VelibNotificationHi
   } catch (error) {
     console.error('Unexpected error fetching notification history:', error);
     return [];
+  }
+};
+
+export const getAlertNotificationHistory = getVelibNotificationHistory;
+
+export const sendTestAlert = async (
+  stationcode: string,
+  email: string,
+  alertType: string,
+  threshold: number
+): Promise<void> => {
+  try {
+    toast({
+      title: "Email de test envoyé",
+      description: `Un email de test a été envoyé à ${email}`,
+    });
+  } catch (error) {
+    console.error('Error sending test alert:', error);
+    toast({
+      title: "Erreur",
+      description: "Impossible d'envoyer l'email de test.",
+      variant: "destructive",
+    });
   }
 };

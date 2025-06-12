@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -8,7 +9,7 @@ import {
   VelibStationWithAvailability
 } from '@/services/velibStationService';
 import { subscribeToStationUpdates } from '@/services/velibRealtimeService';
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Bike, Navigation, RefreshCw } from 'lucide-react';

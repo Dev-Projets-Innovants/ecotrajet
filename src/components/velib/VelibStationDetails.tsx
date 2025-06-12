@@ -10,7 +10,7 @@ import {
   isFavoriteStation
 } from '@/services/velibFavoritesService';
 import { subscribeToStationUpdates } from '@/services/velibRealtimeService';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import VelibStationHeader from './VelibStationHeader';
 import VelibStationAvailability from './VelibStationAvailability';
@@ -127,7 +127,7 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
           last_updated={station.last_updated}
         />
 
-        <VelibStationStatus is_installed={station.is_installed || false} />
+        <VelibStationStatus is_installed={Boolean(station.is_installed)} />
 
         <VelibStationAlertForm stationcode={station.stationcode} />
       </CardContent>
