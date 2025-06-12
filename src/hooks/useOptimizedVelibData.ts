@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   getVelibDashboardStats, 
@@ -9,7 +8,7 @@ import {
   VelibAvailabilityTrend,
   VelibDistributionData,
   VelibUsageData
-} from '@/services/adminVelibService';
+} from '@/services/admin';
 
 export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
   const [stats, setStats] = useState<VelibDashboardStats | null>(null);
