@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bell, Shield } from 'lucide-react';
 import { useNavbar } from '@/hooks/useNavbar';
+import { useAuth } from '@/hooks/useAuth';
 import NavbarLogo from './navbar/NavbarLogo';
 import NavbarDesktop from './navbar/NavbarDesktop';
 import NavbarMobile from './navbar/NavbarMobile';
@@ -10,22 +11,12 @@ import UserAuthDialog from './auth/UserAuthDialog';
 import NotificationsSidebar from './notifications/NotificationsSidebar';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
-import { ADMIN_CREDENTIALS } from '@/pages/SignIn';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Simulating authentication state - in a real app, this would come from your auth provider
-  // For now, we'll use localStorage to simulate auth state
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-
-  // Check if the current user is an admin based on the email in localStorage
-  const [isAdmin, setIsAdmin] = useState(() => {
-    const userEmail = localStorage.getItem('userEmail');
-    return userEmail === ADMIN_CREDENTIALS.email;
-  });
+  const { user, isAdmin, signOut } = useAuth();
+  const isAuthenticated = !!user;
 
   const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
 
@@ -61,16 +52,31 @@ const Navbar = () => {
   };
 
   // Function to handle user logout
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userEmail');
-    setIsAuthenticated(false);
-    setIsAdmin(false);
-    navigate('/');
-    toast({
-      title: "Déconnexion réussie",
-      description: "Vous avez été déconnecté avec succès."
-    });
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          title: "Erreur de déconnexion",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      navigate('/');
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès."
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite lors de la déconnexion.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Determine if we're on the homepage to apply different text color

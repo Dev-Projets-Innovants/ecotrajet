@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { Leaf, ArrowRight, Mail, Apple } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 const SignUp = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signUp } = useAuth();
   // Check if there's a redirect path in the location state
   const from = location.state?.from || "/dashboard";
 
@@ -61,16 +63,33 @@ const SignUp = () => {
     },
   });
 
-  function onSubmit(data: SignUpFormValues) {
-    console.log(data);
-    // Set authentication state in localStorage (In a real app, this would involve a backend)
-    localStorage.setItem('isAuthenticated', 'true');
+  async function onSubmit(data: SignUpFormValues) {
+    console.log('Attempting to sign up with:', data.email);
     
-    toast.success("Inscription réussie!");
-    setTimeout(() => {
-      // Navigate to the redirect path or dashboard
-      navigate(from);
-    }, 1000);
+    try {
+      const { data: authData, error } = await signUp(
+        data.email,
+        data.password,
+        data.firstName,
+        data.lastName
+      );
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        toast.error(error.message || "Erreur lors de l'inscription");
+        return;
+      }
+
+      if (authData?.user) {
+        toast.success("Inscription réussie! Vérifiez votre email pour confirmer votre compte.");
+        setTimeout(() => {
+          navigate(from);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign up:', error);
+      toast.error("Une erreur inattendue s'est produite");
+    }
   }
 
   return (
@@ -179,8 +198,9 @@ const SignUp = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
-            S'inscrire <ArrowRight className="ml-2 h-4 w-4" />
+          <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Inscription..." : "S'inscrire"} 
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </form>
       </Form>

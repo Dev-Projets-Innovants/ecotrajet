@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { ArrowRight, Mail, Apple } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,7 @@ export const ADMIN_CREDENTIALS = {
 const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signIn } = useAuth();
   // Check if there's a redirect path in the location state
   const from = location.state?.from || "/dashboard";
 
@@ -46,30 +48,37 @@ const SignIn = () => {
     },
   });
 
-  function onSubmit(data: SignInFormValues) {
-    console.log(data);
+  async function onSubmit(data: SignInFormValues) {
+    console.log('Attempting to sign in with:', data.email);
     
-    // Check if the user is an admin
-    const isAdmin = data.email === ADMIN_CREDENTIALS.email && 
-                    data.password === ADMIN_CREDENTIALS.password;
-    
-    // Set authentication state in localStorage
-    localStorage.setItem('isAuthenticated', 'true');
-    // Store the user email to identify admin later
-    localStorage.setItem('userEmail', data.email);
-    
-    // If admin user, redirect to admin dashboard
-    if (isAdmin) {
-      toast.success("Connexion administrateur réussie!");
-      setTimeout(() => {
-        navigate('/admin/dashboard');
-      }, 1000);
-    } else {
-      // Regular user flow
-      toast.success("Connexion réussie!");
-      setTimeout(() => {
-        navigate(from);
-      }, 1000);
+    try {
+      const { data: authData, error } = await signIn(data.email, data.password);
+      
+      if (error) {
+        console.error('Sign in error:', error);
+        toast.error(error.message || "Erreur lors de la connexion");
+        return;
+      }
+
+      if (authData?.user) {
+        // Check if the user is an admin
+        const isAdmin = data.email === ADMIN_CREDENTIALS.email;
+        
+        if (isAdmin) {
+          toast.success("Connexion administrateur réussie!");
+          setTimeout(() => {
+            navigate('/admin/dashboard');
+          }, 1000);
+        } else {
+          toast.success("Connexion réussie!");
+          setTimeout(() => {
+            navigate(from);
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign in:', error);
+      toast.error("Une erreur inattendue s'est produite");
     }
   }
 
@@ -116,8 +125,9 @@ const SignIn = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
-            Se connecter <ArrowRight className="ml-2 h-4 w-4" />
+          <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Connexion..." : "Se connecter"} 
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </form>
       </Form>

@@ -53,6 +53,45 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          created_at: string | null
+          email: string
+          first_name: string | null
+          id: string
+          is_admin: boolean | null
+          last_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          email: string
+          first_name?: string | null
+          id: string
+          is_admin?: boolean | null
+          last_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          is_admin?: boolean | null
+          last_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_alerts: {
         Row: {
           alert_type: string
@@ -123,6 +162,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_user_favorite_stations_stationcode"
+            columns: ["stationcode"]
+            isOneToOne: false
+            referencedRelation: "velib_stations"
+            referencedColumns: ["stationcode"]
+          },
           {
             foreignKeyName: "user_favorite_stations_stationcode_fkey"
             columns: ["stationcode"]
