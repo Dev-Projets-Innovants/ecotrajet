@@ -1,45 +1,80 @@
 
-# ÉcoTrajet - Application de mobilité durable
+<div align="center">
+  <img src="public/logo.svg" alt="ÉcoTrajet Logo" width="120" height="120">
+  
+  # ÉcoTrajet
+  
+  **Application de mobilité durable pour Paris**
+  
+  *Révolutionnez vos déplacements urbains avec une approche écologique*
+  
+  [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com)
+  [![Docker](https://img.shields.io/badge/docker-ready-blue)](docker-setup.md)
+  [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+  [![TypeScript](https://img.shields.io/badge/typescript-ready-blue)](https://www.typescriptlang.org/)
+</div>
 
-## Présentation du projet
+---
 
-ÉcoTrajet est une application web dédiée à la promotion de la mobilité durable, spécialement conçue pour les utilisateurs des systèmes de transport en commun et de vélos partagés à Paris. Cette application permet aux utilisateurs de:
+## 📋 Table des Matières
 
-- Visualiser les stations Vélib disponibles sur une carte interactive
-- Planifier des itinéraires écologiques pour leurs déplacements quotidiens
-- Calculer et suivre leur empreinte carbone
-- Participer à des défis écologiques et gagner des récompenses
-- Consulter des tutoriels et guides sur la mobilité durable
-- Rejoindre une communauté d'utilisateurs partageant les mêmes valeurs
+- [🌟 Présentation du Projet](#-présentation-du-projet)
+- [✨ Fonctionnalités Principales](#-fonctionnalités-principales)
+- [🚀 Démarrage Rapide](#-démarrage-rapide)
+- [🛠️ Technologies Utilisées](#️-technologies-utilisées)
+- [⚙️ Options d'Installation](#️-options-dinstallation)
+- [📊 Architecture de l'Application](#-architecture-de-lapplication)
+- [🧪 Tests et Qualité](#-tests-et-qualité)
+- [📚 Documentation Technique](#-documentation-technique)
+- [🚀 Déploiement](#-déploiement)
+- [🤝 Contribution](#-contribution)
+- [📞 Support](#-support)
 
-## Technologies utilisées
+---
 
-Ce projet est construit avec un ensemble de technologies modernes:
+## 🌟 Présentation du Projet
 
-- **Vite**: Outil de build rapide pour le développement JavaScript/TypeScript
-- **TypeScript**: Superset typé de JavaScript pour améliorer la qualité du code
-- **React**: Bibliothèque JavaScript pour construire des interfaces utilisateur
-- **shadcn-ui**: Composants d'interface utilisateur réutilisables et accessibles
-- **Tailwind CSS**: Framework CSS utilitaire pour un design responsive
-- **React Router**: Navigation et routage dans l'application
-- **React Query**: Gestion des requêtes API, mise en cache et synchronisation des états
-- **Leaflet**: Bibliothèque JavaScript pour les cartes interactives
-- **Supabase**: Base de données et authentification backend
-- **Vitest**: Framework de test unitaire moderne et rapide
-- **Docker**: Containerisation pour un environnement de développement cohérent
+ÉcoTrajet est une **application web de mobilité durable** spécialement conçue pour les utilisateurs des systèmes de transport en commun et de vélos partagés à Paris. Notre mission est de promouvoir des déplacements écologiques tout en offrant une expérience utilisateur optimale.
 
-## Installation et démarrage
+### 🎯 Objectifs
+- **Réduire l'empreinte carbone** des déplacements urbains
+- **Faciliter l'accès** aux transports durables
+- **Sensibiliser** à la mobilité écologique
+- **Créer une communauté** d'utilisateurs engagés
 
-### 🚀 Option 1: Docker (Recommandé pour les équipes)
+---
 
-**Démarrage ultra-rapide:**
+## ✨ Fonctionnalités Principales
+
+### 🗺️ Interface Utilisateur
+- **Carte interactive** avec stations Vélib' en temps réel
+- **Planificateur de trajets** écologiques optimisés
+- **Calculateur d'empreinte carbone** personnalisé
+- **Défis écologiques** avec système de récompenses
+- **Statistiques personnelles** de suivi d'impact
+- **Guides et tutoriels** sur la mobilité durable
+
+### 👨‍💼 Panneau d'Administration
+- **Dashboard temps réel** avec métriques Vélib'
+- **Gestion utilisateurs** complète
+- **Gestion de contenu** pour guides et ressources
+- **Système d'alertes** automatisées
+- **Analytics avancés** avec visualisations
+
+---
+
+## 🚀 Démarrage Rapide
+
+> **⚠️ IMPORTANT :** Votre projet nécessite un fichier `package-lock.json`. Exécutez `npm install` dans le répertoire racine avant de continuer.
+
+### 🐳 Option 1: Docker (Recommandé)
 
 ```bash
 # 1. Cloner le projet
 git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
-# 2. Créer le fichier .env
+# 2. Créer le fichier d'environnement
 cp .env.example .env
 # Éditer .env avec vos variables Supabase
 
@@ -47,212 +82,200 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-L'application sera accessible sur http://localhost:8080
+**Application accessible sur :** http://localhost:8080
 
-**Mode développement avec hot-reload:**
+**Avantages Docker :**
+- ✅ **Zéro installation** locale requise
+- ✅ **Environnement identique** pour toute l'équipe
+- ✅ **Démarrage instantané** en 3 commandes
+- ✅ **Hot-reload intégré** pour le développement
+
+### 📋 Autres Options d'Installation
+- **[Installation locale](##️-options-dinstallation)** (développeurs avancés)
+- **GitHub Codespaces** (développement cloud)
+
+---
+
+## 🛠️ Technologies Utilisées
+
+### Frontend
+- **⚡ Vite** - Build tool ultra-rapide
+- **📘 TypeScript** - JavaScript typé et sécurisé
+- **⚛️ React** - Interface utilisateur moderne
+- **🎨 Tailwind CSS** - Framework CSS utilitaire
+- **🧩 shadcn/ui** - Composants réutilisables
+
+### Backend & Infrastructure
+- **🗃️ Supabase** - Base de données et authentification
+- **🗺️ Leaflet** - Cartes interactives
+- **🔄 React Query** - Gestion d'état et cache
+- **🐳 Docker** - Containerisation
+- **🧪 Vitest** - Tests unitaires
+
+---
+
+## ⚙️ Options d'Installation
+
+### Option 2: Installation Locale
+
+**Prérequis :** Node.js 18+ et npm
+
 ```bash
-docker-compose --profile dev up --build ecotrajet-dev
-```
-
-**Avantages Docker:**
-- ✅ **Zéro installation** : Pas besoin de Node.js local
-- ✅ **Environnement identique** : Même configuration pour toute l'équipe
-- ✅ **Démarrage instantané** : 3 commandes seulement
-- ✅ **Gestion automatique** : Fonctionne avec ou sans package-lock.json
-- ✅ **Isolation complète** : Aucun conflit avec d'autres projets
-- ✅ **Hot-reload intégré** : Modifications visibles immédiatement
-
-📋 **Documentation Docker complète :** [docker-setup.md](docker-setup.md)
-
-### Option 2: Installation locale (développeurs avancés)
-
-**Prérequis :** Node.js 18+ et npm installés localement
-
-```bash
-# Étape 1: Cloner le dépôt
+# Cloner et installer
 git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
-
-# Étape 2: Installer les dépendances
 npm install
 
-# Étape 3: Configurer l'environnement
+# Configuration
 cp .env.example .env
-# Éditer .env avec vos variables Supabase
+# Éditer .env avec vos credentials Supabase
 
-# Étape 4: Démarrer le serveur de développement
+# Démarrage
 npm run dev
 ```
 
 ### Option 3: GitHub Codespaces
 
-- Accédez à la page principale de votre dépôt
-- Cliquez sur le bouton "Code" (bouton vert) 
-- Sélectionnez l'onglet "Codespaces"
-- Cliquez sur "Nouveau codespace"
+1. Accédez à votre repository GitHub
+2. Cliquez sur **"Code"** → **"Codespaces"**
+3. Créez un nouveau Codespace
+4. L'environnement se configure automatiquement
 
-## Configuration de l'environnement
+---
 
-### Variables d'environnement requises
-```env
-# Configuration Supabase
-VITE_SUPABASE_URL=https://votre-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=votre_clé_anonyme_supabase
-
-# Environnement
-NODE_ENV=production
-```
-
-### Base de données Supabase
-- Tables pour les stations Vélib', alertes utilisateurs, et données analytics
-- Edge Functions pour la synchronisation des données en temps réel
-- Authentification et gestion des sessions utilisateurs
-
-## Scripts disponibles
-
-```bash
-# Développement
-npm run dev              # Démarrer en mode développement
-npm run build           # Construire pour la production
-npm run preview         # Prévisualiser la version de production
-
-# Tests et qualité
-npm run test            # Lancer les tests unitaires
-npm run test:watch     # Tests en mode watch
-npm run test:coverage  # Rapport de couverture
-npm run lint           # Vérifier avec ESLint
-npm run type-check     # Vérifier les types TypeScript
-
-# Docker (alternative)
-docker-compose up --build                    # Production
-docker-compose --profile dev up ecotrajet-dev  # Développement
-```
-
-## Architecture de l'application
-
-L'application suit une architecture modulaire et maintenable :
+## 📊 Architecture de l'Application
 
 ```
 src/
-├── pages/              # Pages de l'application
-├── components/         # Composants réutilisables
-│   ├── admin/         # Interface d'administration
-│   ├── velib/         # Gestion des stations Vélib'
-│   └── ui/            # Composants de base (shadcn/ui)
-├── hooks/             # Hooks personnalisés
-├── services/          # Services API et logique métier
-├── lib/               # Utilitaires et configurations
-├── tests/             # Tests unitaires
-└── docs/              # Documentation technique
+├── 📄 pages/              # Pages de l'application
+├── 🧩 components/         # Composants réutilisables
+│   ├── admin/            # Interface d'administration
+│   ├── velib/            # Gestion des stations Vélib'
+│   └── ui/               # Composants de base (shadcn/ui)
+├── 🎣 hooks/             # Hooks personnalisés React
+├── 🔧 services/          # Services API et logique métier
+├── 📚 lib/               # Utilitaires et configurations
+├── 🧪 tests/             # Tests unitaires
+└── 📖 docs/              # Documentation technique
 ```
 
-## Fonctionnalités principales
+---
 
-### Interface utilisateur
-1. **Carte interactive**: Stations Vélib' avec détails en temps réel
-2. **Planificateur de trajets**: Itinéraires écologiques optimisés
-3. **Calculateur d'empreinte carbone**: Impact environnemental des déplacements
-4. **Défis écologiques**: Gamification de la mobilité durable
-5. **Statistiques personnelles**: Suivi de l'impact individuel
-6. **Guides et tutoriels**: Ressources pédagogiques
+## 🧪 Tests et Qualité
 
-### Panneau d'administration
-7. **Dashboard temps réel**: Métriques Vélib' actualisées
-8. **Gestion utilisateurs**: Administration des comptes
-9. **Gestion de contenu**: Édition des guides et ressources
-10. **Système d'alertes**: Notifications automatiques
-11. **Analytics avancés**: Rapports et visualisations
-
-## Tests et qualité
-
-### Framework de test
+### Framework de Test
 - **Vitest** avec environnement jsdom
 - **@testing-library/react** pour les composants
 - **Couverture de code** complète avec rapports
 
-### Composants testés
-- `OptimizedStatsCard`: Affichage des statistiques
-- `DashboardFilters`: Contrôles du tableau de bord  
-- `useOptimizedVelibData`: Hook de gestion des données
-- `adminVelibService`: Services d'administration
-
-### CI/CD automatisé
-Pipeline GitHub Actions avec :
-- Linting ESLint
-- Vérification TypeScript
-- Tests unitaires
-- Build de production
-
-## Documentation technique
-
-- 🐳 [Configuration Docker](docker-setup.md) - Setup et déploiement
-- 🧪 [Guide des tests](src/docs/testing-guide.md) - Tests et qualité
-- 🏗️ [Architecture BDD](src/docs/database-architecture.md) - Structure données  
-- 🚀 [Guide CI/CD](src/docs/ci-cd-guide.md) - Intégration continue
-
-## Déploiement
-
-### Développement
+### Scripts Disponibles
 ```bash
-# Avec Docker (recommandé)
+# Développement
+npm run dev              # Serveur de développement
+npm run build           # Build de production
+npm run preview         # Prévisualisation
+
+# Tests et qualité
+npm run test            # Tests unitaires
+npm run test:watch     # Tests en mode watch
+npm run test:coverage  # Rapport de couverture
+npm run lint           # Vérification ESLint
+npm run type-check     # Vérification TypeScript
+```
+
+---
+
+## 📚 Documentation Technique
+
+### 📋 Guides Complets
+- 🐳 **[Configuration Docker](docker-setup.md)** - Setup et déploiement complet
+- 🏗️ **[Environnements de Production](src/docs/environments/README.md)** - Architecture et processus
+- 🧪 **[Guide des Tests](src/docs/testing-guide.md)** - Tests et qualité
+- 🗃️ **[Architecture BDD](src/docs/database-architecture.md)** - Structure des données
+- 🚀 **[Guide CI/CD](src/docs/ci-cd-guide.md)** - Intégration continue
+
+### 📖 Documentation par Thème
+- **[Vue d'ensemble](src/docs/environments/overview.md)** - Architecture générale
+- **[Supabase](src/docs/environments/supabase/README.md)** - Base de données
+- **[Docker](src/docs/environments/docker/README.md)** - Containerisation
+- **[Déploiement](src/docs/environments/deployment/README.md)** - Processus de mise à jour
+- **[Opérations](src/docs/operations/README.md)** - Maintenance et support
+- **[Guides pratiques](src/docs/guides/README.md)** - Procédures détaillées
+
+---
+
+## 🚀 Déploiement
+
+### Environnements
+
+| Environnement | URL | Usage |
+|---------------|-----|-------|
+| **Développement** | `localhost:8080` | Tests et développement |
+| **Staging** | `staging.ecotrajet.app` | Validation pré-production |
+| **Production** | `app.ecotrajet.com` | Utilisateurs finaux |
+
+### Commandes de Déploiement
+```bash
+# Développement avec Docker
 docker-compose --profile dev up ecotrajet-dev
 
-# Local
-npm run dev
-```
-
-### Production  
-```bash
-# Avec Docker
+# Production
 docker-compose up -d --build
 
-# Local
-npm run build && npm run preview
+# Serveur (mise à jour)
+git pull origin main && docker-compose up -d --build
 ```
 
-### Serveur
-```bash
-git pull origin main
-docker-compose up -d --build
-```
+---
 
-## Contribution
+## 🤝 Contribution
 
+### Processus de Contribution
 1. **Fork** le projet
 2. **Créer** une branche feature (`git checkout -b feature/AmazingFeature`)
 3. **Développer** avec tests (`npm run test`)
 4. **Valider** la qualité (`npm run lint && npm run type-check`)
-5. **Commit** les changements (`git commit -m 'Add AmazingFeature'`)
-6. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+5. **Commit** (`git commit -m 'Add AmazingFeature'`)
+6. **Push** (`git push origin feature/AmazingFeature`)
 7. **Ouvrir** une Pull Request
 
-### Standards de qualité
-- Tests unitaires requis pour les nouvelles fonctionnalités
-- Couverture de code maintenue > 80%
-- Pas d'erreurs ESLint ou TypeScript
-- Documentation mise à jour
-
-## Support et ressources
-
-### Documentation
-- 📚 [Documentation complète](src/docs/) dans le projet
-- 🐳 [Guide Docker](docker-setup.md) pour l'environnement
-- 🧪 [Guide des tests](src/docs/testing-guide.md) pour la qualité
-
-### Support technique
-- 🐛 **Issues GitHub** pour les bugs et demandes
-- 💬 **Discussions** pour les questions générales
-- 📧 **Contact équipe** pour le support urgent
-
-### Liens utiles
-- [Supabase Documentation](https://supabase.com/docs)
-- [Vite Documentation](https://vitejs.dev/)
-- [shadcn/ui Components](https://ui.shadcn.com/)
-
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+### Standards de Qualité
+- ✅ **Tests unitaires** requis pour nouvelles fonctionnalités
+- ✅ **Couverture de code** maintenue > 80%
+- ✅ **Pas d'erreurs** ESLint ou TypeScript
+- ✅ **Documentation** mise à jour
 
 ---
 
-**🌱 Rejoignez la révolution de la mobilité durable avec ÉcoTrajet !**
+## 📞 Support
+
+### 🔗 Ressources
+- 📚 **[Documentation complète](src/docs/)** - Guides techniques détaillés
+- 🐳 **[Guide Docker](docker-setup.md)** - Configuration environnement
+- 🧪 **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
+
+### 💬 Aide et Contact
+- 🐛 **Issues GitHub** - Signalement de bugs et demandes de fonctionnalités
+- 💬 **Discussions** - Questions générales et échanges communautaires
+- 📧 **Support technique** - Assistance urgente et support prioritaire
+
+### 🌐 Liens Utiles
+- [Documentation Supabase](https://supabase.com/docs) - Backend et base de données
+- [Documentation Vite](https://vitejs.dev/) - Build tool et développement
+- [shadcn/ui Components](https://ui.shadcn.com/) - Système de design
+
+---
+
+## 📄 Licence
+
+Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+---
+
+<div align="center">
+  
+  **🌱 Rejoignez la révolution de la mobilité durable avec ÉcoTrajet !**
+  
+  Made with 💚 for a sustainable future
+  
+</div>
