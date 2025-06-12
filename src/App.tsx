@@ -1,3 +1,4 @@
+
 /**
  * Application principale ÉcoTrajet
  * 
@@ -39,6 +40,7 @@ import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
 import MapView from "./pages/MapView";
 import VelibAlerts from "./pages/VelibAlerts";
+import OurStory from "./pages/OurStory";
 
 // Pages d'information légale et des fonctionnalités principales
 import Challenges from "./pages/Challenges";
@@ -69,6 +71,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/our-story" element={<OurStory />} />
               
               {/* Routes utilisateur authentifié */}
               <Route path="/dashboard" element={<Dashboard />} />
