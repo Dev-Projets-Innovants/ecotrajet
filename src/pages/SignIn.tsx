@@ -49,10 +49,14 @@ const SignIn = () => {
   });
 
   async function onSubmit(data: SignInFormValues) {
+    console.log('=== SIGNIN DEBUG ===');
     console.log('Attempting to sign in with:', data.email);
+    console.log('Redirect destination:', from);
     
     try {
       const { data: authData, error } = await signIn(data.email, data.password);
+      
+      console.log('Auth response:', { authData, error });
       
       if (error) {
         console.error('Sign in error:', error);
@@ -61,20 +65,28 @@ const SignIn = () => {
       }
 
       if (authData?.user) {
+        console.log('User authenticated successfully:', authData.user);
+        
         // Check if the user is an admin
         const isAdmin = data.email === ADMIN_CREDENTIALS.email;
+        console.log('Is admin?', isAdmin);
         
         if (isAdmin) {
+          console.log('Redirecting to admin dashboard...');
           toast.success("Connexion administrateur réussie!");
           setTimeout(() => {
             navigate('/admin/dashboard');
           }, 1000);
         } else {
+          console.log('Redirecting to user dashboard...', from);
           toast.success("Connexion réussie!");
           setTimeout(() => {
             navigate(from);
           }, 1000);
         }
+      } else {
+        console.error('No user data received despite successful auth');
+        toast.error("Erreur: aucune donnée utilisateur reçue");
       }
     } catch (error) {
       console.error('Unexpected error during sign in:', error);
