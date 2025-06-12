@@ -30,7 +30,7 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 // Admin credentials constant to easily manage and remember
 export const ADMIN_CREDENTIALS = {
   email: "admin@ecotrajet.com",
-  password: "admin123"
+  password: "Admin123!"
 };
 
 const SignIn = () => {
