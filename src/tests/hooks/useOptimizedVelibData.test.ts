@@ -1,6 +1,6 @@
+
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { waitFor } from '@testing-library/dom'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useOptimizedVelibData } from '@/hooks/useOptimizedVelibData'
 
 // Mock du service

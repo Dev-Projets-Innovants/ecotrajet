@@ -1,7 +1,5 @@
-
 import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
-import { screen } from '@testing-library/dom'
+import { render, screen } from '@testing-library/react'
 import VelibUsageChart from '@/components/admin/dashboard/VelibUsageChart'
 import VelibDistributionChart from '@/components/admin/dashboard/VelibDistributionChart'
 import VelibAvailabilityChart from '@/components/admin/dashboard/VelibAvailabilityChart'
