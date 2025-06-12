@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { 
   getStationsWithAvailability, 
   VelibStationWithAvailability 
-} from '@/services/velibStationService';
+} from '@/services/supabaseVelibService';
 import { Button } from "@/components/ui/button";
 import { Bike, Navigation, ArrowRight } from 'lucide-react';
 

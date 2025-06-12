@@ -124,13 +124,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_user_favorite_stations_stationcode"
-            columns: ["stationcode"]
-            isOneToOne: false
-            referencedRelation: "velib_stations"
-            referencedColumns: ["stationcode"]
-          },
-          {
             foreignKeyName: "user_favorite_stations_stationcode_fkey"
             columns: ["stationcode"]
             isOneToOne: false

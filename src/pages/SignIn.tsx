@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import AuthLayout from "@/components/auth/AuthLayout";
-import { supabase } from "@/integrations/supabase/client";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Veuillez saisir une adresse e-mail valide" }),
@@ -36,6 +35,7 @@ export const ADMIN_CREDENTIALS = {
 const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  // Check if there's a redirect path in the location state
   const from = location.state?.from || "/dashboard";
 
   const form = useForm<SignInFormValues>({
@@ -46,54 +46,30 @@ const SignIn = () => {
     },
   });
 
-  useEffect(() => {
-    // Check if user is already authenticated
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate(from);
-      }
-    };
-    checkAuth();
-  }, [navigate, from]);
-
-  async function onSubmit(data: SignInFormValues) {
-    try {
-      // Check if the user is trying to use admin credentials (fallback)
-      const isAdmin = data.email === ADMIN_CREDENTIALS.email && 
-                      data.password === ADMIN_CREDENTIALS.password;
-      
-      if (isAdmin) {
-        // For admin, use localStorage fallback
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', data.email);
-        toast.success("Connexion administrateur réussie!");
+  function onSubmit(data: SignInFormValues) {
+    console.log(data);
+    
+    // Check if the user is an admin
+    const isAdmin = data.email === ADMIN_CREDENTIALS.email && 
+                    data.password === ADMIN_CREDENTIALS.password;
+    
+    // Set authentication state in localStorage
+    localStorage.setItem('isAuthenticated', 'true');
+    // Store the user email to identify admin later
+    localStorage.setItem('userEmail', data.email);
+    
+    // If admin user, redirect to admin dashboard
+    if (isAdmin) {
+      toast.success("Connexion administrateur réussie!");
+      setTimeout(() => {
         navigate('/admin/dashboard');
-        return;
-      }
-
-      // Use Supabase authentication for regular users
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast.error("Email ou mot de passe incorrect");
-        } else {
-          toast.error("Erreur de connexion: " + error.message);
-        }
-        return;
-      }
-
-      if (authData.user) {
-        toast.success("Connexion réussie!");
+      }, 1000);
+    } else {
+      // Regular user flow
+      toast.success("Connexion réussie!");
+      setTimeout(() => {
         navigate(from);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error("Erreur de connexion");
+      }, 1000);
     }
   }
 

@@ -1,130 +1,87 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUserId } from "./auth/authService";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
+import { UserAlert, AlertNotificationHistory } from "@/types/alerts";
+import { isUserAuthenticated, getCurrentUserIdentifier, getCurrentUserEmail } from "./auth/mockAuthService";
+import { 
+  createAlertInDatabase, 
+  fetchUserAlerts, 
+  deactivateAlert, 
+  fetchNotificationHistory,
+  getStationName 
+} from "./alerts/alertsRepository";
+import { sendAlertEmail } from "./alerts/emailService";
 
-export interface VelibAlert {
-  id: string;
-  user_id: string;
-  stationcode: string;
-  alert_type: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes';
-  threshold: number;
-  is_active: boolean;
-  created_at: string;
-  user_email?: string;
-  notification_frequency?: 'immediate' | 'hourly' | 'daily';
-  last_notification_sent?: string;
-}
+// Re-export types for backward compatibility
+export type { UserAlert, AlertNotificationHistory };
 
-export interface UserAlert extends VelibAlert {}
-
-export interface VelibNotificationHistory {
-  id: string;
-  alert_id: string;
-  sent_at: string;
-  email_status: string;
-  alert_type: string;
-  threshold: number;
-  current_value: number;
-  email: string;
-  station_name: string;
-}
-
-export interface AlertNotificationHistory extends VelibNotificationHistory {}
-
-export const createVelibAlert = async (
+/**
+ * Crée une nouvelle alerte utilisateur
+ */
+export async function createUserAlert(
   stationcode: string,
   alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number,
-  email?: string
-): Promise<VelibAlert | null> => {
+  userEmail?: string,
+  notificationFrequency: 'immediate' | 'hourly' | 'daily' = 'immediate'
+): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    
-    if (!userId) {
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour créer une alerte.",
         variant: "destructive",
       });
-      return null;
+      return false;
     }
 
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .insert({
-        user_id: userId,
-        stationcode,
-        alert_type: alertType,
-        threshold,
-        user_email: email || null,
-        is_active: true
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer l'alerte.",
-        variant: "destructive",
-      });
-      return null;
-    }
+    const userIdentifier = getCurrentUserIdentifier();
+    console.log('Creating alert for user identifier:', userIdentifier);
+    
+    await createAlertInDatabase(userIdentifier, stationcode, alertType, threshold, userEmail, notificationFrequency);
 
     toast({
       title: "Alerte créée",
-      description: "Votre alerte a été créée avec succès.",
+      description: userEmail 
+        ? "Vous serez notifié par email quand les conditions seront remplies."
+        : "Alerte créée avec succès.",
     });
-
-    return data;
+    
+    return true;
   } catch (error) {
-    console.error('Unexpected error creating alert:', error);
+    console.error('Error creating alert:', error);
     toast({
       title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
+      description: error instanceof Error ? error.message : "Impossible de créer l'alerte.",
       variant: "destructive",
     });
-    return null;
+    return false;
   }
-};
+}
 
-export const createUserAlert = createVelibAlert;
-
-export const getUserVelibAlerts = async (): Promise<VelibAlert[]> => {
+/**
+ * Récupère les alertes de l'utilisateur
+ */
+export async function getUserAlerts(): Promise<UserAlert[]> {
   try {
-    const userId = await getCurrentUserId();
-    
-    if (!userId) {
+    if (!isUserAuthenticated()) {
+      console.log('User not authenticated via localStorage');
       return [];
     }
 
-    const { data, error } = await supabase
-      .from('user_alerts')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching alerts:', error);
-      return [];
-    }
-
-    return data || [];
+    const userIdentifier = getCurrentUserIdentifier();
+    return await fetchUserAlerts(userIdentifier);
   } catch (error) {
-    console.error('Unexpected error fetching alerts:', error);
+    console.error('Error fetching alerts:', error);
     return [];
   }
-};
+}
 
-export const getUserAlerts = getUserVelibAlerts;
-
-export const deleteVelibAlert = async (alertId: string): Promise<boolean> => {
+/**
+ * Supprime une alerte utilisateur
+ */
+export async function deleteUserAlert(alertId: string): Promise<boolean> {
   try {
-    const userId = await getCurrentUserId();
-    
-    if (!userId) {
+    if (!isUserAuthenticated()) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour supprimer une alerte.",
@@ -133,132 +90,75 @@ export const deleteVelibAlert = async (alertId: string): Promise<boolean> => {
       return false;
     }
 
-    const { error } = await supabase
-      .from('user_alerts')
-      .delete()
-      .eq('id', alertId)
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error deleting alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    const userIdentifier = getCurrentUserIdentifier();
+    await deactivateAlert(alertId, userIdentifier);
 
     toast({
       title: "Alerte supprimée",
       description: "L'alerte a été supprimée avec succès.",
     });
-
+    
     return true;
   } catch (error) {
-    console.error('Unexpected error deleting alert:', error);
+    console.error('Error deleting alert:', error);
     toast({
       title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
+      description: "Impossible de supprimer l'alerte.",
       variant: "destructive",
     });
     return false;
   }
-};
+}
 
-export const deleteUserAlert = deleteVelibAlert;
-
-export const toggleVelibAlert = async (alertId: string, isActive: boolean): Promise<boolean> => {
+/**
+ * Récupère l'historique des notifications
+ */
+export async function getAlertNotificationHistory(): Promise<AlertNotificationHistory[]> {
   try {
-    const userId = await getCurrentUserId();
-    
-    if (!userId) {
-      toast({
-        title: "Connexion requise",
-        description: "Vous devez être connecté pour modifier une alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    const { error } = await supabase
-      .from('user_alerts')
-      .update({ is_active: isActive })
-      .eq('id', alertId)
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error updating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de modifier l'alerte.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    toast({
-      title: isActive ? "Alerte activée" : "Alerte désactivée",
-      description: `L'alerte a été ${isActive ? 'activée' : 'désactivée'} avec succès.`,
-    });
-
-    return true;
-  } catch (error) {
-    console.error('Unexpected error updating alert:', error);
-    toast({
-      title: "Erreur",
-      description: "Une erreur inattendue s'est produite.",
-      variant: "destructive",
-    });
-    return false;
-  }
-};
-
-export const getVelibNotificationHistory = async (): Promise<VelibNotificationHistory[]> => {
-  try {
-    const userId = await getCurrentUserId();
-    
-    if (!userId) {
+    if (!isUserAuthenticated()) {
       return [];
     }
 
-    const { data, error } = await supabase
-      .from('alert_notifications_history')
-      .select('*')
-      .order('sent_at', { ascending: false })
-      .limit(50);
-
-    if (error) {
-      console.error('Error fetching notification history:', error);
+    const currentUserEmail = getCurrentUserEmail();
+    if (!currentUserEmail) {
       return [];
     }
 
-    return data || [];
+    return await fetchNotificationHistory(currentUserEmail);
   } catch (error) {
-    console.error('Unexpected error fetching notification history:', error);
+    console.error('Error fetching notification history:', error);
     return [];
   }
-};
+}
 
-export const getAlertNotificationHistory = getVelibNotificationHistory;
-
-export const sendTestAlert = async (
+/**
+ * Envoie un email de test
+ */
+export async function sendTestAlert(
   stationcode: string,
   email: string,
-  alertType: string,
+  alertType: 'bikes_available' | 'docks_available' | 'ebikes_available' | 'mechanical_bikes',
   threshold: number
-): Promise<void> => {
+): Promise<boolean> {
   try {
+    const stationName = await getStationName(stationcode);
+    // Générer un UUID valide pour le test au lieu d'un simple timestamp
+    const testAlertId = crypto.randomUUID();
+    await sendAlertEmail(email, stationName, stationcode, alertType, threshold, threshold + 1, testAlertId);
+
     toast({
       title: "Email de test envoyé",
-      description: `Un email de test a été envoyé à ${email}`,
+      description: "Vérifiez votre boîte de réception.",
     });
+    
+    return true;
   } catch (error) {
     console.error('Error sending test alert:', error);
     toast({
-      title: "Erreur",
+      title: "Erreur d'envoi",
       description: "Impossible d'envoyer l'email de test.",
       variant: "destructive",
     });
+    return false;
   }
-};
+}

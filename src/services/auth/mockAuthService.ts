@@ -1,67 +1,30 @@
 
-import { supabase } from "@/integrations/supabase/client";
-
-// Helper functions for authentication (with Supabase integration)
-export const isUserAuthenticated = async (): Promise<boolean> => {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) return true;
-    
-    // Fallback to localStorage for admin users
-    return localStorage.getItem('isAuthenticated') === 'true';
-  } catch (error) {
-    // Fallback to localStorage if Supabase fails
-    return localStorage.getItem('isAuthenticated') === 'true';
-  }
+// Helper functions for mock authentication
+export const isUserAuthenticated = (): boolean => {
+  return localStorage.getItem('isAuthenticated') === 'true';
 };
 
-export const getCurrentUserIdentifier = async (): Promise<string> => {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      return session.user.id;
+export const getCurrentUserIdentifier = (): string => {
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail) {
+    // Générer un identifiant unique pour les utilisateurs sans email
+    let anonymousId = localStorage.getItem('anonymousUserId');
+    if (!anonymousId) {
+      anonymousId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('anonymousUserId', anonymousId);
     }
-    
-    // Fallback to localStorage identifier
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) {
-      let anonymousId = localStorage.getItem('anonymousUserId');
-      if (!anonymousId) {
-        anonymousId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('anonymousUserId', anonymousId);
-      }
-      return anonymousId;
-    }
-    
-    return userEmail;
-  } catch (error) {
-    // Fallback to localStorage
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) {
-      let anonymousId = localStorage.getItem('anonymousUserId');
-      if (!anonymousId) {
-        anonymousId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('anonymousUserId', anonymousId);
-      }
-      return anonymousId;
-    }
-    return userEmail;
+    return anonymousId;
   }
+  
+  // Utiliser l'email comme identifiant unique
+  return userEmail;
 };
 
-export const getCurrentUserId = async (): Promise<string> => {
+export const getCurrentUserId = (): string => {
+  // Maintenir la compatibilité pour le code existant
   return getCurrentUserIdentifier();
 };
 
-export const getCurrentUserEmail = async (): Promise<string | null> => {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user?.email) {
-      return session.user.email;
-    }
-    
-    return localStorage.getItem('userEmail');
-  } catch (error) {
-    return localStorage.getItem('userEmail');
-  }
+export const getCurrentUserEmail = (): string | null => {
+  return localStorage.getItem('userEmail');
 };

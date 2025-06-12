@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import AuthLayout from "@/components/auth/AuthLayout";
-import { supabase } from "@/integrations/supabase/client";
 
 const signUpSchema = z
   .object({
@@ -47,6 +46,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 const SignUp = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  // Check if there's a redirect path in the location state
   const from = location.state?.from || "/dashboard";
 
   const form = useForm<SignUpFormValues>({
@@ -61,50 +61,16 @@ const SignUp = () => {
     },
   });
 
-  useEffect(() => {
-    // Check if user is already authenticated
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate(from);
-      }
-    };
-    checkAuth();
-  }, [navigate, from]);
-
-  async function onSubmit(data: SignUpFormValues) {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-          }
-        }
-      });
-
-      if (error) {
-        if (error.message.includes('User already registered')) {
-          toast.error("Un compte avec cet email existe déjà");
-        } else {
-          toast.error("Erreur d'inscription: " + error.message);
-        }
-        return;
-      }
-
-      if (authData.user) {
-        toast.success("Inscription réussie! Vérifiez votre email pour confirmer votre compte.");
-        // Don't navigate immediately, wait for email confirmation
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      toast.error("Erreur d'inscription");
-    }
+  function onSubmit(data: SignUpFormValues) {
+    console.log(data);
+    // Set authentication state in localStorage (In a real app, this would involve a backend)
+    localStorage.setItem('isAuthenticated', 'true');
+    
+    toast.success("Inscription réussie!");
+    setTimeout(() => {
+      // Navigate to the redirect path or dashboard
+      navigate(from);
+    }, 1000);
   }
 
   return (
