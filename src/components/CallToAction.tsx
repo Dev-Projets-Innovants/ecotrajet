@@ -50,7 +50,7 @@ const CallToAction = () => {
                 <span>Commencer maintenant</span>
                 <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
-              <Link to="/guide/tutorials">
+              <Link to="/tutorial-videos">
                 <Button variant="outline" className="group rounded-full px-6 py-6 h-12 border-eco-green text-eco-green hover:bg-eco-light-green shadow-sm transition-all duration-300 flex items-center space-x-2">
                   <Video size={18} className="mr-2" />
                   <span>Voir les tutoriels</span>

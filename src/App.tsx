@@ -43,6 +43,7 @@ import VelibAlerts from "./pages/VelibAlerts";
 import OurStory from "./pages/OurStory";
 import Contact from "./pages/Contact";
 import Careers from "./pages/Careers";
+import TutorialVideos from "./pages/TutorialVideos";
 
 // Pages d'information légale et des fonctionnalités principales
 import Challenges from "./pages/Challenges";
@@ -81,6 +82,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/guide" element={<Guide />} />
               <Route path="/guide/article/:id" element={<ArticleDetail />} />
+              <Route path="/tutorial-videos" element={<TutorialVideos />} />
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/carbon-calculator" element={<CarbonCalculator />} />
               <Route path="/community" element={<Community />} />
