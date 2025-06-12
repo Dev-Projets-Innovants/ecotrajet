@@ -28,9 +28,9 @@ Ce projet est construit avec un ensemble de technologies modernes:
 - **Vitest**: Framework de test unitaire moderne et rapide
 - **GitHub Actions**: CI/CD automatisé pour les tests et déploiements
 
-## Comment modifier ce code?
+## Installation et démarrage
 
-Pour modifier l'application, suivez ces étapes:
+### Option 1: Installation locale
 
 ```sh
 # Étape 1: Clonez le dépôt en utilisant l'URL Git du projet.
@@ -46,19 +46,50 @@ npm i
 npm run dev
 ```
 
-**Modifier un fichier directement dans GitHub**
+### Option 2: Docker (Recommandé pour les équipes)
 
-- Naviguez vers le(s) fichier(s) souhaité(s).
-- Cliquez sur le bouton "Éditer" (icône de crayon) en haut à droite de la vue du fichier.
-- Apportez vos modifications et validez les changements.
+**Démarrage rapide avec Docker:**
 
-**Utiliser GitHub Codespaces**
+```bash
+# 1. Cloner le projet
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
+
+# 2. Créer le fichier .env
+cp .env.example .env
+# Éditer .env avec vos variables Supabase
+
+# 3. Lancer avec Docker
+docker-compose up --build
+```
+
+L'application sera accessible sur http://localhost:8080
+
+**Mode développement avec hot-reload:**
+```bash
+docker-compose --profile dev up --build ecotrajet-dev
+```
+
+**Avantages Docker:**
+- ✅ **Pas d'installation Node.js** : Docker gère tout
+- ✅ **Environnement identique** : Même version Node, mêmes dépendances
+- ✅ **Démarrage rapide** : 3 commandes maximum
+- ✅ **Isolation** : Pas de conflit avec d'autres projets
+
+📋 **Pour plus de détails sur Docker, consultez [docs/docker-setup.md](docs/docker-setup.md)**
+
+### Option 3: GitHub Codespaces
 
 - Accédez à la page principale de votre dépôt.
 - Cliquez sur le bouton "Code" (bouton vert) près du coin supérieur droit.
 - Sélectionnez l'onglet "Codespaces".
 - Cliquez sur "Nouveau codespace" pour lancer un nouvel environnement Codespace.
-- Modifiez les fichiers directement dans le Codespace et validez et poussez vos modifications une fois terminé.
+
+### Modification directe sur GitHub
+
+- Naviguez vers le(s) fichier(s) souhaité(s).
+- Cliquez sur le bouton "Éditer" (icône de crayon) en haut à droite de la vue du fichier.
+- Apportez vos modifications et validez les changements.
 
 ## Scripts disponibles
 
@@ -137,7 +168,7 @@ Le projet utilise **Vitest** pour les tests unitaires avec une couverture compl�
 - **Couverture**: Rapports détaillés avec seuils de qualité
 - **CI/CD**: Intégration dans GitHub Actions
 
-Pour plus d'informations sur les tests, consultez `docs/TESTING.md`.
+Pour plus d'informations sur les tests, consultez `docs/testing-guide.md`.
 
 ## CI/CD avec GitHub Actions
 
@@ -168,6 +199,13 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - Tables pour les stations Vélib', alertes utilisateurs, et données analytics
 - Edge Functions pour la synchronisation des données en temps réel
 - Authentification et gestion des sessions utilisateurs
+
+## Documentation
+
+- 📋 [Configuration Docker](docs/docker-setup.md) - Guide complet pour Docker
+- 🧪 [Guide des tests](docs/testing-guide.md) - Documentation des tests
+- 🏗️ [Architecture de la base de données](docs/database-architecture.md) - Structure des données
+- 🚀 [Guide CI/CD](docs/ci-cd-guide.md) - Intégration et déploiement continu
 
 ## Contribution
 
