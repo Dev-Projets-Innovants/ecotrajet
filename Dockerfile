@@ -8,8 +8,8 @@ WORKDIR /app
 # Copie les fichiers de dépendances
 COPY package*.json ./
 
-# Installe les dépendances (y compris dev pour le build)
-RUN npm ci
+# Installe les dépendances (utilise install si pas de lock file)
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Copie le code source
 COPY . .

@@ -37,12 +37,14 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## Résolution des problèmes courants
 
-### Erreur "lock file is not in sync"
-Si vous rencontrez cette erreur lors du build Docker :
+### Fichier package-lock.json manquant
+Les Dockerfiles sont configurés pour gérer automatiquement l'absence du fichier `package-lock.json`. Si vous souhaitez générer ce fichier localement :
 ```bash
-# Supprimer le lock file et reconstruire
-rm package-lock.json
-docker-compose build --no-cache
+# Générer le package-lock.json
+npm install
+
+# Puis lancer Docker
+docker-compose up --build
 ```
 
 ### Port déjà utilisé
@@ -124,6 +126,7 @@ Vos collègues peuvent maintenant lancer le projet en 3 étapes :
 - ✅ **Pas d'installation Node.js** : Docker gère tout
 - ✅ **Environnement identique** : Même version Node, mêmes dépendances
 - ✅ **Démarrage rapide** : 3 commandes maximum
+- ✅ **Gestion automatique** : Fonctionne avec ou sans package-lock.json
 - ✅ **Isolation** : Pas de conflit avec d'autres projets
 - ✅ **Hot-reload** : Modifications en temps réel en mode dev
 
@@ -140,6 +143,6 @@ L'application sera accessible via l'IP du serveur sur le port 8080.
 
 ## Notes techniques
 
-- Le build Docker installe toutes les dépendances (y compris dev) pour permettre la compilation
+- Le build Docker gère automatiquement la présence ou l'absence du fichier package-lock.json
 - En production, seuls les fichiers build sont servis
-- Le fichier package-lock.json sera automatiquement régénéré lors du premier build
+- Le fichier package-lock.json sera automatiquement généré lors du premier build Docker si absent
