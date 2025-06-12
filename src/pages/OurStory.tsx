@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Timeline, TimelineItem, TimelineConnector, TimelineHeader, TimelineIcon, TimelineTitle, TimelineBody } from '@/components/timeline';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { CalendarIcon, BookIcon, UsersIcon, AwardIcon, ImageIcon, StarIcon, HistoryIcon } from 'lucide-react';
+import { CalendarIcon, BookIcon, UsersIcon, AwardIcon, ImageIcon, StarIcon, HistoryIcon, TargetIcon, AlertTriangleIcon } from 'lucide-react';
 
 const OurStory = () => {
   return (
@@ -18,15 +18,19 @@ const OurStory = () => {
         
         <div className="bg-white rounded-lg shadow-md p-6 mb-10">
           <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-            <span className="font-semibold text-eco-green">ÉcoTrajet</span> est né de la vision commune d'un groupe d'étudiants passionnés par la mobilité durable et les défis environnementaux urbains. Notre ambition : transformer la façon dont les Parisiens se déplacent en rendant les options écologiques plus accessibles, ludiques et communautaires.
+            Notre aventure a commencé en <span className="font-semibold text-eco-green">novembre 2024</span>, née d'une observation simple mais essentielle : les services de Vélib' à Paris, malgré leur popularité croissante, ne mettent pas suffisamment en valeur leur dimension écologique et ne favorisent pas l'engagement communautaire qui pourrait amplifier leur impact positif.
+          </p>
+          <p className="text-gray-700 leading-relaxed">
+            Paris, comme de nombreuses métropoles mondiales, fait face à des défis environnementaux majeurs : pollution atmosphérique, émissions de CO2, congestion urbaine. La mobilité douce représente une réponse concrète à ces problématiques, et le réseau Vélib', avec ses <span className="font-semibold">1400 stations réparties sur 55 communes</span>, constitue un atout considérable mais encore sous-exploité dans cette transition.
           </p>
         </div>
 
         <Tabs defaultValue="timeline" className="mb-10">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="timeline">Notre Parcours</TabsTrigger>
+            <TabsTrigger value="problematique">Problématique</TabsTrigger>
+            <TabsTrigger value="objectifs">Objectifs</TabsTrigger>
             <TabsTrigger value="team">L'Équipe</TabsTrigger>
-            <TabsTrigger value="school">Notre École</TabsTrigger>
           </TabsList>
           
           <TabsContent value="timeline" className="space-y-4">
@@ -48,11 +52,11 @@ const OurStory = () => {
                       <TimelineIcon>
                         <CalendarIcon className="h-4 w-4" />
                       </TimelineIcon>
-                      <TimelineTitle>Septembre 2023</TimelineTitle>
+                      <TimelineTitle>Novembre 2024</TimelineTitle>
                     </TimelineHeader>
                     <TimelineBody className="pb-8">
                       <p className="text-sm text-muted-foreground">
-                        Naissance de l'idée pendant un atelier sur les mobilités durables à notre école. Premier brainstorming sur la façon de rendre la mobilité verte plus attractive.
+                        Naissance du projet ÉcoTrajet. Observation des limites actuelles des services Vélib' en matière de valorisation écologique et d'engagement communautaire. Formation de l'équipe et première analyse de l'existant.
                       </p>
                     </TimelineBody>
                   </TimelineItem>
@@ -63,11 +67,11 @@ const OurStory = () => {
                       <TimelineIcon>
                         <CalendarIcon className="h-4 w-4" />
                       </TimelineIcon>
-                      <TimelineTitle>Novembre 2023</TimelineTitle>
+                      <TimelineTitle>Décembre 2024</TimelineTitle>
                     </TimelineHeader>
                     <TimelineBody className="pb-8">
                       <p className="text-sm text-muted-foreground">
-                        Élaboration du concept et des premières maquettes. Développement d'un prototype d'application centré sur la cartographie des alternatives vertes.
+                        Identification précise de la problématique et définition des objectifs quantitatifs et qualitatifs. Élaboration du concept et des premières maquettes centrées sur l'impact environnemental.
                       </p>
                     </TimelineBody>
                   </TimelineItem>
@@ -78,11 +82,11 @@ const OurStory = () => {
                       <TimelineIcon>
                         <CalendarIcon className="h-4 w-4" />
                       </TimelineIcon>
-                      <TimelineTitle>Janvier 2024</TimelineTitle>
+                      <TimelineTitle>Janvier 2025</TimelineTitle>
                     </TimelineHeader>
                     <TimelineBody className="pb-8">
                       <p className="text-sm text-muted-foreground">
-                        Présentation du projet lors d'un hackathon environnemental. Premier prix dans la catégorie "Innovation urbaine" et rencontre avec des partenaires potentiels.
+                        Développement de l'architecture technique et création du prototype. Intégration des données Vélib' et développement des fonctionnalités de calcul d'impact carbone.
                       </p>
                     </TimelineBody>
                   </TimelineItem>
@@ -93,11 +97,11 @@ const OurStory = () => {
                       <TimelineIcon>
                         <CalendarIcon className="h-4 w-4" />
                       </TimelineIcon>
-                      <TimelineTitle>Mars 2024</TimelineTitle>
+                      <TimelineTitle>Mars 2025</TimelineTitle>
                     </TimelineHeader>
                     <TimelineBody className="pb-8">
                       <p className="text-sm text-muted-foreground">
-                        Lancement de la version bêta d'ÉcoTrajet avec l'intégration des données Vélib et transport en commun. Formation de l'équipe définitive et répartition des rôles.
+                        Lancement de la version bêta d'ÉcoTrajet avec système de défis écologiques et communauté d'utilisateurs. Premiers tests avec un groupe restreint d'utilisateurs parisiens.
                       </p>
                     </TimelineBody>
                   </TimelineItem>
@@ -107,15 +111,127 @@ const OurStory = () => {
                       <TimelineIcon>
                         <CalendarIcon className="h-4 w-4" />
                       </TimelineIcon>
-                      <TimelineTitle>Juin 2024</TimelineTitle>
+                      <TimelineTitle>Juin 2025</TimelineTitle>
                     </TimelineHeader>
                     <TimelineBody>
                       <p className="text-sm text-muted-foreground">
-                        Lancement officiel d'ÉcoTrajet avec toutes les fonctionnalités actuelles: carte interactive, défis écologiques, calculateur d'empreinte et communauté d'utilisateurs engagés.
+                        Lancement officiel d'ÉcoTrajet avec toutes les fonctionnalités : carte interactive, alertes Vélib', calculateur d'empreinte carbone, système de récompenses et communauté d'utilisateurs engagés.
                       </p>
                     </TimelineBody>
                   </TimelineItem>
                 </Timeline>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="problematique" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangleIcon className="h-5 w-5 text-eco-green" />
+                  Problématique Identifiée
+                </CardTitle>
+                <CardDescription>
+                  Les défis que nous adressons dans l'écosystème Vélib'
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="border border-orange-200 rounded-lg p-4 bg-orange-50/50">
+                    <h3 className="font-semibold text-lg mb-2 text-orange-800">Absence de dimension écologique</h3>
+                    <p className="text-sm text-orange-700">
+                      Les applications existantes se concentrent uniquement sur l'aspect pratique (localisation, disponibilité) sans mettre en valeur ni quantifier l'impact environnemental positif de chaque trajet. Cette absence prive les utilisateurs d'une source importante de motivation et de satisfaction.
+                    </p>
+                  </div>
+                  
+                  <div className="border border-blue-200 rounded-lg p-4 bg-blue-50/50">
+                    <h3 className="font-semibold text-lg mb-2 text-blue-800">Manque d'engagement communautaire</h3>
+                    <p className="text-sm text-blue-700">
+                      L'utilisation des Vélib' reste une expérience individuelle, sans partage ni émulation collective qui pourraient renforcer l'adoption et la fidélisation.
+                    </p>
+                  </div>
+                  
+                  <div className="border border-purple-200 rounded-lg p-4 bg-purple-50/50">
+                    <h3 className="font-semibold text-lg mb-2 text-purple-800">Difficulté à quantifier l'impact positif</h3>
+                    <p className="text-sm text-purple-700">
+                      Les utilisateurs n'ont aucun moyen de mesurer concrètement leur contribution environnementale, ce qui diminue le sentiment d'accomplissement et la perception de la valeur ajoutée de ce mode de transport.
+                    </p>
+                  </div>
+                  
+                  <div className="border border-red-200 rounded-lg p-4 bg-red-50/50">
+                    <h3 className="font-semibold text-lg mb-2 text-red-800">Motivation insuffisante</h3>
+                    <p className="text-sm text-red-700">
+                      L'absence de mécanismes de récompense et de reconnaissance limite l'engagement à long terme des utilisateurs et freine le développement de comportements vertueux durables. Les utilisateurs manquent de reconnaissance tangible et de stimulation continue pour transformer leurs actions ponctuelles en habitudes quotidiennes.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="objectifs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TargetIcon className="h-5 w-5 text-eco-green" />
+                  Nos Objectifs
+                </CardTitle>
+                <CardDescription>
+                  Des ambitions précises pour transformer la mobilité urbaine parisienne
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-semibold text-xl mb-4 text-eco-green flex items-center gap-2">
+                      <span className="bg-eco-green text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">✓</span>
+                      Objectifs Quantitatifs
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="border-l-4 border-eco-green pl-4">
+                        <p className="font-medium">500 utilisateurs actifs</p>
+                        <p className="text-sm text-muted-foreground">Dans les 6 premiers mois suivant le lancement</p>
+                      </div>
+                      <div className="border-l-4 border-eco-green pl-4">
+                        <p className="font-medium">10% de réduction d'empreinte carbone</p>
+                        <p className="text-sm text-muted-foreground">En moyenne pour les déplacements urbains des utilisateurs</p>
+                      </div>
+                      <div className="border-l-4 border-eco-green pl-4">
+                        <p className="font-medium">40% de taux de rétention</p>
+                        <p className="text-sm text-muted-foreground">Après 3 mois d'utilisation, témoignant de la valeur ajoutée réelle perçue</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-xl mb-4 text-eco-green flex items-center gap-2">
+                      <span className="bg-eco-green text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">✓</span>
+                      Objectifs Qualitatifs
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="border-l-4 border-eco-light-green pl-4">
+                        <p className="font-medium">Créer une communauté engagée</p>
+                        <p className="text-sm text-muted-foreground">Transformer l'usage individuel en mouvement collectif pour la mobilité verte</p>
+                      </div>
+                      <div className="border-l-4 border-eco-light-green pl-4">
+                        <p className="font-medium">Sensibiliser efficacement</p>
+                        <p className="text-sm text-muted-foreground">À l'impact environnemental des choix de transport quotidiens</p>
+                      </div>
+                      <div className="border-l-4 border-eco-light-green pl-4">
+                        <p className="font-medium">Améliorer l'expérience utilisateur</p>
+                        <p className="text-sm text-muted-foreground">Des services Vélib' par une interface intuitive et agréable</p>
+                      </div>
+                      <div className="border-l-4 border-eco-light-green pl-4">
+                        <p className="font-medium">Développer des partenariats</p>
+                        <p className="text-sm text-muted-foreground">Avec la ville de Paris et les acteurs clés de la mobilité urbaine</p>
+                      </div>
+                      <div className="border-l-4 border-eco-light-green pl-4">
+                        <p className="font-medium">Devenir la référence</p>
+                        <p className="text-sm text-muted-foreground">Dans le domaine des applications de mobilité durable</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -128,7 +244,7 @@ const OurStory = () => {
                   L'Équipe Fondatrice
                 </CardTitle>
                 <CardDescription>
-                  Les étudiants derrière le projet ÉcoTrajet
+                  Une équipe alliant expertise technique et engagement environnemental
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -136,13 +252,13 @@ const OurStory = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="h-16 w-16 border-2 border-eco-light-green">
                       <AvatarImage src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop" />
-                      <AvatarFallback>ME</AvatarFallback>
+                      <AvatarFallback>M1</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium text-lg">Marion Etienne</h3>
-                      <p className="text-sm text-muted-foreground mb-2">Co-fondatrice & Développement Durable</p>
+                      <h3 className="font-medium text-lg">M1</h3>
+                      <p className="text-sm text-muted-foreground mb-2">Chef de projet & Développeur Fullstack</p>
                       <p className="text-sm">
-                        Étudiante en Master Développement Durable et Économie Circulaire, Marion apporte son expertise environnementale et sa vision de la mobilité verte urbaine.
+                        Pilote la vision globale du projet et coordonne le développement technique de l'ensemble de l'application ÉcoTrajet.
                       </p>
                     </div>
                   </div>
@@ -150,13 +266,13 @@ const OurStory = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="h-16 w-16 border-2 border-eco-light-green">
                       <AvatarImage src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=400&fit=crop" />
-                      <AvatarFallback>TL</AvatarFallback>
+                      <AvatarFallback>M2</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium text-lg">Thomas Laurent</h3>
-                      <p className="text-sm text-muted-foreground mb-2">Co-fondateur & Développement</p>
+                      <h3 className="font-medium text-lg">M2</h3>
+                      <p className="text-sm text-muted-foreground mb-2">Développeur Backend & DevOps</p>
                       <p className="text-sm">
-                        Passionné de code et d'impact social, Thomas a développé l'architecture technique de l'application et coordonne le développement des fonctionnalités.
+                        Expert en architecture backend et déploiement, responsable de l'infrastructure technique et de la performance de l'application.
                       </p>
                     </div>
                   </div>
@@ -164,13 +280,13 @@ const OurStory = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="h-16 w-16 border-2 border-eco-light-green">
                       <AvatarImage src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=400&h=400&fit=crop" />
-                      <AvatarFallback>SC</AvatarFallback>
+                      <AvatarFallback>M3</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium text-lg">Sophie Clément</h3>
-                      <p className="text-sm text-muted-foreground mb-2">UX Design & Communauté</p>
+                      <h3 className="font-medium text-lg">M3</h3>
+                      <p className="text-sm text-muted-foreground mb-2">Architecte Infrastructure</p>
                       <p className="text-sm">
-                        En charge de l'expérience utilisateur et de l'animation de la communauté, Sophie travaille à rendre l'application aussi intuitive qu'engageante.
+                        Conçoit et supervise l'architecture technique globale, garantit la scalabilité et la robustesse de la plateforme.
                       </p>
                     </div>
                   </div>
@@ -178,13 +294,41 @@ const OurStory = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="h-16 w-16 border-2 border-eco-light-green">
                       <AvatarImage src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=400&fit=crop" />
-                      <AvatarFallback>AB</AvatarFallback>
+                      <AvatarFallback>M4</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium text-lg">Alex Benali</h3>
-                      <p className="text-sm text-muted-foreground mb-2">Data & Partenariats</p>
+                      <h3 className="font-medium text-lg">M4</h3>
+                      <p className="text-sm text-muted-foreground mb-2">Expert Écologique</p>
                       <p className="text-sm">
-                        Expert en analyse de données, Alex gère l'intégration des API de mobilité et le développement des partenariats avec les acteurs de transport parisiens.
+                        Apporte son expertise en développement durable et veille à l'alignement du projet avec les enjeux environnementaux actuels.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="h-16 w-16 border-2 border-eco-light-green">
+                      <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" />
+                      <AvatarFallback>M5</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium text-lg">M5</h3>
+                      <p className="text-sm text-muted-foreground mb-2">UX/UI Designer</p>
+                      <p className="text-sm">
+                        Responsable de l'expérience utilisateur et de l'interface, crée une application intuitive et engageante pour tous les utilisateurs.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="h-16 w-16 border-2 border-eco-light-green">
+                      <AvatarImage src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop" />
+                      <AvatarFallback>M6</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium text-lg">M6</h3>
+                      <p className="text-sm text-muted-foreground mb-2">Chargé de Documentation & Reporting</p>
+                      <p className="text-sm">
+                        Gère la documentation technique, les rapports de performance et assure la communication sur l'impact du projet.
                       </p>
                     </div>
                   </div>
@@ -194,73 +338,11 @@ const OurStory = () => {
                 
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-4">
-                    Notre équipe s'est formée lors de nos études, réunie par la conviction que la technologie peut être un puissant levier pour la transition écologique.
+                    Notre équipe allie expertise technique et engagement environnemental pour donner vie à cette vision innovante de transformation de la mobilité urbaine parisienne.
                   </p>
                   <p className="text-sm font-medium">
                     "Nous croyons qu'en rendant les choix écologiques plus accessibles et ludiques, nous pouvons tous ensemble transformer la mobilité urbaine."
                   </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="school" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookIcon className="h-5 w-5 text-eco-green" />
-                  Notre École
-                </CardTitle>
-                <CardDescription>
-                  Le berceau d'ÉcoTrajet et notre formation
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-8 rounded-lg overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
-                    alt="Notre campus" 
-                    className="w-full h-64 object-cover" 
-                  />
-                </div>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-medium text-lg flex items-center gap-2">
-                      <AwardIcon className="h-4 w-4 text-eco-green" />
-                      L'École du Numérique Responsable
-                    </h3>
-                    <p className="text-sm mt-2">
-                      Notre formation au sein de l'École du Numérique Responsable (ENR) nous a permis d'acquérir les compétences techniques tout en développant une vision éthique du numérique, orientée vers l'impact positif et la durabilité.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium text-lg flex items-center gap-2">
-                      <StarIcon className="h-4 w-4 text-eco-green" />
-                      Notre Parcours Académique
-                    </h3>
-                    <p className="text-sm mt-2">
-                      Le projet ÉcoTrajet est né dans le cadre du programme "Tech for Good" de notre établissement, qui encourage les initiatives technologiques à impact social et environnemental positif.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium text-lg flex items-center gap-2">
-                      <ImageIcon className="h-4 w-4 text-eco-green" />
-                      Les Valeurs Transmises
-                    </h3>
-                    <p className="text-sm mt-2">
-                      Notre formation nous a inculqué les valeurs d'innovation responsable, d'inclusion et d'engagement écologique que nous avons intégrées au cœur d'ÉcoTrajet. Nous avons appris à concevoir des solutions numériques qui répondent aux enjeux contemporains.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-8 p-4 bg-eco-light-green/30 rounded-lg">
-                  <blockquote className="italic text-sm">
-                    "L'innovation technologique doit être mise au service de la transition écologique et de l'amélioration de la qualité de vie urbaine. C'est cette vision que nous avons souhaité incarner à travers ÉcoTrajet."
-                  </blockquote>
-                  <p className="text-right text-sm font-medium mt-2">— La Direction de l'ENR</p>
                 </div>
               </CardContent>
             </Card>
@@ -270,7 +352,7 @@ const OurStory = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Notre Vision pour l'Avenir</h2>
           <p className="text-gray-700 mb-6">
-            ÉcoTrajet n'est qu'au début de son aventure. Nous travaillons continuellement à enrichir l'application avec de nouvelles fonctionnalités et à étendre notre communauté d'utilisateurs engagés pour la mobilité durable.
+            La ville de Paris a affiché des ambitions fortes en matière de réduction de l'empreinte carbone et d'amélioration de la qualité de vie urbaine. ÉcoTrajet s'inscrit parfaitement dans cette dynamique en proposant une solution numérique qui valorise et amplifie les bénéfices environnementaux de l'utilisation des Vélib', tout en créant une expérience utilisateur enrichie et engageante.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 border border-eco-light-green rounded-lg">
@@ -278,12 +360,12 @@ const OurStory = () => {
               <p className="text-sm">Après Paris, nous souhaitons déployer ÉcoTrajet dans d'autres métropoles françaises puis européennes.</p>
             </div>
             <div className="p-4 border border-eco-light-green rounded-lg">
-              <h3 className="font-medium text-eco-green mb-2">Nouvelles fonctionnalités</h3>
-              <p className="text-sm">Intégration de l'intelligence artificielle pour personnaliser les recommandations de trajets et optimiser l'impact écologique.</p>
+              <h3 className="font-medium text-eco-green mb-2">Innovation continue</h3>
+              <p className="text-sm">Intégration de l'intelligence artificielle pour personnaliser les recommandations et optimiser l'impact écologique.</p>
             </div>
             <div className="p-4 border border-eco-light-green rounded-lg">
               <h3 className="font-medium text-eco-green mb-2">Impact mesurable</h3>
-              <p className="text-sm">Développement d'outils permettant de quantifier précisément l'impact collectif de notre communauté sur la réduction des émissions carbone.</p>
+              <p className="text-sm">Développement d'outils permettant de quantifier précisément l'impact collectif sur la réduction des émissions carbone.</p>
             </div>
           </div>
         </div>
