@@ -1,5 +1,13 @@
 
 import React, { useState } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import OptimizedStatsCard from '@/components/admin/dashboard/OptimizedStatsCard';
+import OptimizedVelibAvailabilityChart from '@/components/admin/dashboard/OptimizedVelibAvailabilityChart';
+import OptimizedVelibDistributionChart from '@/components/admin/dashboard/OptimizedVelibDistributionChart';
+import OptimizedVelibUsageChart from '@/components/admin/dashboard/OptimizedVelibUsageChart';
+import DashboardFilters from '@/components/admin/dashboard/DashboardFilters';
+import { useOptimizedVelibData } from '@/hooks/useOptimizedVelibData';
+import { toast } from '@/hooks/use-toast';
 import { 
   UserCheck, 
   Route, 
@@ -12,16 +20,12 @@ import {
   Battery,
   ParkingCircle
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import AdminLayout from '@/components/admin/AdminLayout';
-import StatsCard from '@/components/admin/dashboard/StatsCard';
-import VelibAvailabilityChart from '@/components/admin/dashboard/VelibAvailabilityChart';
-import VelibDistributionChart from '@/components/admin/dashboard/VelibDistributionChart';
-import VelibUsageChart from '@/components/admin/dashboard/VelibUsageChart';
-import { useVelibDashboardData } from '@/components/admin/dashboard/useVelibDashboardData';
-import { toast } from '@/hooks/use-toast';
 
 const AdminDashboard = () => {
+  const [timeRange, setTimeRange] = useState('24h');
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
+
   const { 
     stats,
     availabilityTrends, 
@@ -30,17 +34,17 @@ const AdminDashboard = () => {
     chartConfig,
     isLoading,
     error,
+    lastUpdated,
     refetchData
-  } = useVelibDashboardData();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  } = useOptimizedVelibData(autoRefresh);
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
+  const handleManualRefresh = async () => {
+    setIsManualRefreshing(true);
     try {
       await refetchData();
       toast({
         title: "Données actualisées",
-        description: "Les données Vélib' ont été mises à jour.",
+        description: "Les données Vélib' ont été mises à jour avec succès.",
       });
     } catch (error) {
       toast({
@@ -49,30 +53,30 @@ const AdminDashboard = () => {
         variant: "destructive"
       });
     } finally {
-      setIsRefreshing(false);
+      setIsManualRefreshing(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <AdminLayout title="Tableau de bord">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green"></div>
-          <span className="ml-2 text-gray-600">Chargement des données Vélib'...</span>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const handleAutoRefreshToggle = () => {
+    setAutoRefresh(!autoRefresh);
+    toast({
+      title: autoRefresh ? "Actualisation automatique désactivée" : "Actualisation automatique activée",
+      description: autoRefresh ? "Les données ne seront plus actualisées automatiquement." : "Les données seront actualisées toutes les 5 minutes.",
+    });
+  };
 
-  if (error) {
+  if (error && !stats) {
     return (
       <AdminLayout title="Tableau de bord">
         <div className="text-center py-12">
           <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={handleRefresh} variant="outline">
+          <button 
+            onClick={handleManualRefresh} 
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
             <RefreshCw className="mr-2 h-4 w-4" />
             Réessayer
-          </Button>
+          </button>
         </div>
       </AdminLayout>
     );
@@ -80,69 +84,81 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Tableau de bord Vélib'">
-      <div className="grid gap-6">
-        {/* Stats Cards Header with Refresh Button */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-semibold">Statistiques Vélib' en temps réel</h2>
-            <p className="text-sm text-gray-600">
-              Dernière mise à jour: {stats ? new Date(stats.lastUpdated).toLocaleString('fr-FR') : 'N/A'}
-            </p>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh} 
-            disabled={isRefreshing}
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Actualiser
-          </Button>
-        </div>
+      <div className="space-y-6">
+        {/* Filtres et contrôles */}
+        <DashboardFilters
+          timeRange={timeRange}
+          onTimeRangeChange={setTimeRange}
+          isRefreshing={isManualRefreshing}
+          onRefresh={handleManualRefresh}
+          lastUpdated={lastUpdated}
+          autoRefresh={autoRefresh}
+          onAutoRefreshToggle={handleAutoRefreshToggle}
+        />
 
-        {/* Stats Cards */}
+        {/* Cartes de statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
+          <OptimizedStatsCard
             title="Stations actives"
             value={stats?.activeStations.toLocaleString() || '0'}
             trend={`${stats?.totalStations || 0} au total`}
             icon={MapPin}
             iconColor="text-eco-green"
+            isLoading={isLoading}
+            lastUpdated={lastUpdated}
           />
           
-          <StatsCard
+          <OptimizedStatsCard
             title="Vélos disponibles"
             value={stats?.totalBikesAvailable.toLocaleString() || '0'}
             trend={`${stats?.mechanicalBikes || 0} mécaniques`}
             icon={Bike}
             iconColor="text-blue-500"
+            isLoading={isLoading}
+            lastUpdated={lastUpdated}
           />
           
-          <StatsCard
+          <OptimizedStatsCard
             title="Vélos électriques"
             value={stats?.electricBikes.toLocaleString() || '0'}
             trend="Disponibles maintenant"
             icon={Battery}
             iconColor="text-green-500"
+            isLoading={isLoading}
+            lastUpdated={lastUpdated}
           />
           
-          <StatsCard
+          <OptimizedStatsCard
             title="Places libres"
             value={stats?.totalDocksAvailable.toLocaleString() || '0'}
             trend={`Capacité moy: ${stats?.averageCapacity || 0}`}
             icon={ParkingCircle}
             iconColor="text-amber-500"
+            isLoading={isLoading}
+            lastUpdated={lastUpdated}
           />
         </div>
 
-        {/* Charts */}
+        {/* Graphiques */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <VelibAvailabilityChart data={availabilityTrends} config={chartConfig} />
-          <VelibDistributionChart data={distributionData} config={chartConfig} />
+          <OptimizedVelibAvailabilityChart 
+            data={availabilityTrends} 
+            config={chartConfig} 
+            isLoading={isLoading}
+          />
+          <OptimizedVelibDistributionChart 
+            data={distributionData} 
+            config={chartConfig} 
+            isLoading={isLoading}
+          />
         </div>
 
-        {/* Usage Chart */}
-        <VelibUsageChart data={usageData} config={chartConfig} />
+        {/* Graphique d'utilisation */}
+        <OptimizedVelibUsageChart 
+          data={usageData} 
+          config={chartConfig} 
+          isLoading={isLoading}
+        />
       </div>
     </AdminLayout>
   );
