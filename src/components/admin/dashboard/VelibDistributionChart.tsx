@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
-import { VelibDistributionData } from '@/services/adminVelibService';
+import { VelibDistributionData } from '@/services/admin';
 
 interface VelibDistributionChartProps {
   data: VelibDistributionData[];

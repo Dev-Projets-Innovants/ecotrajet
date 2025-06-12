@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
-import { VelibAvailabilityTrend } from '@/services/adminVelibService';
+import { VelibAvailabilityTrend } from '@/services/admin';
 
 interface VelibAvailabilityChartProps {
   data: VelibAvailabilityTrend[];
