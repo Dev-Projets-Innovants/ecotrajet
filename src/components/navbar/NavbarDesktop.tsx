@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import NavLink from './NavLink';
@@ -129,7 +128,11 @@ const NavbarDesktop = ({
               </Button>
             </NavLink>
           )}
-          <NavLink to="/profile" onClick={handleProfileClick} className={textColorClass}>
+          <NavLink 
+            to={isAdmin ? "/admin/profile" : "/profile"} 
+            onClick={handleProfileClick} 
+            className={textColorClass}
+          >
             <Button variant="ghost" className={textColorClass}>Profil</Button>
           </NavLink>
           <NavLink to="/notifications" onClick={handleNotificationsClick} className={textColorClass}>

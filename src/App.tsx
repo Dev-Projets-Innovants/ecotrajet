@@ -36,6 +36,7 @@ import AdminChallenges from "./pages/admin/AdminChallenges";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminRewards from "./pages/admin/AdminRewards";
+import AdminProfile from "./pages/admin/AdminProfile";
 import CarbonCalculator from "./pages/CarbonCalculator";
 import Community from "./pages/Community";
 import UserProfile from "./pages/UserProfile";
@@ -109,6 +110,7 @@ function App() {
                 <Route path="/admin/content" element={<AdminContent />} />
                 <Route path="/admin/analytics" element={<AdminAnalytics />} />
                 <Route path="/admin/notifications" element={<AdminNotifications />} />
+                <Route path="/admin/profile" element={<AdminProfile />} />
                 
                 {/* Route de fallback pour les chemins inexistants */}
                 <Route path="*" element={<NotFound />} />

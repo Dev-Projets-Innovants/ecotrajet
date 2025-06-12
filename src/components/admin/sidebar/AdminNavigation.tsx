@@ -17,7 +17,8 @@ import {
   BarChart2, 
   Bell, 
   Settings,
-  Trophy
+  Trophy,
+  UserCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -70,6 +71,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ isSidebarCollapsed })
     { href: '/admin/content', icon: MessageSquare, title: 'Contenu' },
     { href: '/admin/analytics', icon: BarChart2, title: 'Analytique' },
     { href: '/admin/notifications', icon: Bell, title: 'Notifications' },
+    { href: '/admin/profile', icon: UserCircle, title: 'Profil' },
     { href: '/admin/settings', icon: Settings, title: 'Paramètres' },
   ];
 

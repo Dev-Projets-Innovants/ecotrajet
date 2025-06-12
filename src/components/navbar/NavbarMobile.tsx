@@ -1,4 +1,3 @@
-
 import React from 'react';
 import NavLink from './NavLink';
 import { Button } from '@/components/ui/button';
@@ -143,7 +142,7 @@ const NavbarMobile = ({
                     />
                   )}
                   <MobileNavItem 
-                    href="/profile" 
+                    href={isAdmin ? "/admin/profile" : "/profile"} 
                     icon={<UserCircle className="h-5 w-5 text-eco-green" />}
                     label="Profil" 
                     onClick={(e) => { 
