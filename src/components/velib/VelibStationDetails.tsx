@@ -7,10 +7,11 @@ import {
 import {
   addFavoriteStation,
   removeFavoriteStation,
-  getFavoriteStations
+  isFavoriteStation
 } from '@/services/velibFavoritesService';
 import { subscribeToStationUpdates } from '@/services/velibRealtimeService';
 import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import VelibStationHeader from './VelibStationHeader';
 import VelibStationAvailability from './VelibStationAvailability';
 import VelibStationInfo from './VelibStationInfo';
@@ -24,37 +25,52 @@ interface VelibStationDetailsProps {
 const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = localStorage.getItem('isAuthenticated') === 'true';
-      setIsAuthenticated(authenticated);
+    const checkAuthAndFavorite = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const authenticated = !!session;
+        setIsAuthenticated(authenticated);
+
+        if (authenticated) {
+          const favorite = await isFavoriteStation(station.stationcode);
+          setIsFavorite(favorite);
+        }
+      } catch (error) {
+        console.error('Error checking auth and favorite status:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    checkAuth();
 
-    if (isAuthenticated) {
-      checkIfFavorite();
-    }
+    checkAuthAndFavorite();
 
-    const subscription = subscribeToStationUpdates(station.stationcode, (payload) => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setIsAuthenticated(!!session);
+        if (!session) {
+          setIsFavorite(false);
+        } else {
+          // Recheck favorite status when user signs in
+          isFavoriteStation(station.stationcode).then(setIsFavorite);
+        }
+      }
+    );
+
+    const stationSubscription = subscribeToStationUpdates(station.stationcode, (payload) => {
       console.log('Station update received:', payload);
     });
 
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
+      subscription.unsubscribe();
+      if (stationSubscription) {
+        stationSubscription.unsubscribe();
       }
     };
-  }, [station.stationcode, isAuthenticated]);
-
-  const checkIfFavorite = async () => {
-    try {
-      const favorites = await getFavoriteStations();
-      setIsFavorite(favorites.some(fav => fav.stationcode === station.stationcode));
-    } catch (error) {
-      console.error('Error checking favorites:', error);
-    }
-  };
+  }, [station.stationcode]);
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated) {
@@ -74,6 +90,19 @@ const VelibStationDetails: React.FC<VelibStationDetailsProps> = ({ station }) =>
       if (success) setIsFavorite(true);
     }
   };
+
+  if (loading) {
+    return (
+      <Card className="w-full max-w-md">
+        <div className="p-4">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-md">

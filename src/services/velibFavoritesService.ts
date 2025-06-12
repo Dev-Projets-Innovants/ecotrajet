@@ -1,35 +1,23 @@
 
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { getCurrentUserId } from "./auth/authService";
 
 export interface UserFavoriteStation {
   id: string;
   stationcode: string;
   created_at: string;
+  user_id?: string;
 }
 
-// Helper function to check if user is authenticated using the local storage method
-const isUserAuthenticated = (): boolean => {
-  return localStorage.getItem('isAuthenticated') === 'true';
-};
-
-// Helper function to get a mock user ID for the current session
-const getCurrentUserId = (): string => {
-  const userEmail = localStorage.getItem('userEmail');
-  if (!userEmail) {
-    // Generate a consistent mock user ID based on session
-    return 'mock-user-' + Math.random().toString(36).substring(2, 15);
-  }
-  // Use email as basis for consistent mock user ID
-  return 'user-' + btoa(userEmail).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-};
-
 /**
- * Gestion des stations favorites
+ * Gestion des stations favorites avec Supabase
  */
 export async function addFavoriteStation(stationcode: string): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    if (!isUserAuthenticated()) {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour ajouter des favoris.",
@@ -38,23 +26,15 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
       return false;
     }
 
-    const currentUserId = getCurrentUserId();
-    const favorite = {
-      id: 'fav-' + Date.now(),
-      user_id: currentUserId,
-      stationcode,
-      created_at: new Date().toISOString()
-    };
-
-    // Stocker dans localStorage
-    const existingFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-    
     // Vérifier si pas déjà en favoris
-    const alreadyExists = existingFavorites.some((fav: any) => 
-      fav.stationcode === stationcode && fav.user_id === currentUserId
-    );
+    const { data: existingFavorite } = await supabase
+      .from('user_favorite_stations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('stationcode', stationcode)
+      .single();
 
-    if (alreadyExists) {
+    if (existingFavorite) {
       toast({
         title: "Déjà en favoris",
         description: "Cette station est déjà dans vos favoris.",
@@ -62,8 +42,23 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
       return true;
     }
 
-    existingFavorites.push(favorite);
-    localStorage.setItem('userFavorites', JSON.stringify(existingFavorites));
+    // Ajouter aux favoris
+    const { error } = await supabase
+      .from('user_favorite_stations')
+      .insert({
+        user_id: userId,
+        stationcode: stationcode
+      });
+
+    if (error) {
+      console.error('Error adding favorite:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la station aux favoris.",
+        variant: "destructive",
+      });
+      return false;
+    }
 
     toast({
       title: "Favori ajouté",
@@ -73,14 +68,20 @@ export async function addFavoriteStation(stationcode: string): Promise<boolean> 
     return true;
   } catch (error) {
     console.error('Unexpected error adding favorite:', error);
+    toast({
+      title: "Erreur",
+      description: "Une erreur inattendue s'est produite.",
+      variant: "destructive",
+    });
     return false;
   }
 }
 
 export async function removeFavoriteStation(stationcode: string): Promise<boolean> {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    if (!isUserAuthenticated()) {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
       toast({
         title: "Connexion requise",
         description: "Vous devez être connecté pour gérer vos favoris.",
@@ -89,13 +90,21 @@ export async function removeFavoriteStation(stationcode: string): Promise<boolea
       return false;
     }
 
-    const currentUserId = getCurrentUserId();
-    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-    const updatedFavorites = favorites.filter((fav: any) => 
-      !(fav.stationcode === stationcode && fav.user_id === currentUserId)
-    );
-    
-    localStorage.setItem('userFavorites', JSON.stringify(updatedFavorites));
+    const { error } = await supabase
+      .from('user_favorite_stations')
+      .delete()
+      .eq('user_id', userId)
+      .eq('stationcode', stationcode);
+
+    if (error) {
+      console.error('Error removing favorite:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la station des favoris.",
+        variant: "destructive",
+      });
+      return false;
+    }
 
     toast({
       title: "Favori supprimé",
@@ -105,25 +114,60 @@ export async function removeFavoriteStation(stationcode: string): Promise<boolea
     return true;
   } catch (error) {
     console.error('Unexpected error removing favorite:', error);
+    toast({
+      title: "Erreur",
+      description: "Une erreur inattendue s'est produite.",
+      variant: "destructive",
+    });
     return false;
   }
 }
 
 export async function getFavoriteStations(): Promise<UserFavoriteStation[]> {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    if (!isUserAuthenticated()) {
-      console.log('User not authenticated via localStorage');
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      console.log('User not authenticated');
       return [];
     }
 
-    const favorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-    const currentUserId = getCurrentUserId();
-    
-    // Filtrer par utilisateur actuel
-    return favorites.filter((fav: any) => fav.user_id === currentUserId);
+    const { data: favorites, error } = await supabase
+      .from('user_favorite_stations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching favorites:', error);
+      return [];
+    }
+
+    return favorites || [];
   } catch (error) {
     console.error('Unexpected error fetching favorites:', error);
     return [];
+  }
+}
+
+export async function isFavoriteStation(stationcode: string): Promise<boolean> {
+  try {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      return false;
+    }
+
+    const { data: favorite } = await supabase
+      .from('user_favorite_stations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('stationcode', stationcode)
+      .single();
+
+    return !!favorite;
+  } catch (error) {
+    console.error('Error checking if station is favorite:', error);
+    return false;
   }
 }
