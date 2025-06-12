@@ -36,10 +36,9 @@ const Footer = () => {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Entreprise</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">À propos</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Blog</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Carrières</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Contact</a></li>
+              <li><Link to="/our-story" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Notre Histoire</Link></li>
+              <li><Link to="/careers" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Carrières</Link></li>
+              <li><Link to="/contact" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Contact</Link></li>
             </ul>
           </div>
           
@@ -49,7 +48,6 @@ const Footer = () => {
               <li><Link to="/terms-of-use" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Conditions d'utilisation</Link></li>
               <li><Link to="/privacy-policy" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Politique de confidentialité</Link></li>
               <li><Link to="/legal-notice" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Mentions légales</Link></li>
-              <li><Link to="/our-story" className="text-sm text-gray-500 hover:text-eco-green transition-colors">Notre Histoire</Link></li>
             </ul>
           </div>
         </div>

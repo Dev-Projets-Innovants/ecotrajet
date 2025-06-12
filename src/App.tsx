@@ -41,6 +41,8 @@ import UserProfile from "./pages/UserProfile";
 import MapView from "./pages/MapView";
 import VelibAlerts from "./pages/VelibAlerts";
 import OurStory from "./pages/OurStory";
+import Contact from "./pages/Contact";
+import Careers from "./pages/Careers";
 
 // Pages d'information légale et des fonctionnalités principales
 import Challenges from "./pages/Challenges";
@@ -72,6 +74,8 @@ function App() {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/our-story" element={<OurStory />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/careers" element={<Careers />} />
               
               {/* Routes utilisateur authentifié */}
               <Route path="/dashboard" element={<Dashboard />} />
