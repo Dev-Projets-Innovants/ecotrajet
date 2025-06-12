@@ -9,16 +9,16 @@ export interface AuthState {
 }
 
 // Helper functions for authentication
-export const isUserAuthenticated = (): boolean => {
-  // First check Supabase session
-  return supabase.auth.getSession().then(({ data: { session } }) => {
+export const isUserAuthenticated = async (): Promise<boolean> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
     if (session) return true;
     // Fallback to localStorage for admin users
     return localStorage.getItem('isAuthenticated') === 'true';
-  }).catch(() => {
+  } catch (error) {
     // Fallback to localStorage if Supabase fails
     return localStorage.getItem('isAuthenticated') === 'true';
-  });
+  }
 };
 
 export const getCurrentUserIdentifier = async (): Promise<string | null> => {
