@@ -35,6 +35,31 @@ VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
+## Résolution des problèmes courants
+
+### Erreur "lock file is not in sync"
+Si vous rencontrez cette erreur lors du build Docker :
+```bash
+# Supprimer le lock file et reconstruire
+rm package-lock.json
+docker-compose build --no-cache
+```
+
+### Port déjà utilisé
+```bash
+# Changer le port dans docker-compose.yml
+ports:
+  - "3000:8080"  # Port local:port conteneur
+```
+
+### Problème de cache
+```bash
+# Reconstruire complètement
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up
+```
+
 ## Commandes utiles
 
 ### Gestion des conteneurs
@@ -112,3 +137,9 @@ docker-compose up -d --build
 ```
 
 L'application sera accessible via l'IP du serveur sur le port 8080.
+
+## Notes techniques
+
+- Le build Docker installe toutes les dépendances (y compris dev) pour permettre la compilation
+- En production, seuls les fichiers build sont servis
+- Le fichier package-lock.json sera automatiquement régénéré lors du premier build
