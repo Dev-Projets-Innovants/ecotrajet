@@ -29,6 +29,7 @@ import {
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Layout } from "@/components/Layout";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const userData = {
   name: "Thomas Dubois",
@@ -79,10 +80,13 @@ const weatherData = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, isLoading, signOut } = useAuth();
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    if (!isAuthenticated) {
+    console.log('Dashboard useEffect - user:', user, 'isLoading:', isLoading);
+    
+    if (!isLoading && !user) {
+      console.log('User not authenticated, redirecting to signin...');
       toast({
         title: "Accès refusé",
         description: "Vous devez être connecté pour accéder à cette page.",
@@ -90,34 +94,57 @@ const Dashboard = () => {
       });
       navigate('/signin', { state: { from: '/dashboard' } });
     }
-  }, [navigate]);
+  }, [user, isLoading, navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    toast({
-      title: "Déconnexion réussie",
-      description: "Vous avez été déconnecté avec succès.",
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          title: "Erreur de déconnexion",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      navigate('/');
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès."
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite lors de la déconnexion.",
+        variant: "destructive"
+      });
+    }
   };
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <Layout title="Tableau de bord">
+        <div className="min-h-screen bg-gray-50 pt-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green mx-auto mb-4"></div>
+            <p>Chargement...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Don't render dashboard if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   return (
     <Layout title="Tableau de bord">
       <div className="min-h-screen bg-gray-50 pt-6">
-        {/* <header className="bg-white shadow mb-6">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex items-center space-x-2 text-eco-green">
-              <Leaf className="h-6 w-6" />
-              <span className="text-xl font-semibold tracking-tight">ÉcoTrajet</span>
-            </div>
-            <Button variant="ghost" onClick={handleLogout} className="text-gray-600">
-              <LogOut className="mr-2 h-4 w-4" /> Déconnexion
-            </Button>
-          </div>
-        </header>
-        This section is not usedful for now.
-         */}
-
         <main className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-white rounded-lg p-6 shadow">
             <div className="flex flex-col items-center">
