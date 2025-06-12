@@ -1,0 +1,21 @@
+
+# Dockerfile pour le développement
+FROM node:20-alpine
+
+# Définit le répertoire de travail
+WORKDIR /app
+
+# Copie les fichiers de dépendances
+COPY package*.json ./
+
+# Installe toutes les dépendances (y compris dev)
+RUN npm ci
+
+# Copie le code source
+COPY . .
+
+# Expose le port 8080
+EXPOSE 8080
+
+# Commande pour démarrer en mode développement
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
