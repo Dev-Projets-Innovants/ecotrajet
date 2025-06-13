@@ -11,10 +11,11 @@ Docker permet à vos collègues de lancer le projet ÉcoTrajet sans installer No
   - [Télécharger Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - **Docker Compose** (inclus avec Docker Desktop)
 - **Git** pour cloner le repository
+- **Accès aux credentials Supabase** de l'équipe OU compte Supabase personnel
 
-## Architecture Docker
+## 🗃️ Configuration Supabase - ÉTAPE OBLIGATOIRE
 
-Le projet utilise une architecture multi-conteneurs avec :
+> **⚠️ IMPORTANT :** Les tables de base de données ne se créent PAS automatiquement avec Docker ! Docker lance uniquement l'interface frontend. Vous DEVEZ configurer Supabase avant le premier lancement.
 
 ### 📁 Fichiers de configuration
 
@@ -42,27 +43,98 @@ Le projet utilise une architecture multi-conteneurs avec :
 
 ```bash
 # Cloner le repository
-git clone <votre-repo-url>
+git clone https://github.com/Dev-Projets-Innovants/ecotrajet.git
 cd ecotrajet
 
 # Créer le fichier d'environnement
 cp .env.example .env
 ```
 
-### 2. Configuration des variables d'environnement
+### 2. Configuration des variables d'environnement - ÉTAPE CRUCIALE
 
-Éditez le fichier `.env` avec vos vraies valeurs :
+> **🔑 Cette étape est OBLIGATOIRE !** Sans cette configuration, l'application ne fonctionnera pas.
+
+Vous avez **deux options** pour configurer Supabase :
+
+#### **Option A : Utiliser le Projet Supabase de l'Équipe (Recommandé)**
+
+**Pourquoi choisir cette option :**
+- ✅ **Démarrage immédiat** : Tables déjà créées et configurées
+- ✅ **Données partagées** : Collaboration en temps réel avec l'équipe
+- ✅ **Support simplifié** : Environnement identique pour tous
+- ✅ **Comptes de test** : Utilisateurs et admins pré-configurés
+
+**Configuration :**
+```bash
+# Éditer le fichier .env avec ces valeurs exactes
+nano .env
+# OU
+code .env
+```
 
 ```env
-# Configuration Supabase
-VITE_SUPABASE_URL=https://votre-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=votre_clé_anonyme_supabase
+# Configuration Supabase de l'équipe
+VITE_SUPABASE_URL=https://knebskomwvvvoaclrwjv.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuZWJza29td3Z2dm9hY2xyd2p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2MzkzMDMsImV4cCI6MjA2NTIxNTMwM30.45ggA2kNYAVa9_bRqL2ihaan1oqx55HyYlYLv_zxsa8
 
 # Environnement
 NODE_ENV=production
 ```
 
+**Comptes de test disponibles :**
+- **Admin** : `admin@ecotrajet.com` / `password123`
+- **Utilisateur standard** : `user1@gmail.com` / `password123`
+
+#### **Option B : Créer Votre Propre Projet Supabase**
+
+**Pourquoi choisir cette option :**
+- ✅ **Environnement isolé** : Vos tests n'impactent pas l'équipe
+- ✅ **Contrôle total** : Liberté complète sur les données
+- ✅ **Apprentissage** : Comprendre la configuration Supabase
+
+**Étapes détaillées :**
+
+1. **Créer un compte Supabase**
+   - Aller sur [supabase.com](https://supabase.com)
+   - Créer un compte gratuit
+   - Vérifier votre email
+
+2. **Créer un nouveau projet**
+   ```
+   - Cliquer sur "New Project"
+   - Nom : "ecotrajet-dev-[votre-nom]"
+   - Mot de passe BDD : Générer automatiquement
+   - Région : Europe West (Ireland)
+   - Plan : Free
+   ```
+
+3. **Récupérer vos credentials**
+   ```
+   - Aller dans "Settings" > "API"
+   - Copier "Project URL"
+   - Copier "anon public" key
+   ```
+
+4. **Configurer le fichier .env**
+   ```env
+   # Vos credentials personnels
+   VITE_SUPABASE_URL=https://votre-projet-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=votre_clé_anonyme_supabase
+   
+   # Environnement
+   NODE_ENV=production
+   ```
+
+5. **Exécuter les migrations** (OBLIGATOIRE)
+   ```bash
+   # Les tables doivent être créées manuellement
+   # Voir la documentation technique pour les scripts SQL
+   # Ou demander à l'équipe les fichiers de migration
+   ```
+
 ### 3. Lancement du projet
+
+Une fois le fichier `.env` configuré avec l'une des deux options :
 
 #### Mode Production
 ```bash
@@ -88,89 +160,55 @@ Une fois lancé, l'application sera accessible sur :
 - **URL locale** : http://localhost:8080
 - **URL réseau** : http://[votre-ip]:8080
 
-## Commandes utiles
-
-### Gestion des conteneurs
-
-```bash
-# Voir l'état des conteneurs
-docker-compose ps
-
-# Arrêter tous les conteneurs
-docker-compose down
-
-# Arrêter et supprimer les volumes
-docker-compose down -v
-
-# Redémarrer un service spécifique
-docker-compose restart ecotrajet
-
-# Reconstruire sans cache
-docker-compose build --no-cache
-```
-
-### Logs et débogage
-
-```bash
-# Voir tous les logs
-docker-compose logs
-
-# Suivre les logs en temps réel
-docker-compose logs -f
-
-# Logs d'un service spécifique
-docker-compose logs ecotrajet
-docker-compose logs ecotrajet-dev
-
-# Logs avec horodatage
-docker-compose logs -t
-```
-
-### Accès au conteneur
-
-```bash
-# Ouvrir un shell dans le conteneur
-docker-compose exec ecotrajet sh
-
-# Exécuter des commandes npm
-docker-compose exec ecotrajet npm run test
-docker-compose exec ecotrajet npm run build
-
-# Accéder aux fichiers
-docker-compose exec ecotrajet ls -la /app
-```
-
-### Nettoyage
-
-```bash
-# Supprimer les conteneurs arrêtés
-docker container prune
-
-# Supprimer les images inutilisées
-docker image prune
-
-# Nettoyage complet (attention : supprime tout)
-docker system prune -a
-```
+**🎉 Premier test :**
+- Option A : Connectez-vous avec `admin@ecotrajet.com` / `password123`
+- Option B : Créez votre premier compte via l'interface d'inscription
 
 ## Guide pour les nouveaux développeurs
 
-### Onboarding en 3 étapes
+### 🚀 Onboarding Express (Option A - Recommandée)
 
 Partagez ces instructions avec vos nouveaux collègues :
 
 ```bash
 # 1. Cloner le projet
-git clone <votre-repo-url>
+git clone https://github.com/Dev-Projets-Innovants/ecotrajet.git
 cd ecotrajet
 
-# 2. Configurer l'environnement
+# 2. Configurer l'environnement (demander les credentials à l'équipe)
 cp .env.example .env
-# Demander les vraies valeurs Supabase à l'équipe
+# Éditer .env avec les valeurs de l'équipe
 
 # 3. Lancer le projet
 docker-compose --profile dev up --build ecotrajet-dev
 ```
+
+**✅ Temps total : 5 minutes**
+
+### 🛠️ Onboarding Développement Avancé (Option B)
+
+Pour les développeurs qui veulent leur propre environnement :
+
+```bash
+# 1. Cloner le projet
+git clone https://github.com/Dev-Projets-Innovants/ecotrajet.git
+cd ecotrajet
+
+# 2. Créer un projet Supabase personnel
+# (Suivre les étapes détaillées de l'Option B)
+
+# 3. Configurer l'environnement
+cp .env.example .env
+# Éditer .env avec VOS credentials
+
+# 4. Exécuter les migrations
+# (Demander les scripts SQL à l'équipe)
+
+# 5. Lancer le projet
+docker-compose --profile dev up --build ecotrajet-dev
+```
+
+**⏱️ Temps total : 15-20 minutes**
 
 ### Workflow de développement
 
@@ -192,80 +230,53 @@ docker-compose --profile dev up --build ecotrajet-dev
    docker-compose up --build ecotrajet
    ```
 
-## Volumes et persistance
+## Troubleshooting - Problèmes Courants
 
-### Volumes configurés
+### ❌ Erreur : "Failed to connect to Supabase"
 
-- **`./src:/app/src`** : Code source synchronisé
-- **`./public:/app/public`** : Assets publics synchronisés
-- **`/app/node_modules`** : Dependencies isolées dans le conteneur
+**Cause :** Variables d'environnement Supabase incorrectes ou manquantes
 
-### Avantages des volumes
-
-- ✅ **Hot-reload** : Modifications instantanées
-- ✅ **Isolation** : node_modules dans le conteneur
-- ✅ **Performance** : Pas de synchro des dépendances
-
-## Optimisations de performance
-
-### Build multi-stage
-
-Le `Dockerfile` utilise un build multi-stage pour :
-- Installer les dépendances
-- Builder l'application
-- Servir uniquement les fichiers nécessaires
-
-### Cache Docker
-
+**Solution :**
 ```bash
-# Utiliser le cache pour des builds plus rapides
-docker-compose build
+# Vérifier le contenu du fichier .env
+cat .env
 
-# Forcer la reconstruction sans cache
-docker-compose build --no-cache
+# Vérifier que les variables sont bien chargées
+docker-compose exec ecotrajet env | grep VITE_SUPABASE
 ```
 
-## Déploiement sur serveur
+### ❌ Erreur : "Tables do not exist"
 
-### Serveur de production
+**Cause :** Base de données vide (Option B non configurée)
 
+**Solution :**
+- Option A : Utiliser les credentials de l'équipe
+- Option B : Exécuter les migrations SQL
+
+### ❌ Erreur : "Authentication failed"
+
+**Cause :** Clé Supabase incorrecte ou expirée
+
+**Solution :**
 ```bash
-# Sur le serveur
-git pull origin main
-docker-compose up -d --build
-
-# Vérifier le statut
-docker-compose ps
-docker-compose logs -f
+# Re-vérifier les credentials dans Supabase Dashboard
+# Settings > API > Project URL et anon key
 ```
 
-### Variables d'environnement serveur
-
-Créez un fichier `.env` sur le serveur avec :
-```env
-VITE_SUPABASE_URL=https://prod.supabase.co
-VITE_SUPABASE_ANON_KEY=prod_key
-NODE_ENV=production
-```
-
-## Troubleshooting
-
-### Problèmes courants
-
-#### Port déjà utilisé
+### ❌ Port déjà utilisé
 ```bash
 # Changer le port dans docker-compose.yml
 ports:
   - "3000:8080"  # Port local:port conteneur
 ```
 
-#### Problème de permissions
+### ❌ Problème de permissions
 ```bash
 # Linux/Mac - Ajuster les permissions
 sudo chown -R $USER:$USER .
 ```
 
-#### Cache npm corrompu
+### ❌ Cache npm corrompu
 ```bash
 # Reconstruire complètement
 docker-compose down -v
@@ -273,33 +284,11 @@ docker-compose build --no-cache
 docker-compose up
 ```
 
-#### Variables d'environnement manquantes
-```bash
-# Vérifier les variables
-docker-compose config
-
-# Afficher les variables dans le conteneur
-docker-compose exec ecotrajet env | grep VITE
-```
-
-### Logs de débogage
-
-```bash
-# Logs détaillés du build
-docker-compose build --progress=plain
-
-# Inspecter une image
-docker inspect ecotrajet_ecotrajet
-
-# Vérifier l'utilisation des ressources
-docker stats
-```
-
 ## Avantages pour l'équipe
 
 ### ✅ Simplicité
-- **Pas d'installation** : Juste Docker
-- **Démarrage rapide** : 3 commandes maximum
+- **Option A** : 3 commandes, 5 minutes de setup
+- **Option B** : Setup personnalisé en 20 minutes
 - **Documentation claire** : Guide étape par étape
 
 ### ✅ Consistance
@@ -307,23 +296,22 @@ docker stats
 - **Isolation** : Pas de conflit avec d'autres projets
 - **Reproductibilité** : Builds identiques partout
 
-### ✅ Productivité
-- **Hot-reload** : Modifications en temps réel
-- **Tests intégrés** : npm run test dans le conteneur
+### ✅ Flexibilité
+- **Collaboration** : Option A pour le travail d'équipe
+- **Développement isolé** : Option B pour les tests avancés
 - **CI/CD ready** : Même environnement qu'en production
 
 ## Support et ressources
 
-### Documentation Docker
+### 📚 Documentation Docker
 - [Documentation officielle Docker](https://docs.docker.com/)
 - [Docker Compose CLI](https://docs.docker.com/compose/cli/)
-- [Best practices Dockerfile](https://docs.docker.com/develop/dev-best-practices/)
 
-### Support équipe
-- Créer une issue GitHub pour les problèmes
-- Channel Slack #dev-environment
-- Documentation projet dans `/docs`
+### 🆘 Support équipe
+- **Credentials Supabase** : Demander à un membre de l'équipe
+- **Problèmes techniques** : Créer une issue GitHub
+- **Documentation** : Consulter `/docs` pour plus de détails
 
 ---
 
-**🎉 Félicitations !** Votre équipe peut maintenant développer ÉcoTrajet sans souci d'environnement !
+**🎉 Félicitations !** Votre équipe peut maintenant développer ÉcoTrajet avec la configuration Supabase de leur choix !

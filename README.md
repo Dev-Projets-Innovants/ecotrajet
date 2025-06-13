@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="public/logo.svg" alt="ÉcoTrajet Logo" width="120" height="120">
   
@@ -71,24 +70,55 @@
 
 ```bash
 # 1. Cloner le projet
-git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
+git clone https://github.com/Dev-Projets-Innovants/ecotrajet.git
+cd ecotrajet
 
-# 2. Créer le fichier d'environnement
+# 2. Configurer l'environnement
 cp .env.example .env
-# Éditer .env avec vos variables Supabase
+```
 
-# 3. Lancer avec Docker
+**🗃️ ÉTAPE CRUCIALE : Configuration Supabase**
+
+> **⚠️ Les tables de base de données ne se créent PAS automatiquement !** Vous devez choisir une des deux options ci-dessous :
+
+#### **Option A : Utiliser le Projet Supabase de l'Équipe (Recommandé pour débuter)**
+
+```bash
+# Éditer le fichier .env avec les credentials de l'équipe
+# Demandez à un membre de l'équipe les valeurs suivantes :
+VITE_SUPABASE_URL=https://knebskomwvvvoaclrwjv.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**✅ Avantages :**
+- **Données partagées** avec l'équipe
+- **Tables déjà créées** et configurées
+- **Démarrage immédiat** sans configuration
+
+#### **Option B : Créer Votre Propre Projet Supabase**
+
+1. **Créer un compte** sur [supabase.com](https://supabase.com)
+2. **Créer un nouveau projet** 
+3. **Copier vos credentials** dans le fichier `.env`
+4. **Exécuter les migrations** (voir documentation technique)
+
+**✅ Avantages :**
+- **Environnement isolé** pour vos tests
+- **Contrôle total** sur les données
+- **Pas d'impact** sur l'équipe
+
+```bash
+# 3. Lancer l'application
 docker-compose up --build
 ```
 
 **Application accessible sur :** http://localhost:8080
 
-**Avantages Docker :**
-- ✅ **Zéro installation** locale requise
-- ✅ **Environnement identique** pour toute l'équipe
-- ✅ **Démarrage instantané** en 3 commandes
-- ✅ **Hot-reload intégré** pour le développement
+**Comptes de test disponibles** (Option A uniquement) :
+- **Admin** : `admin@ecotrajet.com` / `password123`
+- **Utilisateur** : `user1@gmail.com` / `password123`
+
+---
 
 ### 📋 Autres Options d'Installation
 - **[Installation locale](##️-options-dinstallation)** (développeurs avancés)
@@ -122,8 +152,8 @@ docker-compose up --build
 
 ```bash
 # Cloner et installer
-git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
+git clone https://github.com/Dev-Projets-Innovants/ecotrajet.git
+cd ecotrajet
 npm install
 
 # Configuration
@@ -201,6 +231,10 @@ npm run type-check     # Vérification TypeScript
 - **[Déploiement](src/docs/environments/deployment/README.md)** - Processus de mise à jour
 - **[Opérations](src/docs/operations/README.md)** - Maintenance et support
 - **[Guides pratiques](src/docs/guides/README.md)** - Procédures détaillées
+
+### 🆘 Guide pour Nouveaux Développeurs
+- **[Configuration base de données](src/docs/guides/README.md#premiers-pas-pour-nouveaux-développeurs)** - Options Supabase détaillées
+- **[Résolution de problèmes](src/docs/guides/troubleshooting.md)** - Solutions aux erreurs courantes
 
 ---
 
