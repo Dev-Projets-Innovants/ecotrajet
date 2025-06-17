@@ -123,25 +123,28 @@ docker-compose up --build
 
 ### 📋 Autres Options d'Installation
 - **[Installation locale](##️-options-dinstallation)** (développeurs avancés)
-- **GitHub Codespaces** (développement cloud)
+- **GitHub Codespaces** (développement cloud recommandée pour les membres de l'équipe)
 
 ---
 
 ## 🛠️ Technologies Utilisées
 
 ### Frontend
-- **⚡ Vite** - Build tool ultra-rapide
-- **📘 TypeScript** - JavaScript typé et sécurisé
-- **⚛️ React** - Interface utilisateur moderne
-- **🎨 Tailwind CSS** - Framework CSS utilitaire
-- **🧩 shadcn/ui** - Composants réutilisables
+- ** Vite** - Build tool ultra-rapide
+- ** TypeScript** - JavaScript typé et sécurisé
+- ** React** - Interface utilisateur moderne
+- ** Tailwind CSS** - Framework CSS utilitaire
+- ** shadcn/ui** - Composants réutilisables
 
 ### Backend & Infrastructure
-- **🗃️ Supabase** - Base de données et authentification
-- **🗺️ Leaflet** - Cartes interactives
-- **🔄 React Query** - Gestion d'état et cache
-- **🐳 Docker** - Containerisation
-- **🧪 Vitest** - Tests unitaires
+- ** Supabase** - Base de données et authentification
+- ** Leaflet** - Cartes interactives
+- ** React Query** - Gestion d'état et cache
+- ** Docker** - Containerisation
+- ** Vitest** - Tests unitaires
+
+### Architecture
+- **Draw.io** - Pour désigner l'architecture
 
 ---
 
@@ -241,14 +244,6 @@ npm run type-check     # Vérification TypeScript
 
 ## 🚀 Déploiement
 
-### Environnements
-
-| Environnement | URL | Usage |
-|---------------|-----|-------|
-| **Développement** | `localhost:8080` | Tests et développement |
-| **Staging** | `staging.ecotrajet.app` | Validation pré-production |
-| **Production** | `app.ecotrajet.com` | Utilisateurs finaux |
-
 ### Commandes de Déploiement
 ```bash
 # Développement avec Docker
@@ -282,28 +277,12 @@ git pull origin main && docker-compose up -d --build
 
 ---
 
-## 📞 Support
+## Support
 
-### 🔗 Ressources
-- 📚 **[Documentation complète](src/docs/)** - Guides techniques détaillés
-- 🐳 **[Guide Docker](docker-setup.md)** - Configuration environnement
-- 🧪 **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
-
-### 💬 Aide et Contact
-- 🐛 **Issues GitHub** - Signalement de bugs et demandes de fonctionnalités
-- 💬 **Discussions** - Questions générales et échanges communautaires
-- 📧 **Support technique** - Assistance urgente et support prioritaire
-
-### 🌐 Liens Utiles
-- [Documentation Supabase](https://supabase.com/docs) - Backend et base de données
-- [Documentation Vite](https://vitejs.dev/) - Build tool et développement
-- [shadcn/ui Components](https://ui.shadcn.com/) - Système de design
-
----
-
-## 📄 Licence
-
-Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+### Ressources
+-  **[Documentation complète](src/docs/)** - Guides techniques détaillés
+-  **[Guide Docker](docker-setup.md)** - Configuration environnement
+-  **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
 
 ---
 
