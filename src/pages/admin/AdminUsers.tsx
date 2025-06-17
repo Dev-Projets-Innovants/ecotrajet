@@ -1,27 +1,13 @@
 
 import React, { useState } from 'react';
-import { RefreshCw, Search, Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useAdminUsers } from '@/hooks/useAdminUsers';
 import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
+import { UserTableFilters } from '@/components/admin/users/UserTableFilters';
+import { UserTable } from '@/components/admin/users/UserTable';
+import { UserTablePagination } from '@/components/admin/users/UserTablePagination';
 import { AdminUser } from '@/services/admin/usersService';
 
 const AdminUsers = () => {
@@ -90,10 +76,14 @@ const AdminUsers = () => {
     }
   };
 
-  const getFullName = (user: AdminUser) => {
-    const firstName = user.first_name || '';
-    const lastName = user.last_name || '';
-    return `${firstName} ${lastName}`.trim() || 'Sans nom';
+  const handleEditUserClick = (user: AdminUser) => {
+    setSelectedUser(user);
+    setIsEditUserDialogOpen(true);
+  };
+
+  const handleDeleteUserClick = (user: AdminUser) => {
+    setSelectedUser(user);
+    setIsDeleteUserDialogOpen(true);
   };
 
   if (error) {
@@ -113,142 +103,35 @@ const AdminUsers = () => {
     <AdminLayout title="Gestion des utilisateurs">
       <div className="grid gap-6">
         {/* Barre d'outils avec recherche, filtres et actualisation */}
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="search"
-                placeholder="Rechercher un utilisateur..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Rôle" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les rôles</SelectItem>
-                <SelectItem value="user">Utilisateur</SelectItem>
-                <SelectItem value="admin">Administrateur</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={handleRefresh} 
-            disabled={isRefreshing}
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
+        <UserTableFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          roleFilter={roleFilter}
+          onRoleFilterChange={setRoleFilter}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+        />
 
         {/* Tableau des utilisateurs */}
         <div className="rounded-md border">
-          <div className="overflow-x-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-eco-green"></div>
-                <p className="ml-3 text-base">Chargement...</p>
-              </div>
-            ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="py-3 px-4 text-left font-medium">Nom</th>
-                    <th className="py-3 px-4 text-left font-medium">Email</th>
-                    <th className="py-3 px-4 text-left font-medium">Ville</th>
-                    <th className="py-3 px-4 text-left font-medium">Rôle</th>
-                    <th className="py-3 px-4 text-left font-medium">Membre depuis</th>
-                    <th className="py-3 px-4 text-left font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedUsers.map((user) => (
-                    <tr key={user.id} className="border-b">
-                      <td className="py-3 px-4">{getFullName(user)}</td>
-                      <td className="py-3 px-4">{user.email}</td>
-                      <td className="py-3 px-4">{user.city || '-'}</td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          user.is_admin 
-                            ? 'bg-purple-100 text-purple-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {user.is_admin ? 'Admin' : 'Utilisateur'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {new Date(user.created_at).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="py-3 px-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => {
-                              setSelectedUser(user);
-                              setIsEditUserDialogOpen(true);
-                            }}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Éditer
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                setSelectedUser(user);
-                                setIsDeleteUserDialogOpen(true);
-                              }}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Supprimer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          <UserTable
+            users={paginatedUsers}
+            isLoading={isLoading}
+            onEditUser={handleEditUserClick}
+            onDeleteUser={handleDeleteUserClick}
+          />
         </div>
 
         {/* Pagination */}
         {!isLoading && (
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Affichage de {paginatedUsers.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} à {Math.min(currentPage * itemsPerPage, filteredUsers.length)} sur {filteredUsers.length} utilisateurs
-            </div>
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-                disabled={currentPage <= 1}
-              >
-                Précédent
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-                disabled={currentPage >= totalPages}
-              >
-                Suivant
-              </Button>
-            </div>
-          </div>
+          <UserTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredUsers.length}
+            displayedItems={paginatedUsers.length}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
 
