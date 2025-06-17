@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminSidebar from "./sidebar/AdminSidebar";
 import AdminHeader from "./header/AdminHeader";
 import AdminContent from "./content/AdminContent";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -14,14 +15,19 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleLogout = () => {
-    // In a real app, handle logout logic here
-    navigate('/admin');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
   };
 
   return (
