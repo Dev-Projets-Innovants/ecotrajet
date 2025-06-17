@@ -1,247 +1,371 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { User, Settings, Shield, Activity, Bell, Lock, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Layout } from "@/components/Layout";
-import { toast } from "@/hooks/use-toast";
+import React, { useState, useRef } from 'react';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Edit, 
+  Save, 
+  X, 
+  Upload,
+  User,
+  Mail,
+  MapPin,
+  FileText,
+  Camera
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const AdminProfile = () => {
-  const navigate = useNavigate();
-  const { user, profile, isLoading, signOut } = useAuth();
+  const { profile, user, isLoading, isEditing, setIsEditing, updateProfile } = useUserProfile();
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    city: '',
+    bio: '',
+  });
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (isLoading) {
-    return (
-      <Layout title="Profil Administrateur">
-        <div className="min-h-screen bg-gray-50 pt-6 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-300 mx-auto mb-4"></div>
-            <p>Chargement...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+  // Synchroniser les données du profil avec le formulaire
+  React.useEffect(() => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        city: profile.city || '',
+        bio: profile.bio || '',
+      });
+    }
+  }, [profile]);
 
-  if (!user || !profile?.is_admin) {
-    navigate('/dashboard');
-    return null;
-  }
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
-  const handleLogout = async () => {
+  const handleSave = async () => {
+    await updateProfile(formData);
+  };
+
+  const handleCancel = () => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        city: profile.city || '',
+        bio: profile.bio || '',
+      });
+    }
+    setIsEditing(false);
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Vérifier que c'est une image
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner un fichier image');
+      return;
+    }
+
+    // Vérifier la taille (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('L\'image ne doit pas dépasser 5MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
     try {
-      const { error } = await signOut();
-      if (error) {
-        toast({
-          title: "Erreur de déconnexion",
-          description: error.message,
-          variant: "destructive"
+      // Créer un nom de fichier unique
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      // Upload vers Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          upsert: true,
         });
-        return;
+
+      if (uploadError) {
+        throw uploadError;
       }
+
+      // Obtenir l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Mettre à jour le profil avec la nouvelle URL d'avatar
+      await updateProfile({ avatar_url: publicUrl });
       
-      navigate('/');
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès."
-      });
+      toast.success('Avatar mis à jour avec succès');
     } catch (error) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur inattendue s'est produite lors de la déconnexion.",
-        variant: "destructive"
-      });
+      console.error('Erreur lors de l\'upload:', error);
+      toast.error('Erreur lors de l\'upload de l\'avatar');
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
+  const getInitials = () => {
+    const firstName = profile?.first_name || '';
+    const lastName = profile?.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'A';
+  };
+
+  const getFullName = () => {
+    const firstName = profile?.first_name || '';
+    const lastName = profile?.last_name || '';
+    return `${firstName} ${lastName}`.trim() || 'Administrateur';
+  };
+
+  if (isLoading) {
+    return (
+      <AdminLayout title="Mon Profil">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green"></div>
+          <p className="ml-3 text-lg">Chargement...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <AdminLayout title="Mon Profil">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="pt-6">
+            <p className="text-center text-gray-500">Profil non trouvé</p>
+          </CardContent>
+        </Card>
+      </AdminLayout>
+    );
+  }
+
   return (
-    <Layout title="Profil Administrateur">
-      <div className="min-h-screen bg-gray-50 pt-6">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {/* Header Profile Section */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center space-x-6">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile?.avatar_url || ""} alt="Profile" />
-                  <AvatarFallback className="text-lg">
-                    {profile?.first_name?.[0]}{profile?.last_name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                      {profile?.first_name} {profile?.last_name}
-                    </h1>
-                    <Badge variant="default" className="bg-red-100 text-red-800">
-                      <Shield className="h-3 w-3 mr-1" />
-                      Administrateur
-                    </Badge>
+    <AdminLayout title="Mon Profil">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header avec avatar */}
+        <div className="text-center mb-8">
+          <div className="relative inline-block">
+            <Avatar className="h-24 w-24 mx-auto mb-4">
+              <AvatarImage src={profile.avatar_url || undefined} />
+              <AvatarFallback className="bg-eco-green text-white text-xl">
+                {getInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute bottom-4 right-0 rounded-full w-8 h-8"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingAvatar}
+            >
+              {isUploadingAvatar ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-eco-green"></div>
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">{getFullName()}</h1>
+          <p className="text-gray-600">{profile.email}</p>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mt-2">
+            Administrateur
+          </span>
+        </div>
+
+        {/* Carte principale du profil */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Informations personnelles</CardTitle>
+                <CardDescription>
+                  Gérez vos informations de profil
+                </CardDescription>
+              </div>
+              {!isEditing && (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-eco-green hover:bg-eco-dark-green"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="first_name">Prénom</Label>
+                    <Input
+                      id="first_name"
+                      value={formData.first_name}
+                      onChange={(e) => handleInputChange('first_name', e.target.value)}
+                      placeholder="Votre prénom"
+                    />
                   </div>
-                  <p className="text-gray-600 mb-3">{user.email}</p>
-                  <div className="flex space-x-3">
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Modifier le profil
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleLogout}>
-                      Déconnexion
-                    </Button>
+                  <div>
+                    <Label htmlFor="last_name">Nom</Label>
+                    <Input
+                      id="last_name"
+                      value={formData.last_name}
+                      onChange={(e) => handleInputChange('last_name', e.target.value)}
+                      placeholder="Votre nom"
+                    />
                   </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="city">Ville</Label>
+                  <Input
+                    id="city"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    placeholder="Votre ville"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    placeholder="Parlez-nous de vous..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Annuler
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={isLoading}
+                    className="flex-1 bg-eco-green hover:bg-eco-dark-green"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+                  </Button>
                 </div>
               </div>
-            </CardHeader>
-          </Card>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Account Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Paramètres du compte
-                </CardTitle>
-                <CardDescription>
-                  Gérez vos informations personnelles et préférences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Notifications par email</p>
-                    <p className="text-sm text-gray-500">Recevoir les alertes importantes</p>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-5 w-5 text-eco-green" />
+                    <div>
+                      <p className="font-medium">Prénom</p>
+                      <p className="text-gray-600">{profile.first_name || 'Non renseigné'}</p>
+                    </div>
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Authentification à deux facteurs</p>
-                    <p className="text-sm text-gray-500">Sécurité renforcée</p>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User className="h-5 w-5 text-eco-green" />
+                    <div>
+                      <p className="font-medium">Nom</p>
+                      <p className="text-gray-600">{profile.last_name || 'Non renseigné'}</p>
+                    </div>
                   </div>
-                  <Switch />
                 </div>
-                <Separator />
-                <Button variant="outline" className="w-full">
-                  <Lock className="h-4 w-4 mr-2" />
-                  Changer le mot de passe
-                </Button>
-              </CardContent>
-            </Card>
 
-            {/* Admin Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="h-5 w-5 mr-2" />
-                  Paramètres d'administration
-                </CardTitle>
-                <CardDescription>
-                  Configuration et préférences administratives
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Mail className="h-5 w-5 text-eco-green" />
                   <div>
-                    <p className="font-medium">Mode maintenance</p>
-                    <p className="text-sm text-gray-500">Activer la maintenance du site</p>
+                    <p className="font-medium">Email</p>
+                    <p className="text-gray-600">{profile.email}</p>
                   </div>
-                  <Switch />
                 </div>
-                <Separator />
-                <div className="flex items-center justify-between">
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <MapPin className="h-5 w-5 text-eco-green" />
                   <div>
-                    <p className="font-medium">Logs détaillés</p>
-                    <p className="text-sm text-gray-500">Enregistrement étendu des activités</p>
+                    <p className="font-medium">Ville</p>
+                    <p className="text-gray-600">{profile.city || 'Non renseignée'}</p>
                   </div>
-                  <Switch defaultChecked />
                 </div>
-                <Separator />
-                <Button variant="outline" className="w-full">
-                  <Activity className="h-4 w-4 mr-2" />
-                  Voir les logs d'activité
-                </Button>
-              </CardContent>
-            </Card>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2" />
-                  Actions rapides
-                </CardTitle>
-                <CardDescription>
-                  Accès rapide aux fonctions principales
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/admin/users')}
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Gestion des utilisateurs
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/admin/analytics')}
-                >
-                  <Activity className="h-4 w-4 mr-2" />
-                  Statistiques et analyses
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/admin/notifications')}
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notifications système
-                </Button>
-              </CardContent>
-            </Card>
+                {profile.bio && (
+                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FileText className="h-5 w-5 text-eco-green mt-1" />
+                    <div>
+                      <p className="font-medium">Bio</p>
+                      <p className="text-gray-600">{profile.bio}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-            {/* Security Overview */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Eye className="h-5 w-5 mr-2" />
-                  Aperçu sécurité
-                </CardTitle>
-                <CardDescription>
-                  État de la sécurité du compte
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Dernière connexion</span>
-                  <span className="text-sm text-gray-500">Il y a 2 heures</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Sessions actives</span>
-                  <Badge variant="outline">3</Badge>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Niveau de sécurité</span>
-                  <Badge className="bg-green-100 text-green-800">Élevé</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        {/* Informations du compte */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Informations du compte</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Membre depuis</p>
+              <p className="text-gray-900">
+                {new Date(profile.created_at).toLocaleDateString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Dernière mise à jour</p>
+              <p className="text-gray-900">
+                {new Date(profile.updated_at).toLocaleDateString('fr-FR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </Layout>
+    </AdminLayout>
   );
 };
 
