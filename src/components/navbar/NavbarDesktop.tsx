@@ -135,9 +135,6 @@ const NavbarDesktop = ({
           >
             <Button variant="ghost" className={textColorClass}>Profil</Button>
           </NavLink>
-          <NavLink to="/notifications" onClick={handleNotificationsClick} className={textColorClass}>
-            <Button variant="ghost" className={textColorClass}>Notifications</Button>
-          </NavLink>
           <Button variant="ghost" onClick={handleLogout} className={`flex items-center ${textColorClass}`}>
             <LogOut className="mr-2 h-4 w-4" />
             Déconnexion
