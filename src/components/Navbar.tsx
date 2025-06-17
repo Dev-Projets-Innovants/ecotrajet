@@ -64,6 +64,7 @@ const Navbar = () => {
         return;
       }
       
+      // Rediriger vers la page d'accueil après déconnexion
       navigate('/');
       toast({
         title: "Déconnexion réussie",

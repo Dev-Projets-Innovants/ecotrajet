@@ -1,3 +1,4 @@
+
 /**
  * Application principale ÉcoTrajet
  * 
@@ -27,7 +28,6 @@ import Dashboard from "./pages/Dashboard";
 import Guide from "./pages/Guide";
 import ArticleDetail from "./pages/ArticleDetail";
 import Rewards from "./pages/Rewards";
-import AdminSignIn from "./pages/admin/AdminSignIn";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminContent from "./pages/admin/AdminContent";
@@ -100,8 +100,8 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/legal-notice" element={<LegalNotice />} />
                 
-                {/* Routes d'administration (accès restreint) */}
-                <Route path="/admin" element={<AdminSignIn />} />
+                {/* Routes d'administration (accès restreint) - plus de page de connexion séparée */}
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/rewards" element={<AdminRewards />} />
