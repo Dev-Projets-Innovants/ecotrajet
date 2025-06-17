@@ -94,10 +94,10 @@ const UserProfile = () => {
     setIsUploadingAvatar(true);
 
     try {
-      // Créer un nom de fichier unique
+      // Créer un nom de fichier unique avec le bon format pour les politiques RLS
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileName = `avatar.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
 
       // Upload vers Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
