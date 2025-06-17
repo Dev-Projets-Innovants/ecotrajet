@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import { AdminLayout } from '@/components/admin/AdminLayout';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   Card, 
   CardContent, 
