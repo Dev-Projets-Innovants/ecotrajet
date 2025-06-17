@@ -115,8 +115,9 @@ docker-compose up --build
 **Application accessible sur :** http://localhost:8080
 
 **Comptes de test disponibles** (Option A uniquement) :
-- **Admin** : `admin@ecotrajet.com` / `password123`
-- **Utilisateur** : `user1@gmail.com` / `password123`
+- **Admin** : `admin@ecotrajet.com` / `pa****12`
+- **Utilisateur** : `user1@gmail.com` / `pa****12`
+- Demandez à un membre de l'équipe les mots de passe
 
 ---
 
