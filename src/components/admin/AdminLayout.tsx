@@ -13,16 +13,10 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
   };
 
   const handleLogout = () => {
@@ -31,15 +25,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${darkMode ? 'dark' : ''}`}>
+    <div className="min-h-screen flex flex-col">
       <SidebarProvider defaultOpen={sidebarOpen}>
         <div className="flex flex-1 w-full">
           {/* Sidebar */}
           <AdminSidebar 
             sidebarOpen={sidebarOpen}
-            darkMode={darkMode}
             toggleSidebar={toggleSidebar}
-            toggleDarkMode={toggleDarkMode}
             handleLogout={handleLogout}
           />
 

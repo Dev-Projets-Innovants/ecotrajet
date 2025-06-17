@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, 
   LogOut, 
-  Moon, 
-  Sun,
   Home
 } from "lucide-react";
 import { 
@@ -18,21 +16,16 @@ import AdminNavigation from "./AdminNavigation";
 
 interface AdminSidebarProps {
   sidebarOpen: boolean;
-  darkMode: boolean;
   toggleSidebar: () => void;
-  toggleDarkMode: () => void;
   handleLogout: () => void;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({
   sidebarOpen,
-  darkMode,
   toggleSidebar,
-  toggleDarkMode,
   handleLogout,
 }) => {
   const navigate = useNavigate();
-  const { open } = useSidebar();
 
   const handleHomeNavigation = () => {
     navigate('/');
@@ -40,7 +33,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   return (
     <Sidebar 
-      className={`${sidebarOpen ? 'w-64' : 'w-16'} duration-300 transition-width bg-white dark:bg-gray-900 z-50`}
+      className={`${sidebarOpen ? 'w-64' : 'w-16'} duration-300 transition-width bg-white z-50`}
       data-state={sidebarOpen ? "open" : "collapsed"}
     >
       <SidebarContent>
@@ -78,27 +71,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <Button 
               variant="ghost" 
               className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
-              onClick={toggleDarkMode}
-            >
-              {darkMode ? (
-                <>
-                  <Sun className="h-5 w-5" />
-                  {sidebarOpen && <span className="ml-2">Mode clair</span>}
-                </>
-              ) : (
-                <>
-                  <Moon className="h-5 w-5" />
-                  {sidebarOpen && <span className="ml-2">Mode sombre</span>}
-                </>
-              )}
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
               onClick={handleHomeNavigation}
             >
-              <Home className="h-5 w-5" />
+              <Home className={`${sidebarOpen ? 'h-5 w-5' : 'h-6 w-6'}`} />
               {sidebarOpen && <span className="ml-2">Accueil</span>}
             </Button>
 
@@ -107,7 +82,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`} 
               onClick={handleLogout}
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className={`${sidebarOpen ? 'h-5 w-5' : 'h-6 w-6'}`} />
               {sidebarOpen && <span className="ml-2">Déconnexion</span>}
             </Button>
           </div>

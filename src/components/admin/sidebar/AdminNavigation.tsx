@@ -16,7 +16,6 @@ import {
   MessageSquare, 
   BarChart2, 
   Bell, 
-  Settings,
   Trophy,
   UserCircle
 } from 'lucide-react';
@@ -50,7 +49,7 @@ const NavItem: React.FC<NavItemProps> = ({
           : "text-muted-foreground"
       )}
     >
-      <Icon className="h-5 w-5 mr-2" />
+      <Icon className={`${isSidebarCollapsed ? 'h-6 w-6' : 'h-5 w-5'} ${!isSidebarCollapsed ? 'mr-2' : ''}`} />
       {!isSidebarCollapsed && <span>{title}</span>}
     </Link>
   );
@@ -62,7 +61,7 @@ interface AdminNavigationProps {
 
 // Navigation principale du panneau d'administration
 const AdminNavigation: React.FC<AdminNavigationProps> = ({ isSidebarCollapsed }) => {
-  // Définition des éléments de navigation
+  // Définition des éléments de navigation (sans paramètres)
   const navigationItems = [
     { href: '/admin/dashboard', icon: LayoutDashboard, title: 'Tableau de bord' },
     { href: '/admin/users', icon: Users, title: 'Utilisateurs' },
@@ -72,7 +71,6 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ isSidebarCollapsed })
     { href: '/admin/analytics', icon: BarChart2, title: 'Analytique' },
     { href: '/admin/notifications', icon: Bell, title: 'Notifications' },
     { href: '/admin/profile', icon: UserCircle, title: 'Profil' },
-    { href: '/admin/settings', icon: Settings, title: 'Paramètres' },
   ];
 
   return (
