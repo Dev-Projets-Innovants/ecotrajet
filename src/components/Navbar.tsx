@@ -34,7 +34,7 @@ const Navbar = () => {
     handleDashboardClick,
     handleStatisticsClick,
     handleChallengesClick
-  } = useNavbar(isAuthenticated);
+  } = useNavbar(isAuthenticated, isAdmin);
 
   // Function to handle navigation to admin dashboard
   const handleAdminDashboardClick = () => {

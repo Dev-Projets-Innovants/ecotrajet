@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const useNavbar = (isAuthenticated: boolean) => {
+export const useNavbar = (isAuthenticated: boolean, isAdmin?: boolean) => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,6 +62,14 @@ export const useNavbar = (isAuthenticated: boolean) => {
     if (!isAuthenticated) {
       e.preventDefault();
       handleProtectedAction("vos récompenses");
+      return;
+    }
+    
+    // Block admin access to rewards
+    if (isAdmin) {
+      e.preventDefault();
+      navigate('/admin/dashboard');
+      return;
     }
   };
 

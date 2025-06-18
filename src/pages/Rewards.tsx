@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Award, 
   Trophy, 
@@ -30,12 +30,46 @@ import { ChallengesSection } from "@/components/rewards/ChallengesSection";
 import { LeaderboardSection } from "@/components/rewards/LeaderboardSection";
 import { RewardsSection } from "@/components/rewards/RewardsSection";
 import { CollectiveImpactSection } from "@/components/rewards/CollectiveImpactSection";
+import { useAuth } from "@/hooks/useAuth";
 
 // Mock data for demonstration
 import { mockUserRewards, mockChallenges, mockLeaderboard, mockCollectiveImpact } from "@/data/mockRewardsData";
 
 const Rewards = () => {
+  const navigate = useNavigate();
+  const { user, isAdmin, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("progress");
+
+  // Redirect admin users to admin dashboard
+  useEffect(() => {
+    if (!isLoading && isAdmin) {
+      navigate('/admin/dashboard');
+    }
+  }, [isAdmin, isLoading, navigate]);
+
+  // Redirect unauthenticated users to sign in
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/signin');
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything for admin users (they will be redirected)
+  if (isAdmin) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
