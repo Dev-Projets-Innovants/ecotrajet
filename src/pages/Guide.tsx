@@ -646,22 +646,6 @@ const Guide = () => {
                     </div>
                     
                     <Separator />
-                    
-                    <div className="p-6 rounded-lg bg-eco-light-green/50 border border-eco-green/20">
-                      <div className="flex flex-col md:flex-row md:items-center">
-                        <div className="md:w-2/3 mb-4 md:mb-0 md:pr-6">
-                          <h3 className="text-xl font-semibold text-eco-dark-green mb-2">Problèmes avec un Vélib' ?</h3>
-                          <p className="text-gray-700">
-                            Si vous rencontrez un problème avec un vélo en libre-service, signalez-le via l'application pour qu'il puisse être réparé rapidement. Vous contribuez ainsi à maintenir le service en bon état pour tous les utilisateurs.
-                          </p>
-                        </div>
-                        <div className="md:w-1/3 flex justify-center md:justify-end">
-                          <Button className="bg-eco-green hover:bg-eco-dark-green text-white">
-                            Signaler un problème
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
 
                     <ShareExperienceForm />
                   </TabsContent>
