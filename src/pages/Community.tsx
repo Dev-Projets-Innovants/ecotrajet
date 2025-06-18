@@ -70,7 +70,7 @@ const Community = () => {
           ...post,
           forum_categories: post.forum_categories ? {
             ...post.forum_categories,
-            description: post.forum_categories.description || null,
+            description: null, // Set description to null since it's not included in the query
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
