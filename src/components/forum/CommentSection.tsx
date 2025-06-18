@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Heart, Reply, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,10 @@ const CommentItem: React.FC<{
   onLike: (commentId: string) => void;
   level: number;
 }> = ({ comment, onReply, onLike, level }) => {
+  const [localLikesCount, setLocalLikesCount] = useState(comment.likes_count);
+  const [isLocallyLiked, setIsLocallyLiked] = useState(comment.isLiked || false);
+  const [isLiking, setIsLiking] = useState(false);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -40,6 +43,35 @@ const CommentItem: React.FC<{
   const getUserInitials = () => {
     const name = getUserDisplayName();
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
+
+  const handleLike = async () => {
+    if (isLiking) return;
+    
+    setIsLiking(true);
+    
+    // Mise à jour optimiste de l'UI
+    const newLikeState = !isLocallyLiked;
+    setIsLocallyLiked(newLikeState);
+    setLocalLikesCount(prev => newLikeState ? prev + 1 : prev - 1);
+    
+    try {
+      await forumService.toggleCommentLike(comment.id);
+      onLike(comment.id); // Callback pour informer le parent
+    } catch (error) {
+      // Rollback en cas d'erreur
+      setIsLocallyLiked(!newLikeState);
+      setLocalLikesCount(prev => newLikeState ? prev - 1 : prev + 1);
+      
+      console.error('Error toggling comment like:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de liker ce commentaire",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   return (
@@ -71,13 +103,14 @@ const CommentItem: React.FC<{
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onLike(comment.id)}
-                  className={`hover:bg-red-50 ${comment.isLiked ? 'text-red-500' : 'text-gray-500'}`}
+                  onClick={handleLike}
+                  disabled={isLiking}
+                  className={`hover:bg-red-50 ${isLocallyLiked ? 'text-red-500' : 'text-gray-500'}`}
                 >
                   <Heart 
-                    className={`h-3 w-3 mr-1 ${comment.isLiked ? 'fill-current' : ''}`} 
+                    className={`h-3 w-3 mr-1 ${isLocallyLiked ? 'fill-current' : ''}`} 
                   />
-                  {comment.likes_count}
+                  {localLikesCount}
                 </Button>
                 
                 <Button
@@ -217,17 +250,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const handleLikeComment = async (commentId: string) => {
-    try {
-      await forumService.toggleCommentLike(commentId);
-      await fetchComments();
-    } catch (error) {
-      console.error('Error toggling comment like:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de liker ce commentaire",
-        variant: "destructive",
-      });
-    }
+    // Cette fonction est appelée par les CommentItem pour notifier les changements
+    // Nous pourrions ici mettre à jour le cache local si nécessaire
+    console.log('Comment like toggled:', commentId);
   };
 
   const handleReply = (parentId: string) => {

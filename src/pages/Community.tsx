@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { Layout } from '@/components/Layout';
@@ -13,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import ForumPostCard from '@/components/forum/ForumPostCard';
 import CreatePostDialog from '@/components/forum/CreatePostDialog';
-import ModerationWarning from '@/components/forum/ModerationWarning';
+import CommunityRulesTooltip from '@/components/forum/CommunityRulesTooltip';
 import { forumService, ForumPost, ForumCategory } from '@/services/forumService';
 import { toast } from '@/hooks/use-toast';
 
@@ -126,17 +125,17 @@ const Community = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Communauté ÉcoTrajet
-          </h1>
+          <div className="flex items-center gap-2 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Communauté ÉcoTrajet
+            </h1>
+            <CommunityRulesTooltip />
+          </div>
           <p className="text-gray-600 max-w-2xl">
             Partagez vos expériences, posez des questions et découvrez les conseils 
             de la communauté pour une mobilité plus durable.
           </p>
         </div>
-
-        {/* Message de modération */}
-        <ModerationWarning />
 
         {/* Controls */}
         <div className="flex flex-col lg:flex-row gap-4 mb-8">

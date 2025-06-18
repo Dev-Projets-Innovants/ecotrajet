@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Image, MapPin, Tag } from 'lucide-react';
+import { X, Image, MapPin, Tag, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ForumCategory, forumService } from '@/services/forumService';
 import { toast } from '@/hooks/use-toast';
 
@@ -122,6 +123,15 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
             Partagez vos expériences, conseils ou questions avec la communauté ÉcoTrajet
           </DialogDescription>
         </DialogHeader>
+
+        {/* Règles de modération */}
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-sm text-orange-700">
+            <strong>Règles de la communauté :</strong> Respectez autrui, restez constructif, 
+            partagez responsable. Les contenus inappropriés peuvent être supprimés.
+          </AlertDescription>
+        </Alert>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* User Info */}
