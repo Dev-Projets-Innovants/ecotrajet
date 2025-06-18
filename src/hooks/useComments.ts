@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { forumService, ForumComment } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
@@ -14,6 +15,44 @@ export const useComments = (postId: string) => {
 
   useEffect(() => {
     fetchComments();
+  }, [postId]);
+
+  useEffect(() => {
+    // Écouter les nouveaux commentaires en temps réel
+    const commentsChannel = supabase
+      .channel(`comments-${postId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'forum_comments',
+          filter: `post_id=eq.${postId}`
+        },
+        (payload) => {
+          console.log('New comment received:', payload);
+          // Recharger les commentaires pour maintenir la structure hiérarchique
+          fetchComments();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'forum_comments',
+          filter: `post_id=eq.${postId}`
+        },
+        () => {
+          console.log('Comment deleted');
+          fetchComments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(commentsChannel);
+    };
   }, [postId]);
 
   const fetchComments = async () => {
@@ -78,7 +117,6 @@ export const useComments = (postId: string) => {
 
   const handleLikeComment = async (commentId: string) => {
     // Cette fonction est appelée par les CommentItem pour notifier les changements
-    // Nous pourrions ici mettre à jour le cache local si nécessaire
     console.log('Comment like toggled:', commentId);
   };
 

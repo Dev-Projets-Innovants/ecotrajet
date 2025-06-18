@@ -1,64 +1,18 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ForumPostCard from '@/components/forum/ForumPostCard';
 import CommentSection from '@/components/forum/CommentSection';
-import { forumService, ForumPost } from '@/services/forum';
-import { toast } from '@/hooks/use-toast';
+import { useRealtimePost } from '@/hooks/useRealtimePost';
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<ForumPost | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (id) {
-      fetchPost();
-    }
-  }, [id]);
-
-  const fetchPost = async () => {
-    if (!id) return;
-    
-    setIsLoading(true);
-    try {
-      const { data, error } = await forumService.getPostById(id);
-      
-      if (error) throw error;
-      
-      if (data) {
-        // Transform the data to match ForumPost interface
-        const transformedPost = {
-          ...data,
-          forum_categories: data.forum_categories ? {
-            ...data.forum_categories,
-            description: null,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          } : undefined
-        };
-        setPost(transformedPost);
-      }
-    } catch (error) {
-      console.error('Error fetching post:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger le post",
-        variant: "destructive",
-      });
-      navigate('/community');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { post, isLoading } = useRealtimePost(id!);
 
   if (isLoading) {
     return (
@@ -105,8 +59,8 @@ const PostDetail = () => {
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Post principal */}
-          <ForumPostCard post={post} />
+          {/* Post principal avec mises à jour temps réel */}
+          <ForumPostCard post={post} showRealTimeUpdates={true} />
           
           {/* Section des commentaires */}
           <Card>

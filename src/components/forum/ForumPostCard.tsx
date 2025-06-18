@@ -7,16 +7,27 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ForumPost, forumService } from '@/services/forum';
+import { useRealtimeLikes } from '@/hooks/useRealtimeLikes';
 import { toast } from '@/hooks/use-toast';
 
 interface ForumPostCardProps {
   post: ForumPost;
+  showRealTimeUpdates?: boolean;
 }
 
-const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
+const ForumPostCard: React.FC<ForumPostCardProps> = ({ 
+  post, 
+  showRealTimeUpdates = false 
+}) => {
   const [localLikesCount, setLocalLikesCount] = useState(post.likes_count);
-  const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  
+  const { isLiked, isChecking } = useRealtimeLikes(post.id);
+
+  // Si on utilise les mises à jour temps réel, on utilise les compteurs du post
+  // Sinon on utilise l'état local pour les mises à jour optimistes
+  const displayLikesCount = showRealTimeUpdates ? post.likes_count : localLikesCount;
+  const displayIsLiked = isChecking ? false : isLiked;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -42,15 +53,20 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
     
     setIsLiking(true);
     
-    const newLikeState = !isLiked;
-    setIsLiked(newLikeState);
-    setLocalLikesCount(prev => newLikeState ? prev + 1 : prev - 1);
+    // Mise à jour optimiste uniquement si on n'utilise pas le temps réel
+    if (!showRealTimeUpdates) {
+      const newLikeState = !displayIsLiked;
+      setLocalLikesCount(prev => newLikeState ? prev + 1 : prev - 1);
+    }
     
     try {
       await forumService.togglePostLike(post.id);
     } catch (error) {
-      setIsLiked(!newLikeState);
-      setLocalLikesCount(prev => newLikeState ? prev - 1 : prev + 1);
+      // Rollback en cas d'erreur (uniquement pour les mises à jour optimistes)
+      if (!showRealTimeUpdates) {
+        const rollbackLikeState = !displayIsLiked;
+        setLocalLikesCount(prev => rollbackLikeState ? prev - 1 : prev + 1);
+      }
       
       console.error('Error toggling like:', error);
       toast({
@@ -155,11 +171,11 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
-                disabled={isLiking}
-                className={`hover:bg-red-50 ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
+                disabled={isLiking || isChecking}
+                className={`hover:bg-red-50 ${displayIsLiked ? 'text-red-500' : 'text-gray-500'}`}
               >
-                <Heart className={`h-4 w-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
-                {localLikesCount}
+                <Heart className={`h-4 w-4 mr-1 ${displayIsLiked ? 'fill-current' : ''}`} />
+                {displayLikesCount}
               </Button>
               
               <Link to={`/community/post/${post.id}`}>
