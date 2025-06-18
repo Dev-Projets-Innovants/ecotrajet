@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   BookOpen, 
@@ -571,49 +570,6 @@ const Guide = () => {
                     </div>
                     
                     <Separator />
-                    
-                    <div>
-                      <h2 className="text-2xl font-bold mb-4">Témoignages d'utilisateurs</h2>
-                      <p className="text-gray-600 mb-6">
-                        Découvrez comment d'autres utilisateurs contribuent à l'écologie grâce à ÉcoTrajet.
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card>
-                          <CardContent className="pt-6">
-                            <div className="flex items-start space-x-4">
-                              <div className="w-12 h-12 rounded-full bg-eco-light-green flex items-center justify-center flex-shrink-0">
-                                <MessageSquare className="h-6 w-6 text-eco-green" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">Sophie, 34 ans</h3>
-                                <p className="text-sm text-gray-500 mb-2">Utilisatrice depuis 6 mois</p>
-                                <p className="text-gray-600 italic">
-                                  "Depuis que j'utilise ÉcoTrajet pour mes déplacements quotidiens, j'ai économisé plus de 250kg de CO2 et je me sens en meilleure forme physique. C'est une victoire sur tous les plans !"
-                                </p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        
-                        <Card>
-                          <CardContent className="pt-6">
-                            <div className="flex items-start space-x-4">
-                              <div className="w-12 h-12 rounded-full bg-eco-light-green flex items-center justify-center flex-shrink-0">
-                                <MessageSquare className="h-6 w-6 text-eco-green" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">Thomas, 28 ans</h3>
-                                <p className="text-sm text-gray-500 mb-2">Utilisateur depuis 1 an</p>
-                                <p className="text-gray-600 italic">
-                                  "Je n'aurais jamais pensé que changer simplement mon mode de transport aurait un tel impact. Grâce à l'application, je vois concrètement ma contribution à l'environnement."
-                                </p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </div>
                   </TabsContent>
                   
                   {/* Bike Maintenance Content */}
