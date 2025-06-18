@@ -8,16 +8,17 @@ import OptimizedVelibUsageChart from '@/components/admin/dashboard/OptimizedVeli
 import DashboardFilters from '@/components/admin/dashboard/DashboardFilters';
 import { useOptimizedVelibData } from '@/hooks/useOptimizedVelibData';
 import { toast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { 
+  UserCheck, 
+  Route, 
+  Leaf, 
+  Award,
+  TrendingUp,
+  RefreshCw,
   Bike,
   MapPin,
   Battery,
-  ParkingCircle,
-  AlertTriangle,
-  CheckCircle,
-  Clock
+  ParkingCircle
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -34,9 +35,8 @@ const AdminDashboard = () => {
     isLoading,
     error,
     lastUpdated,
-    dataFreshness,
     refetchData
-  } = useOptimizedVelibData(autoRefresh, timeRange);
+  } = useOptimizedVelibData(autoRefresh);
 
   const handleManualRefresh = async () => {
     setIsManualRefreshing(true);
@@ -65,41 +65,22 @@ const AdminDashboard = () => {
     });
   };
 
-  const getDataFreshnessInfo = () => {
-    switch (dataFreshness) {
-      case 'fresh':
-        return { icon: CheckCircle, color: 'text-green-500', label: 'Données récentes' };
-      case 'stale':
-        return { icon: Clock, color: 'text-yellow-500', label: 'Données légèrement anciennes' };
-      case 'outdated':
-        return { icon: AlertTriangle, color: 'text-red-500', label: 'Données obsolètes' };
-      default:
-        return { icon: Clock, color: 'text-gray-500', label: 'Statut inconnu' };
-    }
-  };
-
   if (error && !stats) {
     return (
       <AdminLayout title="Tableau de bord">
         <div className="text-center py-12">
-          <Alert variant="destructive" className="max-w-md mx-auto mb-4">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <p className="text-red-600 mb-4">{error}</p>
           <button 
             onClick={handleManualRefresh} 
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-            disabled={isManualRefreshing}
           >
-            {isManualRefreshing ? 'Actualisation...' : 'Réessayer'}
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Réessayer
           </button>
         </div>
       </AdminLayout>
     );
   }
-
-  const freshnessInfo = getDataFreshnessInfo();
-  const FreshnessIcon = freshnessInfo.icon;
 
   return (
     <AdminLayout title="Tableau de bord Vélib'">
@@ -114,24 +95,6 @@ const AdminDashboard = () => {
           autoRefresh={autoRefresh}
           onAutoRefreshToggle={handleAutoRefreshToggle}
         />
-
-        {/* Indicateur de fraîcheur des données */}
-        {lastUpdated && (
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <FreshnessIcon className={`h-3 w-3 ${freshnessInfo.color}`} />
-              {freshnessInfo.label}
-            </Badge>
-            {dataFreshness === 'outdated' && (
-              <Alert variant="destructive" className="flex-1">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Les données semblent obsolètes. Vérifiez la synchronisation Vélib.
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-        )}
 
         {/* Cartes de statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -182,7 +145,6 @@ const AdminDashboard = () => {
             data={availabilityTrends} 
             config={chartConfig} 
             isLoading={isLoading}
-            timeRange={timeRange}
           />
           <OptimizedVelibDistributionChart 
             data={distributionData} 
@@ -196,7 +158,6 @@ const AdminDashboard = () => {
           data={usageData} 
           config={chartConfig} 
           isLoading={isLoading}
-          timeRange={timeRange}
         />
       </div>
     </AdminLayout>
