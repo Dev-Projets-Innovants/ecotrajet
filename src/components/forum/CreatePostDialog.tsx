@@ -39,13 +39,63 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const validateForm = () => {
+    const errors = [];
+
+    // Validation du nom
+    if (!formData.user_name.trim()) {
+      errors.push("Le nom est obligatoire");
+    }
+
+    // Validation de l'email
+    if (!formData.user_email.trim()) {
+      errors.push("L'email est obligatoire");
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.user_email)) {
+      errors.push("L'email n'est pas valide");
+    }
+
+    // Validation du titre
+    if (!formData.title.trim()) {
+      errors.push("Le titre est obligatoire");
+    } else if (formData.title.trim().length < 5) {
+      errors.push("Le titre doit contenir au moins 5 caractères");
+    } else if (formData.title.trim().length > 200) {
+      errors.push("Le titre ne peut pas dépasser 200 caractères");
+    }
+
+    // Validation de la catégorie
+    if (!formData.category_id) {
+      errors.push("La catégorie est obligatoire");
+    }
+
+    // Validation du contenu
+    if (!formData.content.trim()) {
+      errors.push("Le contenu est obligatoire");
+    } else if (formData.content.trim().length < 20) {
+      errors.push("Le contenu doit contenir au moins 20 caractères");
+    } else if (formData.content.trim().length > 2000) {
+      errors.push("Le contenu ne peut pas dépasser 2000 caractères");
+    }
+
+    // Validation des tags
+    if (formData.tags) {
+      const tags = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      if (tags.length > 5) {
+        errors.push("Vous ne pouvez pas ajouter plus de 5 tags");
+      }
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim() || !formData.content.trim()) {
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
       toast({
-        title: "Erreur",
-        description: "Le titre et le contenu sont obligatoires",
+        title: "Erreur de validation",
+        description: validationErrors.join(", "),
         variant: "destructive",
       });
       return;
@@ -57,11 +107,11 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
       const postData = {
         title: formData.title.trim(),
         content: formData.content.trim(),
-        category_id: formData.category_id || undefined,
+        category_id: formData.category_id,
         location: formData.location.trim() || undefined,
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : undefined,
-        user_name: formData.user_name.trim() || undefined,
-        user_email: formData.user_email.trim() || undefined,
+        user_name: formData.user_name.trim(),
+        user_email: formData.user_email.trim(),
         image_url: formData.image_url || undefined,
       };
 
@@ -119,6 +169,16 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
     setFormData(prev => ({ ...prev, image_url: '' }));
   };
 
+  // Vérifier si le formulaire est valide pour activer/désactiver le bouton
+  const isFormValid = () => {
+    return formData.user_name.trim() &&
+           formData.user_email.trim() &&
+           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.user_email) &&
+           formData.title.trim().length >= 5 &&
+           formData.category_id &&
+           formData.content.trim().length >= 20;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -152,7 +212,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
             <Button 
               type="submit" 
               className="bg-eco-green hover:bg-eco-green/90"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isFormValid()}
             >
               {isSubmitting ? 'Publication...' : 'Publier'}
             </Button>

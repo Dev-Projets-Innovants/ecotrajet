@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Image, MapPin, Tag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -44,44 +45,60 @@ const PostFormFields: React.FC<PostFormFieldsProps> = ({
       {/* User Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="user_name">Votre nom (optionnel)</Label>
+          <Label htmlFor="user_name">
+            Votre nom <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="user_name"
             placeholder="ex: Marie Dupont"
             value={formData.user_name}
             onChange={(e) => onFormDataChange({ user_name: e.target.value })}
+            required
           />
         </div>
         <div>
-          <Label htmlFor="user_email">Votre email (optionnel)</Label>
+          <Label htmlFor="user_email">
+            Votre email <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="user_email"
             type="email"
             placeholder="ex: marie@example.com"
             value={formData.user_email}
             onChange={(e) => onFormDataChange({ user_email: e.target.value })}
+            required
           />
         </div>
       </div>
 
       {/* Title */}
       <div>
-        <Label htmlFor="title">Titre *</Label>
+        <Label htmlFor="title">
+          Titre <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="title"
           placeholder="Donnez un titre accrocheur à votre post..."
           value={formData.title}
           onChange={(e) => onFormDataChange({ title: e.target.value })}
           required
+          minLength={5}
+          maxLength={200}
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Entre 5 et 200 caractères
+        </p>
       </div>
 
       {/* Category */}
       <div>
-        <Label htmlFor="category">Catégorie</Label>
+        <Label htmlFor="category">
+          Catégorie <span className="text-red-500">*</span>
+        </Label>
         <Select 
           value={formData.category_id} 
           onValueChange={(value) => onFormDataChange({ category_id: value })}
+          required
         >
           <SelectTrigger>
             <SelectValue placeholder="Choisissez une catégorie..." />
@@ -104,15 +121,22 @@ const PostFormFields: React.FC<PostFormFieldsProps> = ({
 
       {/* Content */}
       <div>
-        <Label htmlFor="content">Contenu *</Label>
+        <Label htmlFor="content">
+          Contenu <span className="text-red-500">*</span>
+        </Label>
         <Textarea
           id="content"
-          placeholder="Partagez vos expériences, conseils, questions..."
+          placeholder="Partagez vos expériences, conseils, questions... (minimum 20 caractères)"
           className="min-h-[120px]"
           value={formData.content}
           onChange={(e) => onFormDataChange({ content: e.target.value })}
           required
+          minLength={20}
+          maxLength={2000}
         />
+        <p className="text-xs text-gray-500 mt-1">
+          Entre 20 et 2000 caractères ({formData.content.length}/2000)
+        </p>
       </div>
 
       {/* Image Upload */}
@@ -139,6 +163,7 @@ const PostFormFields: React.FC<PostFormFieldsProps> = ({
           placeholder="ex: Paris 15e, Métro ligne 1..."
           value={formData.location}
           onChange={(e) => onFormDataChange({ location: e.target.value })}
+          maxLength={100}
         />
       </div>
 
@@ -153,9 +178,10 @@ const PostFormFields: React.FC<PostFormFieldsProps> = ({
           placeholder="ex: vélo, entretien, sécurité (séparés par des virgules)"
           value={formData.tags}
           onChange={(e) => onFormDataChange({ tags: e.target.value })}
+          maxLength={200}
         />
         <p className="text-xs text-gray-500 mt-1">
-          Séparez les tags par des virgules
+          Séparez les tags par des virgules (maximum 5 tags)
         </p>
       </div>
     </div>
