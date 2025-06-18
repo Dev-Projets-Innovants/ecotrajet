@@ -26,21 +26,8 @@ export async function getVelibAvailabilityTrends(timeRange: string = '24h'): Pro
         startDate.setHours(now.getHours() - 24);
     }
 
-    // Utiliser une requête SQL optimisée avec GROUP BY
-    const { data, error } = await supabase.rpc('get_availability_trends', {
-      start_time: startDate.toISOString(),
-      end_time: now.toISOString(),
-      time_range: timeRange
-    });
-
-    if (error) {
-      console.error('Error fetching availability trends:', error);
-      
-      // Fallback vers l'ancienne méthode si la fonction RPC n'existe pas
-      return await getFallbackAvailabilityTrends(startDate, timeRange);
-    }
-
-    return data || [];
+    // Utiliser directement la méthode fallback optimisée
+    return await getFallbackAvailabilityTrends(startDate, timeRange);
     
   } catch (error) {
     console.error('Error in getVelibAvailabilityTrends:', error);
@@ -53,10 +40,10 @@ export async function getVelibAvailabilityTrends(timeRange: string = '24h'): Pro
 }
 
 /**
- * Méthode de fallback pour récupérer les tendances
+ * Méthode optimisée pour récupérer les tendances
  */
 async function getFallbackAvailabilityTrends(startDate: Date, timeRange: string): Promise<VelibAvailabilityTrend[]> {
-  console.log('Using fallback method for availability trends');
+  console.log('Fetching availability trends from database');
   
   const { data: availabilityData, error } = await supabase
     .from('velib_availability_history')
@@ -65,8 +52,8 @@ async function getFallbackAvailabilityTrends(startDate: Date, timeRange: string)
     .order('timestamp', { ascending: true });
 
   if (error) {
-    console.error('Error in fallback method:', error);
-    throw error;
+    console.error('Error fetching availability data:', error);
+    return generateEmptyTrends(timeRange);
   }
 
   if (!availabilityData || availabilityData.length === 0) {
@@ -103,7 +90,7 @@ async function getFallbackAvailabilityTrends(startDate: Date, timeRange: string)
     const hourKey = `${hour.toString().padStart(2, '0')}h`;
     const hourData = hourlyData.get(hourKey);
     
-    if (hourData) {
+    if (hourData && hourData.bikes.length > 0) {
       trends.push({
         hour: hourKey,
         bikes: Math.round(hourData.bikes.reduce((a, b) => a + b, 0) / hourData.bikes.length),

@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from "@/integrations/supabase/client";
 import { 
   getVelibDashboardStats, 
   getVelibAvailabilityTrends, 
@@ -30,7 +31,7 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false, timeRange: s
       const startTime = Date.now();
       console.log(`Loading data for timeRange: ${timeRange}`);
       
-      const [statsData, trendsData, distributionData, usageData] = await Promise.all([
+      const [statsData, trendsData, distributionDataResult, usageDataResult] = await Promise.all([
         getVelibDashboardStats(timeRange),
         getVelibAvailabilityTrends(timeRange),
         getVelibDistributionData(timeRange),
@@ -42,8 +43,8 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false, timeRange: s
       
       setStats(statsData);
       setAvailabilityTrends(trendsData);
-      setDistributionData(distributionData);
-      setUsageData(usageData);
+      setDistributionData(distributionDataResult);
+      setUsageData(usageDataResult);
       
       const now = new Date().toISOString();
       setLastUpdated(now);
