@@ -48,8 +48,10 @@ export async function getVelibUsageData(timeRange: string = '24h'): Promise<Veli
       return generateDefaultUsageData(timeRange);
     }
 
-    // Grouper par jour pour le calcul du taux d'occupation moyen
+    // Grouper par jour pour le calcul des moyennes
     const dailyData = new Map<string, {
+      totalBikes: number;
+      totalDocks: number;
       totalOccupancy: number;
       count: number;
     }>();
@@ -58,13 +60,21 @@ export async function getVelibUsageData(timeRange: string = '24h'): Promise<Veli
       const date = new Date(record.timestamp!).toISOString().split('T')[0];
       const capacity = record.velib_stations?.capacity || 1;
       const bikesAvailable = record.numbikesavailable || 0;
+      const docksAvailable = record.numdocksavailable || 0;
       const occupancyRate = Math.round((bikesAvailable / capacity) * 100);
       
       if (!dailyData.has(date)) {
-        dailyData.set(date, { totalOccupancy: 0, count: 0 });
+        dailyData.set(date, { 
+          totalBikes: 0, 
+          totalDocks: 0, 
+          totalOccupancy: 0, 
+          count: 0 
+        });
       }
       
       const dayData = dailyData.get(date)!;
+      dayData.totalBikes += bikesAvailable;
+      dayData.totalDocks += docksAvailable;
       dayData.totalOccupancy += occupancyRate;
       dayData.count++;
     });
@@ -76,9 +86,16 @@ export async function getVelibUsageData(timeRange: string = '24h'): Promise<Veli
           month: 'short', 
           day: 'numeric' 
         }),
+        totalBikes: Math.round(data.totalBikes / data.count),
+        totalDocks: Math.round(data.totalDocks / data.count),
         occupancyRate: Math.round(data.totalOccupancy / data.count),
       }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .sort((a, b) => {
+        // Convertir les dates formatées en objets Date pour un tri correct
+        const dateA = new Date(a.date + ' 2024'); // Ajouter une année par défaut
+        const dateB = new Date(b.date + ' 2024');
+        return dateA.getTime() - dateB.getTime();
+      })
       .slice(-7); // Derniers 7 jours
 
     console.log(`Usage data processed: ${result.length} data points`);
@@ -108,6 +125,8 @@ function generateDefaultUsageData(timeRange: string): VelibUsageData[] {
         month: 'short', 
         day: 'numeric' 
       }),
+      totalBikes: 0,
+      totalDocks: 0,
       occupancyRate: 0,
     });
   }
