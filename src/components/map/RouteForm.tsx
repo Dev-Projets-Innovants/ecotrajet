@@ -24,10 +24,12 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
 
   const handleStartAddressSelect = (address: GeocodingResult) => {
     setStartAddress(address);
+    console.log('Adresse de départ sélectionnée:', address);
   };
 
   const handleEndAddressSelect = (address: GeocodingResult) => {
     setEndAddress(address);
+    console.log('Adresse d\'arrivée sélectionnée:', address);
   };
 
   const handleOpenGoogleMaps = () => {
@@ -40,19 +42,32 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
       return;
     }
 
-    // Construire l'URL Google Maps avec le mode vélo
+    // Construire l'URL Google Maps avec le mode vélo en utilisant les coordonnées précises
     const origin = `${startAddress.lat},${startAddress.lng}`;
     const destination = `${endAddress.lat},${endAddress.lng}`;
     const googleMapsUrl = `https://www.google.com/maps/dir/${origin}/${destination}/@${startAddress.lat},${startAddress.lng},14z/data=!3m1!4b1!4m4!4m3!1m1!4e2!3e1`;
     
+    console.log('URL Google Maps générée:', googleMapsUrl);
+    console.log('Coordonnées départ:', { lat: startAddress.lat, lng: startAddress.lng });
+    console.log('Coordonnées arrivée:', { lat: endAddress.lat, lng: endAddress.lng });
+    
     // Ouvrir Google Maps dans un nouvel onglet
     window.open(googleMapsUrl, '_blank');
     
+    // Message de confirmation adapté selon le type d'adresse
+    const hasApproximateAddress = startAddress.is_fallback || endAddress.is_fallback;
+    const toastMessage = hasApproximateAddress 
+      ? "L'itinéraire vélo s'ouvre dans un nouvel onglet (certaines adresses sont approximatives)."
+      : "L'itinéraire vélo s'ouvre dans un nouvel onglet.";
+    
     toast({
       title: "Redirection vers Google Maps ✅",
-      description: "L'itinéraire vélo s'ouvre dans un nouvel onglet.",
+      description: toastMessage,
     });
   };
+
+  // Le bouton est maintenant toujours activé si les deux champs ont du texte
+  const canOpenMaps = startAddress && endAddress;
 
   return (
     <div className="space-y-6 bg-white p-6 rounded-xl shadow-lg">
@@ -139,13 +154,13 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
         <Button 
           className="w-full bg-eco-green hover:bg-eco-dark-green text-white py-3 text-lg"
           onClick={handleOpenGoogleMaps}
-          disabled={!startAddress || !endAddress}
+          disabled={!canOpenMaps}
         >
           <ExternalLink className="h-5 w-5 mr-2" />
           Voir l'itinéraire vélo sur Google Maps
         </Button>
 
-        {startAddress && endAddress && (
+        {canOpenMaps && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-medium text-gray-800 mb-2">Aperçu du trajet :</h4>
             <div className="space-y-2 text-sm">
@@ -153,12 +168,18 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
                 <MapPin className="h-4 w-4 text-eco-green mt-0.5 flex-shrink-0" />
                 <span className="text-gray-600">
                   <strong>Départ :</strong> {startAddress.display_name}
+                  {startAddress.is_fallback && (
+                    <span className="text-orange-500 text-xs ml-2">(approximatif)</span>
+                  )}
                 </span>
               </div>
               <div className="flex items-start gap-2">
                 <MapPinOff className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                 <span className="text-gray-600">
                   <strong>Arrivée :</strong> {endAddress.display_name}
+                  {endAddress.is_fallback && (
+                    <span className="text-orange-500 text-xs ml-2">(approximatif)</span>
+                  )}
                 </span>
               </div>
             </div>

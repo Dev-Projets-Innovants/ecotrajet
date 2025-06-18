@@ -29,6 +29,7 @@ export interface GeocodingResult {
   lng: number;
   display_name: string;
   place_id: string;
+  is_fallback?: boolean;
 }
 
 // Fonction pour géocoder une adresse (convertir adresse en coordonnées)
@@ -44,16 +45,52 @@ export async function geocodeAddress(address: string): Promise<GeocodingResult[]
     
     const results = await response.json();
     
-    return results.map((result: any) => ({
+    const geocodedResults = results.map((result: any) => ({
       lat: parseFloat(result.lat),
       lng: parseFloat(result.lon),
       display_name: result.display_name,
-      place_id: result.place_id
+      place_id: result.place_id,
+      is_fallback: false
     }));
+
+    // Si aucun résultat trouvé, essayer sans spécifier Paris
+    if (geocodedResults.length === 0) {
+      console.log('Aucun résultat trouvé avec Paris, essai sans restriction géographique...');
+      const fallbackResponse = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5`
+      );
+      
+      if (fallbackResponse.ok) {
+        const fallbackResults = await fallbackResponse.json();
+        const fallbackGeocodedResults = fallbackResults.map((result: any) => ({
+          lat: parseFloat(result.lat),
+          lng: parseFloat(result.lon),
+          display_name: result.display_name + " (recherche élargie)",
+          place_id: result.place_id,
+          is_fallback: true
+        }));
+        
+        return fallbackGeocodedResults;
+      }
+    }
+    
+    return geocodedResults;
   } catch (error) {
     console.error('Erreur de géocodage:', error);
     throw new Error('Impossible de trouver cette adresse');
   }
+}
+
+// Nouvelle fonction pour créer une adresse fallback basée sur le texte saisi
+export function createFallbackAddress(addressText: string): GeocodingResult {
+  // Coordonnées par défaut : centre de Paris (Notre-Dame)
+  return {
+    lat: 48.8566,
+    lng: 2.3522,
+    display_name: `${addressText} (recherche approximative dans Paris)`,
+    place_id: `fallback-${Date.now()}`,
+    is_fallback: true
+  };
 }
 
 // Fonction pour calculer un itinéraire

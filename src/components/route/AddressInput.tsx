@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { MapPin, X, Navigation } from 'lucide-react';
-import { geocodeAddress, GeocodingResult } from '@/services/routingService';
+import { MapPin, X, Navigation, AlertTriangle } from 'lucide-react';
+import { geocodeAddress, GeocodingResult, createFallbackAddress } from '@/services/routingService';
 
 interface AddressInputProps {
   placeholder: string;
@@ -26,6 +26,7 @@ const AddressInput = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string>('');
+  const [showFallbackOption, setShowFallbackOption] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -38,13 +39,20 @@ const AddressInput = ({
       
       timeoutRef.current = setTimeout(async () => {
         setIsLoading(true);
+        setShowFallbackOption(false);
         try {
           const results = await geocodeAddress(inputValue);
           setSuggestions(results);
           setShowSuggestions(true);
+          
+          // Si aucun résultat trouvé, proposer l'option fallback
+          if (results.length === 0) {
+            setShowFallbackOption(true);
+          }
         } catch (error) {
           console.error('Erreur de recherche:', error);
           setSuggestions([]);
+          setShowFallbackOption(true);
         } finally {
           setIsLoading(false);
         }
@@ -52,6 +60,7 @@ const AddressInput = ({
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setShowFallbackOption(false);
     }
 
     return () => {
@@ -65,7 +74,16 @@ const AddressInput = ({
     setInputValue(suggestion.display_name);
     setSelectedAddress(suggestion.display_name);
     setShowSuggestions(false);
+    setShowFallbackOption(false);
     onAddressSelect(suggestion);
+  };
+
+  const handleFallbackSelection = () => {
+    const fallbackAddress = createFallbackAddress(inputValue);
+    setSelectedAddress(inputValue);
+    setShowSuggestions(false);
+    setShowFallbackOption(false);
+    onAddressSelect(fallbackAddress);
   };
 
   const handleClear = () => {
@@ -73,6 +91,7 @@ const AddressInput = ({
     setSelectedAddress('');
     setSuggestions([]);
     setShowSuggestions(false);
+    setShowFallbackOption(false);
     inputRef.current?.focus();
   };
 
@@ -147,7 +166,7 @@ const AddressInput = ({
       </div>
 
       {/* Suggestions dropdown */}
-      {showSuggestions && (suggestions.length > 0 || isLoading) && (
+      {(showSuggestions || showFallbackOption) && (suggestions.length > 0 || isLoading || showFallbackOption) && (
         <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-60 overflow-y-auto">
           {isLoading ? (
             <div className="p-3 text-center text-sm text-gray-500">
@@ -159,13 +178,36 @@ const AddressInput = ({
                 <button
                   key={`${suggestion.place_id}-${index}`}
                   type="button"
-                  className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-start gap-2 text-sm"
+                  className={`w-full px-3 py-2 text-left hover:bg-gray-100 flex items-start gap-2 text-sm ${
+                    suggestion.is_fallback ? 'bg-yellow-50 border-b border-yellow-200' : ''
+                  }`}
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
-                  <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span className="truncate">{suggestion.display_name}</span>
+                  <MapPin className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+                    suggestion.is_fallback ? 'text-yellow-500' : 'text-gray-400'
+                  }`} />
+                  <span className="truncate">
+                    {suggestion.display_name}
+                    {suggestion.is_fallback && (
+                      <span className="text-xs text-yellow-600 block">Recherche élargie</span>
+                    )}
+                  </span>
                 </button>
               ))}
+              
+              {showFallbackOption && suggestions.length === 0 && (
+                <button
+                  type="button"
+                  className="w-full px-3 py-2 text-left hover:bg-orange-50 flex items-start gap-2 text-sm bg-orange-25 border-b border-orange-200"
+                  onClick={handleFallbackSelection}
+                >
+                  <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="truncate block">Utiliser "{inputValue}" (approximatif)</span>
+                    <span className="text-xs text-orange-600">Adresse non trouvée, recherche dans Paris</span>
+                  </div>
+                </button>
+              )}
             </div>
           )}
         </Card>
