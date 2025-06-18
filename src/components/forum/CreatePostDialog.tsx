@@ -23,6 +23,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ForumCategory, forumService } from '@/services/forumService';
 import { toast } from '@/hooks/use-toast';
+import ImageUpload from './ImageUpload';
 
 interface CreatePostDialogProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
     tags: '',
     user_name: '',
     user_email: '',
+    image_url: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,6 +73,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : undefined,
         user_name: formData.user_name.trim() || undefined,
         user_email: formData.user_email.trim() || undefined,
+        image_url: formData.image_url || undefined,
       };
 
       const { error } = await forumService.createPost(postData);
@@ -93,6 +96,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
         tags: '',
         user_name: '',
         user_email: '',
+        image_url: '',
       });
 
       onPostCreated();
@@ -112,6 +116,14 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
     if (!isSubmitting) {
       onClose();
     }
+  };
+
+  const handleImageUploaded = (url: string) => {
+    setFormData(prev => ({ ...prev, image_url: url }));
+  };
+
+  const handleImageRemoved = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }));
   };
 
   return (
@@ -205,6 +217,19 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
               value={formData.content}
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
               required
+            />
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <Label className="flex items-center">
+              <Image className="h-4 w-4 mr-1" />
+              Image (optionnel)
+            </Label>
+            <ImageUpload
+              onImageUploaded={handleImageUploaded}
+              onImageRemoved={handleImageRemoved}
+              imageUrl={formData.image_url}
             />
           </div>
 
