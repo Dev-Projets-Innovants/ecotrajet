@@ -6,9 +6,11 @@ import { getCurrentUserIdentifier } from '@/services/auth/mockAuthService';
 export const useRealtimeLikes = (postId: string) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [isToggling, setIsToggling] = useState(false);
 
   const checkUserLike = async () => {
     try {
+      setIsChecking(true);
       const { data: { user } } = await supabase.auth.getUser();
       
       let query = supabase
@@ -26,6 +28,7 @@ export const useRealtimeLikes = (postId: string) => {
       const { data } = await query.single();
       setIsLiked(!!data);
     } catch (error) {
+      console.log('No like found for user:', error);
       setIsLiked(false);
     } finally {
       setIsChecking(false);
@@ -45,8 +48,10 @@ export const useRealtimeLikes = (postId: string) => {
       const userIdentifier = await getUserIdentifier();
       const { data: { user } } = await supabase.auth.getUser();
 
+      console.log('Setting up realtime listener for user:', user ? user.id : userIdentifier);
+
       const channel = supabase
-        .channel(`user-likes-${postId}`)
+        .channel(`user-likes-${postId}-${userIdentifier}`)
         .on(
           'postgres_changes',
           {
@@ -56,11 +61,13 @@ export const useRealtimeLikes = (postId: string) => {
             filter: `post_id=eq.${postId}`
           },
           (payload) => {
+            console.log('Like INSERT received:', payload);
             const isCurrentUser = user 
               ? payload.new.user_id === user.id
               : payload.new.user_identifier === userIdentifier;
             
             if (isCurrentUser) {
+              console.log('Setting isLiked to true for current user');
               setIsLiked(true);
             }
           }
@@ -74,11 +81,13 @@ export const useRealtimeLikes = (postId: string) => {
             filter: `post_id=eq.${postId}`
           },
           (payload) => {
+            console.log('Like DELETE received:', payload);
             const isCurrentUser = user 
               ? payload.old.user_id === user.id
               : payload.old.user_identifier === userIdentifier;
             
             if (isCurrentUser) {
+              console.log('Setting isLiked to false for current user');
               setIsLiked(false);
             }
           }
@@ -95,5 +104,11 @@ export const useRealtimeLikes = (postId: string) => {
     };
   }, [postId]);
 
-  return { isLiked, isChecking, refetch: checkUserLike };
+  return { 
+    isLiked, 
+    isChecking, 
+    isToggling, 
+    setIsToggling, 
+    refetch: checkUserLike 
+  };
 };

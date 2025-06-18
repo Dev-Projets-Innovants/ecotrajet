@@ -30,6 +30,9 @@ export const useRealtimePost = (postId: string) => {
       if (data) {
         const transformedPost = {
           ...data,
+          // S'assurer que les compteurs ne sont jamais négatifs
+          likes_count: Math.max(0, data.likes_count || 0),
+          comments_count: Math.max(0, data.comments_count || 0),
           forum_categories: data.forum_categories ? {
             ...data.forum_categories,
             description: null,
@@ -68,7 +71,13 @@ export const useRealtimePost = (postId: string) => {
         },
         (payload) => {
           console.log('Post updated:', payload);
-          setPost(prev => prev ? { ...prev, ...payload.new } : null);
+          setPost(prev => prev ? { 
+            ...prev, 
+            ...payload.new,
+            // S'assurer que les compteurs ne sont jamais négatifs
+            likes_count: Math.max(0, payload.new.likes_count || 0),
+            comments_count: Math.max(0, payload.new.comments_count || 0)
+          } : null);
         }
       )
       .subscribe();
@@ -86,7 +95,10 @@ export const useRealtimePost = (postId: string) => {
         },
         () => {
           console.log('New like added');
-          setPost(prev => prev ? { ...prev, likes_count: prev.likes_count + 1 } : null);
+          setPost(prev => prev ? { 
+            ...prev, 
+            likes_count: Math.max(0, prev.likes_count + 1) 
+          } : null);
         }
       )
       .on(
@@ -99,7 +111,10 @@ export const useRealtimePost = (postId: string) => {
         },
         () => {
           console.log('Like removed');
-          setPost(prev => prev ? { ...prev, likes_count: prev.likes_count - 1 } : null);
+          setPost(prev => prev ? { 
+            ...prev, 
+            likes_count: Math.max(0, prev.likes_count - 1) 
+          } : null);
         }
       )
       .subscribe();
@@ -117,7 +132,10 @@ export const useRealtimePost = (postId: string) => {
         },
         () => {
           console.log('New comment added');
-          setPost(prev => prev ? { ...prev, comments_count: prev.comments_count + 1 } : null);
+          setPost(prev => prev ? { 
+            ...prev, 
+            comments_count: Math.max(0, prev.comments_count + 1) 
+          } : null);
         }
       )
       .on(
@@ -130,7 +148,10 @@ export const useRealtimePost = (postId: string) => {
         },
         () => {
           console.log('Comment removed');
-          setPost(prev => prev ? { ...prev, comments_count: prev.comments_count - 1 } : null);
+          setPost(prev => prev ? { 
+            ...prev, 
+            comments_count: Math.max(0, prev.comments_count - 1) 
+          } : null);
         }
       )
       .subscribe();
