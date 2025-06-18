@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminSidebar from "./sidebar/AdminSidebar";
 import AdminHeader from "./header/AdminHeader";
-import AdminContent from "./content/AdminContent";
 import { useAuth } from "@/hooks/useAuth";
 
 interface AdminLayoutProps {
@@ -47,9 +46,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
               title={title}
               toggleSidebar={toggleSidebar}
             />
-            <AdminContent>
+            <main className="flex-1 p-6 bg-gray-50 dark:bg-gray-900">
               {children}
-            </AdminContent>
+            </main>
           </div>
         </div>
       </SidebarProvider>
