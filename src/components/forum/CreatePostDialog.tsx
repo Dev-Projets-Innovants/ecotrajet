@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { X, Image, MapPin, Tag, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,20 +9,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ForumCategory, forumService } from '@/services/forumService';
 import { toast } from '@/hooks/use-toast';
-import ImageUpload from './ImageUpload';
+import PostFormRules from './PostFormRules';
+import PostFormFields from './PostFormFields';
 
 interface CreatePostDialogProps {
   isOpen: boolean;
@@ -118,6 +107,10 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
     }
   };
 
+  const handleFormDataChange = (updates: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
+
   const handleImageUploaded = (url: string) => {
     setFormData(prev => ({ ...prev, image_url: url }));
   };
@@ -136,135 +129,18 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Règles de modération */}
-        <Alert className="border-orange-200 bg-orange-50">
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
-          <AlertDescription className="text-sm text-orange-700">
-            <strong>Règles de la communauté :</strong> Respectez autrui, restez constructif, 
-            partagez responsable. Les contenus inappropriés peuvent être supprimés.
-          </AlertDescription>
-        </Alert>
+        <PostFormRules />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* User Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="user_name">Votre nom (optionnel)</Label>
-              <Input
-                id="user_name"
-                placeholder="ex: Marie Dupont"
-                value={formData.user_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, user_name: e.target.value }))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="user_email">Votre email (optionnel)</Label>
-              <Input
-                id="user_email"
-                type="email"
-                placeholder="ex: marie@example.com"
-                value={formData.user_email}
-                onChange={(e) => setFormData(prev => ({ ...prev, user_email: e.target.value }))}
-              />
-            </div>
-          </div>
+        <form onSubmit={handleSubmit}>
+          <PostFormFields
+            formData={formData}
+            categories={categories}
+            onFormDataChange={handleFormDataChange}
+            onImageUploaded={handleImageUploaded}
+            onImageRemoved={handleImageRemoved}
+          />
 
-          {/* Title */}
-          <div>
-            <Label htmlFor="title">Titre *</Label>
-            <Input
-              id="title"
-              placeholder="Donnez un titre accrocheur à votre post..."
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              required
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <Label htmlFor="category">Catégorie</Label>
-            <Select 
-              value={formData.category_id} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisissez une catégorie..." />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: category.color }}
-                      />
-                      {category.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Content */}
-          <div>
-            <Label htmlFor="content">Contenu *</Label>
-            <Textarea
-              id="content"
-              placeholder="Partagez vos expériences, conseils, questions..."
-              className="min-h-[120px]"
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              required
-            />
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <Label className="flex items-center">
-              <Image className="h-4 w-4 mr-1" />
-              Image (optionnel)
-            </Label>
-            <ImageUpload
-              onImageUploaded={handleImageUploaded}
-              onImageRemoved={handleImageRemoved}
-              imageUrl={formData.image_url}
-            />
-          </div>
-
-          {/* Location */}
-          <div>
-            <Label htmlFor="location" className="flex items-center">
-              <MapPin className="h-4 w-4 mr-1" />
-              Localisation (optionnel)
-            </Label>
-            <Input
-              id="location"
-              placeholder="ex: Paris 15e, Métro ligne 1..."
-              value={formData.location}
-              onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-            />
-          </div>
-
-          {/* Tags */}
-          <div>
-            <Label htmlFor="tags" className="flex items-center">
-              <Tag className="h-4 w-4 mr-1" />
-              Tags (optionnel)
-            </Label>
-            <Input
-              id="tags"
-              placeholder="ex: vélo, entretien, sécurité (séparés par des virgules)"
-              value={formData.tags}
-              onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Séparez les tags par des virgules
-            </p>
-          </div>
-
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button 
               type="button" 
               variant="outline" 
