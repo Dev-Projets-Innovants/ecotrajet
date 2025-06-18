@@ -129,16 +129,34 @@ export const forumService = {
     user_name?: string;
     user_email?: string;
   }) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return await supabase
-      .from('forum_posts')
-      .insert({
-        ...post,
-        user_identifier: userIdentifier,
-      })
-      .select()
-      .single();
+    console.log('Creating post with user:', user);
+    
+    // Si l'utilisateur est connecté, utiliser son ID
+    if (user) {
+      return await supabase
+        .from('forum_posts')
+        .insert({
+          ...post,
+          user_id: user.id,
+          user_name: post.user_name || user.user_metadata?.first_name || null,
+          user_email: post.user_email || user.email || null,
+        })
+        .select()
+        .single();
+    } else {
+      // Si l'utilisateur n'est pas connecté, utiliser un identifiant anonyme
+      const userIdentifier = getCurrentUserIdentifier();
+      return await supabase
+        .from('forum_posts')
+        .insert({
+          ...post,
+          user_identifier: userIdentifier,
+        })
+        .select()
+        .single();
+    }
   },
 
   async updatePost(id: string, updates: Partial<ForumPost>) {
@@ -174,16 +192,30 @@ export const forumService = {
     user_name?: string;
     user_email?: string;
   }) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return await supabase
-      .from('forum_comments')
-      .insert({
-        ...comment,
-        user_identifier: userIdentifier,
-      })
-      .select()
-      .single();
+    if (user) {
+      return await supabase
+        .from('forum_comments')
+        .insert({
+          ...comment,
+          user_id: user.id,
+          user_name: comment.user_name || user.user_metadata?.first_name || null,
+          user_email: comment.user_email || user.email || null,
+        })
+        .select()
+        .single();
+    } else {
+      const userIdentifier = getCurrentUserIdentifier();
+      return await supabase
+        .from('forum_comments')
+        .insert({
+          ...comment,
+          user_identifier: userIdentifier,
+        })
+        .select()
+        .single();
+    }
   },
 
   async updateComment(id: string, content: string) {
@@ -204,30 +236,58 @@ export const forumService = {
 
   // Likes for posts
   async togglePostLike(postId: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    // Check if already liked
-    const { data: existingLike } = await supabase
-      .from('forum_post_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_identifier', userIdentifier)
-      .single();
+    if (user) {
+      // Check if already liked
+      const { data: existingLike } = await supabase
+        .from('forum_post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .single();
 
-    if (existingLike) {
-      // Remove like
-      return await supabase
-        .from('forum_post_likes')
-        .delete()
-        .eq('id', existingLike.id);
+      if (existingLike) {
+        // Remove like
+        return await supabase
+          .from('forum_post_likes')
+          .delete()
+          .eq('id', existingLike.id);
+      } else {
+        // Add like
+        return await supabase
+          .from('forum_post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id,
+          });
+      }
     } else {
-      // Add like
-      return await supabase
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      // Check if already liked
+      const { data: existingLike } = await supabase
         .from('forum_post_likes')
-        .insert({
-          post_id: postId,
-          user_identifier: userIdentifier,
-        });
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_identifier', userIdentifier)
+        .single();
+
+      if (existingLike) {
+        // Remove like
+        return await supabase
+          .from('forum_post_likes')
+          .delete()
+          .eq('id', existingLike.id);
+      } else {
+        // Add like
+        return await supabase
+          .from('forum_post_likes')
+          .insert({
+            post_id: postId,
+            user_identifier: userIdentifier,
+          });
+      }
     }
   },
 
@@ -239,84 +299,164 @@ export const forumService = {
   },
 
   async hasUserLikedPost(postId: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    const { data } = await supabase
-      .from('forum_post_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_identifier', userIdentifier)
-      .single();
+    if (user) {
+      const { data } = await supabase
+        .from('forum_post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .single();
 
-    return !!data;
+      return !!data;
+    } else {
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      const { data } = await supabase
+        .from('forum_post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_identifier', userIdentifier)
+        .single();
+
+      return !!data;
+    }
   },
 
   // Likes for comments
   async toggleCommentLike(commentId: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    // Check if already liked
-    const { data: existingLike } = await supabase
-      .from('forum_comment_likes')
-      .select('id')
-      .eq('comment_id', commentId)
-      .eq('user_identifier', userIdentifier)
-      .single();
+    if (user) {
+      // Check if already liked
+      const { data: existingLike } = await supabase
+        .from('forum_comment_likes')
+        .select('id')
+        .eq('comment_id', commentId)
+        .eq('user_id', user.id)
+        .single();
 
-    if (existingLike) {
-      // Remove like
-      return await supabase
-        .from('forum_comment_likes')
-        .delete()
-        .eq('id', existingLike.id);
+      if (existingLike) {
+        // Remove like
+        return await supabase
+          .from('forum_comment_likes')
+          .delete()
+          .eq('id', existingLike.id);
+      } else {
+        // Add like
+        return await supabase
+          .from('forum_comment_likes')
+          .insert({
+            comment_id: commentId,
+            user_id: user.id,
+          });
+      }
     } else {
-      // Add like
-      return await supabase
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      // Check if already liked
+      const { data: existingLike } = await supabase
         .from('forum_comment_likes')
-        .insert({
-          comment_id: commentId,
-          user_identifier: userIdentifier,
-        });
+        .select('id')
+        .eq('comment_id', commentId)
+        .eq('user_identifier', userIdentifier)
+        .single();
+
+      if (existingLike) {
+        // Remove like
+        return await supabase
+          .from('forum_comment_likes')
+          .delete()
+          .eq('id', existingLike.id);
+      } else {
+        // Add like
+        return await supabase
+          .from('forum_comment_likes')
+          .insert({
+            comment_id: commentId,
+            user_identifier: userIdentifier,
+          });
+      }
     }
   },
 
   async hasUserLikedComment(commentId: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    const { data } = await supabase
-      .from('forum_comment_likes')
-      .select('id')
-      .eq('comment_id', commentId)
-      .eq('user_identifier', userIdentifier)
-      .single();
+    if (user) {
+      const { data } = await supabase
+        .from('forum_comment_likes')
+        .select('id')
+        .eq('comment_id', commentId)
+        .eq('user_id', user.id)
+        .single();
 
-    return !!data;
+      return !!data;
+    } else {
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      const { data } = await supabase
+        .from('forum_comment_likes')
+        .select('id')
+        .eq('comment_id', commentId)
+        .eq('user_identifier', userIdentifier)
+        .single();
+
+      return !!data;
+    }
   },
 
   // Reports
   async reportPost(postId: string, reason: string, description?: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return await supabase
-      .from('forum_reports')
-      .insert({
-        post_id: postId,
-        reason,
-        description,
-        reporter_identifier: userIdentifier,
-      });
+    if (user) {
+      return await supabase
+        .from('forum_reports')
+        .insert({
+          post_id: postId,
+          reason,
+          description,
+          reporter_user_id: user.id,
+        });
+    } else {
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      return await supabase
+        .from('forum_reports')
+        .insert({
+          post_id: postId,
+          reason,
+          description,
+          reporter_identifier: userIdentifier,
+        });
+    }
   },
 
   async reportComment(commentId: string, reason: string, description?: string) {
-    const userIdentifier = getCurrentUserIdentifier();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return await supabase
-      .from('forum_reports')
-      .insert({
-        comment_id: commentId,
-        reason,
-        description,
-        reporter_identifier: userIdentifier,
-      });
+    if (user) {
+      return await supabase
+        .from('forum_reports')
+        .insert({
+          comment_id: commentId,
+          reason,
+          description,
+          reporter_user_id: user.id,
+        });
+    } else {
+      const userIdentifier = getCurrentUserIdentifier();
+      
+      return await supabase
+        .from('forum_reports')
+        .insert({
+          comment_id: commentId,
+          reason,
+          description,
+          reporter_identifier: userIdentifier,
+        });
+    }
   }
 };
