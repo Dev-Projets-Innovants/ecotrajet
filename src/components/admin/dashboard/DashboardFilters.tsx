@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Calendar, RefreshCw } from 'lucide-react';
+import { Clock, Calendar, RefreshCw, Database, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface DashboardFiltersProps {
   timeRange: string;
@@ -13,6 +13,8 @@ interface DashboardFiltersProps {
   lastUpdated?: string;
   autoRefresh: boolean;
   onAutoRefreshToggle: () => void;
+  dataFreshness?: 'fresh' | 'stale' | 'outdated';
+  onTriggerSync?: () => Promise<void>;
 }
 
 const DashboardFilters: React.FC<DashboardFiltersProps> = ({
@@ -23,10 +25,66 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   lastUpdated,
   autoRefresh,
   onAutoRefreshToggle,
+  dataFreshness = 'fresh',
+  onTriggerSync,
 }) => {
+  const [isSyncing, setIsSyncing] = React.useState(false);
+
+  const handleTriggerSync = async () => {
+    if (!onTriggerSync) return;
+    
+    setIsSyncing(true);
+    try {
+      await onTriggerSync();
+    } catch (error) {
+      console.error('Error triggering sync:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const getFreshnessIcon = () => {
+    switch (dataFreshness) {
+      case 'fresh':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'stale':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'outdated':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  const getFreshnessText = () => {
+    switch (dataFreshness) {
+      case 'fresh':
+        return 'Données récentes';
+      case 'stale':
+        return 'Données légèrement anciennes';
+      case 'outdated':
+        return 'Données anciennes';
+      default:
+        return 'État inconnu';
+    }
+  };
+
+  const getFreshnessColor = () => {
+    switch (dataFreshness) {
+      case 'fresh':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'stale':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'outdated':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white rounded-lg border">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <Select value={timeRange} onValueChange={onTimeRangeChange}>
@@ -49,6 +107,13 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
             </span>
           </div>
         )}
+
+        <div className="flex items-center gap-2">
+          {getFreshnessIcon()}
+          <Badge variant="outline" className={getFreshnessColor()}>
+            {getFreshnessText()}
+          </Badge>
+        </div>
       </div>
       
       <div className="flex items-center gap-2">
@@ -70,6 +135,19 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           Actualiser
         </Button>
+
+        {onTriggerSync && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleTriggerSync} 
+            disabled={isSyncing}
+            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Database className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            Sync Vélib
+          </Button>
+        )}
         
         {autoRefresh && (
           <Badge variant="secondary" className="bg-green-100 text-green-800">

@@ -18,7 +18,8 @@ import {
   Bike,
   MapPin,
   Battery,
-  ParkingCircle
+  ParkingCircle,
+  AlertCircle
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -35,8 +36,10 @@ const AdminDashboard = () => {
     isLoading,
     error,
     lastUpdated,
-    refetchData
-  } = useOptimizedVelibData(autoRefresh);
+    dataFreshness,
+    refetchData,
+    triggerDataSync
+  } = useOptimizedVelibData(autoRefresh, timeRange);
 
   const handleManualRefresh = async () => {
     setIsManualRefreshing(true);
@@ -65,18 +68,44 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleTriggerSync = async () => {
+    try {
+      await triggerDataSync();
+      toast({
+        title: "Synchronisation déclenchée",
+        description: "La synchronisation des données Vélib' a été déclenchée avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur de synchronisation",
+        description: "Impossible de déclencher la synchronisation des données Vélib'.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (error && !stats) {
     return (
       <AdminLayout title="Tableau de bord">
         <div className="text-center py-12">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
           <p className="text-red-600 mb-4">{error}</p>
-          <button 
-            onClick={handleManualRefresh} 
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Réessayer
-          </button>
+          <div className="space-x-2">
+            <button 
+              onClick={handleManualRefresh} 
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Réessayer
+            </button>
+            <button 
+              onClick={handleTriggerSync} 
+              className="inline-flex items-center px-4 py-2 border border-blue-300 rounded-md shadow-sm bg-blue-50 text-sm font-medium text-blue-700 hover:bg-blue-100"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Synchroniser les données
+            </button>
+          </div>
         </div>
       </AdminLayout>
     );
@@ -94,6 +123,8 @@ const AdminDashboard = () => {
           lastUpdated={lastUpdated}
           autoRefresh={autoRefresh}
           onAutoRefreshToggle={handleAutoRefreshToggle}
+          dataFreshness={dataFreshness}
+          onTriggerSync={handleTriggerSync}
         />
 
         {/* Cartes de statistiques */}
@@ -159,6 +190,23 @@ const AdminDashboard = () => {
           config={chartConfig} 
           isLoading={isLoading}
         />
+
+        {/* Indicateur de fraîcheur des données */}
+        {dataFreshness === 'outdated' && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800">
+                  Données anciennes détectées
+                </h3>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Les données affichées sont anciennes. Cliquez sur "Sync Vélib" pour forcer une mise à jour.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   getVelibDashboardStats, 
@@ -10,7 +11,7 @@ import {
   VelibUsageData
 } from '@/services/admin';
 
-export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
+export const useOptimizedVelibData = (autoRefresh: boolean = false, timeRange: string = '24h') => {
   const [stats, setStats] = useState<VelibDashboardStats | null>(null);
   const [availabilityTrends, setAvailabilityTrends] = useState<VelibAvailabilityTrend[]>([]);
   const [distributionData, setDistributionData] = useState<VelibDistributionData[]>([]);
@@ -18,6 +19,7 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [dataFreshness, setDataFreshness] = useState<'fresh' | 'stale' | 'outdated'>('fresh');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadData = useCallback(async (showLoading = true) => {
@@ -26,37 +28,59 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
       setError(null);
       
       const startTime = Date.now();
+      console.log(`Loading data for timeRange: ${timeRange}`);
       
       const [statsData, trendsData, distributionData, usageData] = await Promise.all([
-        getVelibDashboardStats(),
-        getVelibAvailabilityTrends(),
-        getVelibDistributionData(),
-        getVelibUsageData()
+        getVelibDashboardStats(timeRange),
+        getVelibAvailabilityTrends(timeRange),
+        getVelibDistributionData(timeRange),
+        getVelibUsageData(timeRange)
       ]);
       
       const loadTime = Date.now() - startTime;
-      console.log(`Données chargées en ${loadTime}ms`);
+      console.log(`Données chargées en ${loadTime}ms pour ${timeRange}`);
       
       setStats(statsData);
       setAvailabilityTrends(trendsData);
       setDistributionData(distributionData);
       setUsageData(usageData);
-      setLastUpdated(new Date().toISOString());
+      
+      const now = new Date().toISOString();
+      setLastUpdated(now);
+      
+      // Calculer la fraîcheur des données
+      if (statsData.lastUpdated) {
+        const dataAge = Date.now() - new Date(statsData.lastUpdated).getTime();
+        const ageInMinutes = dataAge / (1000 * 60);
+        
+        if (ageInMinutes < 15) {
+          setDataFreshness('fresh');
+        } else if (ageInMinutes < 60) {
+          setDataFreshness('stale');
+        } else {
+          setDataFreshness('outdated');
+        }
+      }
+      
     } catch (err) {
       console.error('Erreur lors du chargement des données Vélib:', err);
       setError('Erreur lors du chargement des données Vélib');
+      setDataFreshness('outdated');
     } finally {
       if (showLoading) setIsLoading(false);
     }
-  }, []);
+  }, [timeRange]);
 
+  // Charger les données au changement de timeRange
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  // Gérer l'auto-refresh
   useEffect(() => {
     if (autoRefresh) {
       intervalRef.current = setInterval(() => {
+        console.log('Auto-refresh triggered');
         loadData(false); // Ne pas afficher le spinner pour l'auto-refresh
       }, 5 * 60 * 1000); // 5 minutes
     } else {
@@ -74,7 +98,38 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
   }, [autoRefresh, loadData]);
 
   const refetchData = useCallback(async () => {
+    console.log('Manual refresh triggered');
     await loadData(true);
+  }, [loadData]);
+
+  // Fonction pour déclencher une synchronisation manuelle des données
+  const triggerDataSync = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      console.log('Triggering manual data sync...');
+      
+      // Appeler l'edge function de synchronisation
+      const { data, error } = await supabase.functions.invoke('sync-velib-data');
+      
+      if (error) {
+        console.error('Error triggering sync:', error);
+        throw error;
+      }
+      
+      console.log('Sync triggered successfully:', data);
+      
+      // Attendre un peu puis recharger les données
+      setTimeout(() => {
+        loadData(false);
+      }, 2000);
+      
+      return data;
+    } catch (error) {
+      console.error('Error in triggerDataSync:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   }, [loadData]);
 
   const chartConfig = {
@@ -109,6 +164,8 @@ export const useOptimizedVelibData = (autoRefresh: boolean = false) => {
     isLoading,
     error,
     lastUpdated,
-    refetchData
+    dataFreshness,
+    refetchData,
+    triggerDataSync
   };
 };
