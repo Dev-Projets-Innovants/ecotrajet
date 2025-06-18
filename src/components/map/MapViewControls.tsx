@@ -36,19 +36,11 @@ const MapViewControls = ({ onTabChange }: MapViewControlsProps) => {
       </TabsContent>
       
       <TabsContent value="routes" className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <RouteForm 
-              selectedTransportType={selectedTransportType}
-              setSelectedTransportType={setSelectedTransportType}
-            />
-          </div>
-          
-          <div className="md:col-span-2">
-            <div className="relative rounded-xl overflow-hidden h-[600px]">
-              <SupabaseMap />
-            </div>
-          </div>
+        <div className="max-w-2xl mx-auto">
+          <RouteForm 
+            selectedTransportType={selectedTransportType}
+            setSelectedTransportType={setSelectedTransportType}
+          />
         </div>
       </TabsContent>
     </Tabs>
