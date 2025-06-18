@@ -14,19 +14,21 @@ import {
 import { ForumCategory } from '@/services/forumService';
 import ImageUpload from './ImageUpload';
 
+interface PostFormData {
+  title: string;
+  content: string;
+  category_id: string;
+  location: string;
+  tags: string;
+  user_name: string;
+  user_email: string;
+  image_url: string;
+}
+
 interface PostFormFieldsProps {
-  formData: {
-    title: string;
-    content: string;
-    category_id: string;
-    location: string;
-    tags: string;
-    user_name: string;
-    user_email: string;
-    image_url: string;
-  };
+  formData: PostFormData;
   categories: ForumCategory[];
-  onFormDataChange: (updates: Partial<typeof formData>) => void;
+  onFormDataChange: (updates: Partial<PostFormData>) => void;
   onImageUploaded: (url: string) => void;
   onImageRemoved: () => void;
 }
