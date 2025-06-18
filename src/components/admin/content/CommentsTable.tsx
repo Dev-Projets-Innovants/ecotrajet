@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MoreHorizontal, CheckCircle, XCircle, Eye, Calendar, User } from 'lucide-react';
+import { MoreHorizontal, CheckCircle, XCircle, Eye, Calendar, User, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -19,20 +19,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AdminForumPost } from '@/services/admin/contentModerationService';
+import { AdminForumComment } from '@/services/admin/commentsModerationService';
 
-interface ForumPostsTableProps {
-  posts: AdminForumPost[];
-  onViewPost: (post: AdminForumPost) => void;
-  onApprovePost: (postId: string) => void;
-  onRejectPost: (postId: string) => void;
+interface CommentsTableProps {
+  comments: AdminForumComment[];
+  onViewComment: (comment: AdminForumComment) => void;
+  onApproveComment: (commentId: string) => void;
+  onRejectComment: (commentId: string) => void;
 }
 
-const ForumPostsTable: React.FC<ForumPostsTableProps> = ({
-  posts,
-  onViewPost,
-  onApprovePost,
-  onRejectPost
+const CommentsTable: React.FC<CommentsTableProps> = ({
+  comments,
+  onViewComment,
+  onApproveComment,
+  onRejectComment
 }) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -44,10 +44,10 @@ const ForumPostsTable: React.FC<ForumPostsTableProps> = ({
     });
   };
 
-  const getStatusBadge = (post: AdminForumPost) => {
-    if (post.is_reported) {
+  const getStatusBadge = (comment: AdminForumComment) => {
+    if (comment.is_reported) {
       return <Badge variant="destructive">Rejeté</Badge>;
-    } else if (post.is_approved) {
+    } else if (comment.is_approved) {
       return <Badge variant="default" className="bg-green-500 hover:bg-green-600">Approuvé</Badge>;
     } else {
       return <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white">En attente</Badge>;
@@ -64,63 +64,58 @@ const ForumPostsTable: React.FC<ForumPostsTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>Auteur</TableHead>
-            <TableHead>Titre</TableHead>
             <TableHead>Contenu</TableHead>
-            <TableHead className="hidden md:table-cell">Catégorie</TableHead>
+            <TableHead className="hidden md:table-cell">Post</TableHead>
+            <TableHead className="hidden md:table-cell">Likes</TableHead>
             <TableHead className="hidden md:table-cell">Date</TableHead>
             <TableHead>Statut</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {posts.map((post) => (
-            <TableRow key={post.id}>
+          {comments.map((comment) => (
+            <TableRow key={comment.id}>
               <TableCell>
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-gray-400" />
                   <div>
                     <div className="font-medium">
-                      {post.user_name || 'Utilisateur anonyme'}
+                      {comment.user_name || 'Utilisateur anonyme'}
                     </div>
-                    {post.user_email && (
+                    {comment.user_email && (
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {post.user_email}
+                        {comment.user_email}
                       </div>
                     )}
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                <div className="max-w-[200px]">
-                  <div className="font-medium">{truncateText(post.title, 30)}</div>
-                </div>
-              </TableCell>
-              <TableCell>
                 <div className="max-w-[300px] text-sm text-gray-600 dark:text-gray-300">
-                  {truncateText(post.content, 60)}
+                  {truncateText(comment.content, 80)}
                 </div>
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                {post.forum_categories && (
-                  <Badge 
-                    variant="outline"
-                    style={{ 
-                      borderColor: post.forum_categories.color,
-                      color: post.forum_categories.color 
-                    }}
-                  >
-                    {post.forum_categories.name}
-                  </Badge>
+                {comment.forum_posts && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <MessageSquare className="h-3 w-3 mr-1" />
+                    {truncateText(comment.forum_posts.title, 30)}
+                  </div>
                 )}
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                <div className="text-sm text-gray-500">
+                  {comment.likes_count || 0} likes
+                </div>
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 <div className="flex items-center text-sm text-gray-500">
                   <Calendar className="h-3 w-3 mr-1" />
-                  {formatDate(post.created_at)}
+                  {formatDate(comment.created_at)}
                 </div>
               </TableCell>
               <TableCell>
-                {getStatusBadge(post)}
+                {getStatusBadge(comment)}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -133,23 +128,23 @@ const ForumPostsTable: React.FC<ForumPostsTableProps> = ({
                   <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onViewPost(post)}>
+                    <DropdownMenuItem onClick={() => onViewComment(comment)}>
                       <Eye className="h-4 w-4 mr-2" />
                       Consulter
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {!post.is_approved && !post.is_reported && (
+                    {!comment.is_approved && !comment.is_reported && (
                       <DropdownMenuItem 
-                        onClick={() => onApprovePost(post.id)}
+                        onClick={() => onApproveComment(comment.id)}
                         className="text-green-600 dark:text-green-400"
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Approuver
                       </DropdownMenuItem>
                     )}
-                    {!post.is_reported && (
+                    {!comment.is_reported && (
                       <DropdownMenuItem 
-                        onClick={() => onRejectPost(post.id)}
+                        onClick={() => onRejectComment(comment.id)}
                         className="text-red-600 dark:text-red-400"
                       >
                         <XCircle className="h-4 w-4 mr-2" />
@@ -167,4 +162,4 @@ const ForumPostsTable: React.FC<ForumPostsTableProps> = ({
   );
 };
 
-export default ForumPostsTable;
+export default CommentsTable;

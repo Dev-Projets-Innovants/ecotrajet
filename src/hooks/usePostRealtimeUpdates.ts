@@ -55,8 +55,6 @@ export const usePostRealtimeUpdates = (
               console.log('Setting isLiked to true for current user');
               callbacks.onLikeStateChange(true);
             }
-            // Update counter for all users
-            callbacks.onLikesCountChange(prev => Math.max(0, prev + 1));
           }
         )
         .on(
@@ -77,8 +75,6 @@ export const usePostRealtimeUpdates = (
               console.log('Setting isLiked to false for current user');
               callbacks.onLikeStateChange(false);
             }
-            // Update counter for all users
-            callbacks.onLikesCountChange(prev => Math.max(0, prev - 1));
           }
         )
         .on(
@@ -91,7 +87,6 @@ export const usePostRealtimeUpdates = (
           },
           () => {
             console.log('New comment added');
-            callbacks.onCommentsCountChange(prev => Math.max(0, prev + 1));
           }
         )
         .on(
@@ -104,7 +99,6 @@ export const usePostRealtimeUpdates = (
           },
           () => {
             console.log('Comment removed');
-            callbacks.onCommentsCountChange(prev => Math.max(0, prev - 1));
           }
         )
         .subscribe();

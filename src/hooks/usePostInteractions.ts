@@ -25,20 +25,8 @@ export const usePostInteractions = (postId: string, initialLikesCount = 0, initi
 
   const realtimeCallbacks = useCallback(() => ({
     onLikeStateChange: (liked: boolean) => setIsLiked(liked),
-    onLikesCountChange: (count: number | ((prev: number) => number)) => {
-      if (typeof count === 'function') {
-        setLikesCount(count);
-      } else {
-        setLikesCount(count);
-      }
-    },
-    onCommentsCountChange: (count: number | ((prev: number) => number)) => {
-      if (typeof count === 'function') {
-        setCommentsCount(count);
-      } else {
-        setCommentsCount(count);
-      }
-    }
+    onLikesCountChange: (count: number) => setLikesCount(count),
+    onCommentsCountChange: (count: number) => setCommentsCount(count)
   }), []);
 
   usePostRealtimeUpdates(postId, realtimeCallbacks());

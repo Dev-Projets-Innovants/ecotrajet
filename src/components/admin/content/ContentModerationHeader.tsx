@@ -39,17 +39,14 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
         onValueChange={onTabChange}
         className="w-full"
       >
-        <TabsList className={`grid w-full ${showForumPosts ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <TabsList className="grid w-full grid-cols-2">
           {showForumPosts && (
             <TabsTrigger value="posts" className="flex items-center gap-2">
               Posts du Forum
             </TabsTrigger>
           )}
-          <TabsTrigger value="testimonials" className="flex items-center gap-2">
-            Témoignages
-          </TabsTrigger>
-          <TabsTrigger value="photos" className="flex items-center gap-2">
-            Photos
+          <TabsTrigger value="comments" className="flex items-center gap-2">
+            Commentaires
           </TabsTrigger>
         </TabsList>
         
@@ -60,8 +57,8 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
               type="search"
               placeholder={`Rechercher ${
                 activeTab === 'posts' ? 'un post' :
-                activeTab === 'testimonials' ? 'un témoignage' : 
-                'une photo'
+                activeTab === 'comments' ? 'un commentaire' : 
+                'du contenu'
               }...`}
               className="pl-8"
               value={searchQuery}
@@ -69,8 +66,8 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
             />
           </div>
           
-          {/* Filtres pour les posts du forum */}
-          {activeTab === 'posts' && filters && onFiltersChange && (
+          {/* Filtres pour les posts du forum et commentaires */}
+          {(activeTab === 'posts' || activeTab === 'comments') && filters && onFiltersChange && (
             <Select
               value={filters.status}
               onValueChange={(value: 'all' | 'pending' | 'approved' | 'rejected') => 
