@@ -1,28 +1,36 @@
 
 import React from 'react';
-import { Star } from 'lucide-react';
+import { CheckCircle, XCircle, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { UserExperience } from '@/services/userExperiencesService';
 
 interface ExperienceViewDialogProps {
   isOpen: boolean;
   onClose: () => void;
   experience: UserExperience | null;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
 }
 
 const ExperienceViewDialog: React.FC<ExperienceViewDialogProps> = ({
   isOpen,
   onClose,
-  experience
+  experience,
+  onApprove,
+  onReject
 }) => {
+  if (!experience) return null;
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
@@ -34,48 +42,69 @@ const ExperienceViewDialog: React.FC<ExperienceViewDialogProps> = ({
     ));
   };
 
-  if (!experience) return null;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Détails de l'expérience</DialogTitle>
+          <DialogTitle>Détail de l'expérience</DialogTitle>
           <DialogDescription>
-            Soumis par {experience.name || 'Anonyme'} le{' '}
-            {new Date(experience.created_at).toLocaleDateString('fr-FR')}
+            Soumis par {experience.name || 'Anonyme'} le {new Date(experience.created_at).toLocaleDateString('fr-FR')}
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div>
-            <h4 className="font-medium mb-2">Note</h4>
-            <div className="flex items-center gap-1">
+            <label className="text-sm font-medium">Auteur:</label>
+            <p className="text-sm text-gray-600">{experience.name || 'Anonyme'}</p>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium">Note:</label>
+            <div className="flex items-center gap-1 mt-1">
               {renderStars(experience.rating)}
             </div>
           </div>
+          
           <div>
-            <h4 className="font-medium mb-2">Catégorie</h4>
-            <Badge variant="outline">{experience.category}</Badge>
+            <label className="text-sm font-medium">Catégorie:</label>
+            <Badge variant="outline" className="ml-2">{experience.category}</Badge>
           </div>
+          
           <div>
-            <h4 className="font-medium mb-2">Expérience</h4>
+            <label className="text-sm font-medium">Statut:</label>
+            <Badge className={experience.is_approved ? "bg-green-500 ml-2" : "bg-amber-500 ml-2"}>
+              {experience.is_approved ? 'Approuvé' : 'En attente'}
+            </Badge>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium">Expérience:</label>
             <Textarea 
               readOnly 
               value={experience.experience_text} 
-              className="min-h-[100px] bg-gray-50"
+              className="min-h-[100px] bg-gray-50 dark:bg-gray-900 mt-1"
             />
           </div>
-          {experience.image_url && (
-            <div>
-              <h4 className="font-medium mb-2">Image</h4>
-              <img 
-                src={experience.image_url} 
-                alt="Experience" 
-                className="w-full h-64 object-cover rounded-md"
-              />
-            </div>
-          )}
         </div>
+        <DialogFooter className="flex justify-between sm:justify-between gap-2">
+          <Button 
+            type="button" 
+            variant="destructive" 
+            onClick={() => onReject(experience.id)}
+            disabled={!experience.is_approved}
+          >
+            <XCircle className="h-4 w-4 mr-2" />
+            Rejeter
+          </Button>
+          <Button 
+            type="button"
+            className="bg-green-600 hover:bg-green-700"
+            onClick={() => onApprove(experience.id)}
+            disabled={experience.is_approved}
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Approuver
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

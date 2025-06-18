@@ -2,9 +2,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, Image } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import {
-  TabsContent,
-} from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import ContentModerationHeader from '@/components/admin/content/ContentModerationHeader';
@@ -161,23 +158,25 @@ const AdminContent = () => {
           onSearchChange={setSearchQuery}
         />
         
-        <TabsContent value="testimonials" className="mt-6">
-          <TestimonialTable
-            testimonials={filteredTestimonials}
-            onViewItem={handleViewItem}
-            onModerateItem={handleModerateItem}
-            getStatusBadge={getStatusBadge}
-          />
-        </TabsContent>
-        
-        <TabsContent value="photos" className="mt-6">
-          <PhotoTable
-            photos={filteredPhotos}
-            onViewItem={handleViewItem}
-            onModerateItem={handleModerateItem}
-            getStatusBadge={getStatusBadge}
-          />
-        </TabsContent>
+        <div className="mt-6">
+          {activeTab === 'testimonials' && (
+            <TestimonialTable
+              testimonials={filteredTestimonials}
+              onViewItem={handleViewItem}
+              onModerateItem={handleModerateItem}
+              getStatusBadge={getStatusBadge}
+            />
+          )}
+          
+          {activeTab === 'photos' && (
+            <PhotoTable
+              photos={filteredPhotos}
+              onViewItem={handleViewItem}
+              onModerateItem={handleModerateItem}
+              getStatusBadge={getStatusBadge}
+            />
+          )}
+        </div>
       </div>
 
       <ContentViewDialog
