@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { 
   BookOpen, 
   Shield, 
   Leaf, 
   Wrench, 
   MapPin, 
-  FileText, 
-  MessageSquare,
-  ArrowRight,
-  Bike,
-  Info,
-  Award,
-  TrendingUp,
   PlayCircle,
   Play,
   Clock,
-  Users
+  Users,
+  Info,
+  Award,
+  TrendingUp,
+  Bike
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -24,23 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
-import ShareExperienceModal from '@/components/modals/ShareExperienceModal';
-
-// Mock Article Data for linking purposes
-const articles = [
-  {
-    id: '1',
-    title: "L'impact du vélo sur la réduction de la pollution urbaine",
-  },
-  {
-    id: '2',
-    title: "Les bénéfices du vélo sur la santé physique et mentale",
-  },
-  {
-    id: '3',
-    title: "L'évolution des pistes cyclables à Paris",
-  },
-];
+import { ShareExperienceForm } from '@/components/guide/ShareExperienceForm';
 
 // Mock Tutorial Videos Data
 const tutorialVideos = [
@@ -80,7 +60,6 @@ const tutorialVideos = [
 
 const Guide = () => {
   const [activeCategory, setActiveCategory] = useState("getting-started");
-  const [shareModalOpen, setShareModalOpen] = useState(false);
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -98,21 +77,13 @@ const Guide = () => {
               <p className="text-lg text-gray-600 max-w-2xl mb-8">
                 Découvrez comment maximiser votre expérience ÉcoTrajet et contribuer à un avenir plus vert pour Paris.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex justify-center">
                 <Button 
                   className="bg-eco-green hover:bg-eco-dark-green text-white"
                   onClick={() => setActiveCategory("tutorials")}
                 >
                   Voir les tutoriels
                   <PlayCircle className="ml-2 h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-eco-green text-eco-green hover:bg-eco-light-green"
-                  onClick={() => setShareModalOpen(true)}
-                >
-                  Partager votre expérience
-                  <MessageSquare className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -308,12 +279,10 @@ const Guide = () => {
                       </div>
                       
                       <div className="flex justify-center mt-8">
-                        <Link to="/guide/share-experience">
-                          <Button className="bg-eco-green hover:bg-eco-dark-green text-white">
-                            Partager votre expérience
-                            <MessageSquare className="ml-2 h-4 w-4" />
-                          </Button>
-                        </Link>
+                        <Button className="bg-eco-green hover:bg-eco-dark-green text-white" onClick={() => setActiveCategory("tutorials")}>
+                          Voir les tutoriels
+                          <PlayCircle className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                     
@@ -357,7 +326,7 @@ const Guide = () => {
                     </div>
                   </TabsContent>
                   
-                  {/* NEW: Tutorials Content */}
+                  {/* Tutorials Content */}
                   <TabsContent value="tutorials" className="space-y-8">
                     <div>
                       <h2 className="text-2xl font-bold mb-4">Tutoriels vidéo</h2>
@@ -400,10 +369,9 @@ const Guide = () => {
                         <Button 
                           variant="outline" 
                           className="border-eco-green text-eco-green hover:bg-eco-light-green"
-                          onClick={() => setShareModalOpen(true)}
+                          onClick={() => setActiveCategory("getting-started")}
                         >
-                          Partager votre expérience
-                          <MessageSquare className="ml-2 h-4 w-4" />
+                          Retour aux premiers pas
                         </Button>
                       </div>
                     </div>
@@ -643,15 +611,6 @@ const Guide = () => {
                           </CardContent>
                         </Card>
                       </div>
-                      
-                      <div className="flex justify-center mt-8">
-                        <Link to="/guide/share-experience">
-                          <Button variant="outline" className="border-eco-green text-eco-green hover:bg-eco-light-green hover:text-eco-green">
-                            Partager votre expérience
-                            <MessageSquare className="ml-2 h-4 w-4" />
-                          </Button>
-                        </Link>
-                      </div>
                     </div>
                   </TabsContent>
                   
@@ -745,67 +704,17 @@ const Guide = () => {
                         </div>
                       </div>
                     </div>
+
+                    <ShareExperienceForm />
                   </TabsContent>
                 </Tabs>
               </div>
             </div>
           </div>
         </section>
-        
-        {/* Articles Section */}
-        <section className="py-12">
-          <div className="container max-w-7xl mx-auto px-4 md:px-6">
-            <div className="flex flex-col md:flex-row items-center justify-between mb-10">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold">Articles et ressources</h2>
-                <p className="text-gray-600 mt-2">
-                  Découvrez nos contenus écologiques et inspirez-vous.
-                </p>
-              </div>
-              <Link to="/guide">
-                <Button variant="outline" className="mt-4 md:mt-0 border-eco-green text-eco-green hover:bg-eco-light-green">
-                  Voir tous les articles
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {articles.map((article, index) => (
-                <Card key={article.id} className="overflow-hidden">
-                  <div className="h-48 bg-gray-200 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <FileText className="h-12 w-12 text-gray-400" />
-                    </div>
-                  </div>
-                  <CardHeader>
-                    <CardTitle>{article.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {index === 0 ? "Une étude récente montre que si 10% des automobilistes parisiens passaient au vélo, la pollution de l'air diminuerait de 8% dans la capitale." : 
-                       index === 1 ? "30 minutes de vélo par jour réduisent de 30% les risques de maladies cardiovasculaires et améliorent considérablement la santé mentale." :
-                       "En 5 ans, Paris a doublé la longueur de ses pistes cyclables, facilitant ainsi la mobilité verte et encourageant plus de citoyens à adopter le vélo."}
-                    </p>
-                    <Link to={`/guide/article/${article.id}`} className="text-eco-green font-medium hover:underline inline-flex items-center">
-                      Lire l'article
-                      <ArrowRight className="ml-1 h-4 w-4" />
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
       </main>
       
       <Footer />
-      
-      {/* Share Experience Modal */}
-      <ShareExperienceModal 
-        open={shareModalOpen} 
-        onOpenChange={setShareModalOpen} 
-      />
     </div>
   );
 };
