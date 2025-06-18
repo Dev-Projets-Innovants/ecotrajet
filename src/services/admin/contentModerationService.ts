@@ -33,7 +33,7 @@ export const contentModerationService = {
     if (filters?.status && filters.status !== 'all') {
       switch (filters.status) {
         case 'pending':
-          query = query.eq('is_approved', false);
+          query = query.eq('is_approved', false).eq('is_reported', false);
           break;
         case 'approved':
           query = query.eq('is_approved', true);
@@ -64,6 +64,8 @@ export const contentModerationService = {
 
   // Approuver un post
   async approvePost(postId: string) {
+    console.log('Approving post with ID:', postId);
+    
     const { data, error } = await supabase
       .from('forum_posts')
       .update({ 
@@ -73,14 +75,25 @@ export const contentModerationService = {
       })
       .eq('id', postId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error approving post:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      throw new Error('Post not found');
+    }
+    
+    console.log('Post approved successfully:', data);
     return data;
   },
 
   // Rejeter un post
   async rejectPost(postId: string) {
+    console.log('Rejecting post with ID:', postId);
+    
     const { data, error } = await supabase
       .from('forum_posts')
       .update({ 
@@ -90,9 +103,18 @@ export const contentModerationService = {
       })
       .eq('id', postId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error rejecting post:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      throw new Error('Post not found');
+    }
+    
+    console.log('Post rejected successfully:', data);
     return data;
   },
 

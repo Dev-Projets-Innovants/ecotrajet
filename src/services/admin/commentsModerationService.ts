@@ -41,7 +41,7 @@ export const commentsModerationService = {
     if (filters?.status && filters.status !== 'all') {
       switch (filters.status) {
         case 'pending':
-          query = query.eq('is_approved', false);
+          query = query.eq('is_approved', false).eq('is_reported', false);
           break;
         case 'approved':
           query = query.eq('is_approved', true);
@@ -71,6 +71,8 @@ export const commentsModerationService = {
 
   // Approuver un commentaire
   async approveComment(commentId: string) {
+    console.log('Approving comment with ID:', commentId);
+    
     const { data, error } = await supabase
       .from('forum_comments')
       .update({ 
@@ -80,14 +82,25 @@ export const commentsModerationService = {
       })
       .eq('id', commentId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error approving comment:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      throw new Error('Comment not found');
+    }
+    
+    console.log('Comment approved successfully:', data);
     return data;
   },
 
   // Rejeter un commentaire
   async rejectComment(commentId: string) {
+    console.log('Rejecting comment with ID:', commentId);
+    
     const { data, error } = await supabase
       .from('forum_comments')
       .update({ 
@@ -97,9 +110,18 @@ export const commentsModerationService = {
       })
       .eq('id', commentId)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error rejecting comment:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      throw new Error('Comment not found');
+    }
+    
+    console.log('Comment rejected successfully:', data);
     return data;
   },
 
