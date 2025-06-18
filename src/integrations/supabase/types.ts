@@ -142,6 +142,45 @@ export type Database = {
           },
         ]
       }
+      user_experiences: {
+        Row: {
+          category: string | null
+          created_at: string
+          experience_text: string
+          id: string
+          image_url: string | null
+          is_approved: boolean
+          name: string | null
+          rating: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          experience_text: string
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean
+          name?: string | null
+          rating: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          experience_text?: string
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean
+          name?: string | null
+          rating?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_favorite_stations: {
         Row: {
           created_at: string | null

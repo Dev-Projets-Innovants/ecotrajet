@@ -10,6 +10,7 @@
  * - Hero: Section de présentation principale avec call-to-action
  * - MapPlaceholder: Aperçu de la carte interactive des stations Vélib
  * - Features: Présentation des fonctionnalités principales de l'application
+ * - TestimonialsSection: Témoignages de la communauté
  * - GuidePreview: Aperçu du guide écologique
  * - CallToAction: Invitation à l'inscription
  * - Footer: Pied de page avec liens utiles
@@ -20,6 +21,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import MapPlaceholder from '@/components/MapPlaceholder';
 import Features from '@/components/Features';
+import TestimonialsSection from '@/components/TestimonialsSection';
 import GuidePreview from '@/components/GuidePreview';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
@@ -104,6 +106,9 @@ const Index = () => {
         
         {/* Présentation des fonctionnalités */}
         <Features />
+        
+        {/* Témoignages de la communauté */}
+        <TestimonialsSection />
         
         {/* Aperçu du guide écologique */}
         <GuidePreview />

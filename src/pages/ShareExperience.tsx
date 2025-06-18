@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
+import { userExperiencesService } from '@/services/userExperiencesService';
 
 const ShareExperience = () => {
   const [experience, setExperience] = useState('');
@@ -17,6 +17,7 @@ const ShareExperience = () => {
   const [rating, setRating] = useState('5');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -34,7 +35,7 @@ const ShareExperience = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
@@ -47,17 +48,50 @@ const ShareExperience = () => {
       return;
     }
 
-    // Here you would normally send the data to an API
-    // For now, we'll just show a success message and redirect
-    toast({
-      title: "Merci pour votre contribution !",
-      description: "Votre expérience a été partagée avec succès.",
-    });
+    setIsSubmitting(true);
     
-    // Redirect to the guide page after submission
-    setTimeout(() => {
-      navigate('/guide');
-    }, 2000);
+    try {
+      // For now, we'll store the image preview as base64 if an image is selected
+      // In a production app, you'd want to upload to Supabase Storage first
+      const imageUrl = imagePreview || undefined;
+      
+      const { data, error } = await userExperiencesService.createExperience({
+        experience_text: experience.trim(),
+        name: name.trim() || undefined,
+        rating: parseInt(rating),
+        image_url: imageUrl,
+        category: 'bike_maintenance'
+      });
+
+      if (error) {
+        console.error('Error creating experience:', error);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de l'enregistrement de votre expérience.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Merci pour votre contribution !",
+        description: "Votre expérience a été soumise et sera examinée avant publication.",
+      });
+      
+      // Redirect to the guide page after submission
+      setTimeout(() => {
+        navigate('/guide');
+      }, 2000);
+    } catch (error) {
+      console.error('Error submitting experience:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue est survenue.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -97,6 +131,7 @@ const ShareExperience = () => {
                     className="h-40 mt-2"
                     value={experience}
                     onChange={(e) => setExperience(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -110,6 +145,7 @@ const ShareExperience = () => {
                     className="mt-2"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    disabled={isSubmitting}
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     Laissez vide pour rester anonyme
@@ -127,6 +163,7 @@ const ShareExperience = () => {
                         type="button"
                         onClick={() => setRating(value.toString())}
                         className="focus:outline-none"
+                        disabled={isSubmitting}
                       >
                         <Star
                           className={`h-8 w-8 ${
@@ -150,6 +187,7 @@ const ShareExperience = () => {
                       variant="outline"
                       onClick={() => document.getElementById('photo')?.click()}
                       className="flex items-center space-x-2"
+                      disabled={isSubmitting}
                     >
                       <ImageIcon className="h-5 w-5" />
                       <span>Choisir une image</span>
@@ -160,6 +198,7 @@ const ShareExperience = () => {
                       accept="image/*"
                       className="hidden"
                       onChange={handleFileChange}
+                      disabled={isSubmitting}
                     />
                     <span className="text-sm text-gray-500">
                       {selectedFile ? selectedFile.name : 'Aucun fichier sélectionné'}
@@ -183,12 +222,19 @@ const ShareExperience = () => {
                   <Button
                     type="submit"
                     className="bg-eco-green hover:bg-eco-dark-green text-white px-8"
+                    disabled={isSubmitting}
                   >
                     <Send className="mr-2 h-4 w-4" />
-                    Partager mon expérience
+                    {isSubmitting ? 'Envoi en cours...' : 'Partager mon expérience'}
                   </Button>
                 </div>
               </form>
+
+              <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note :</strong> Votre témoignage sera examiné par notre équipe avant d'être publié sur notre site pour maintenir la qualité de notre communauté.
+                </p>
+              </div>
             </div>
           </div>
         </div>
