@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Calendar, User, Tag } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ interface ForumPostCardProps {
 }
 
 const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
+  const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes_count);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +32,9 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
     }
   };
 
-  const handleLike = async () => {
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Empêcher la navigation lors du clic sur like
+    
     if (isLoading) return;
     
     setIsLoading(true);
@@ -55,20 +59,31 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
     }
   };
 
-  const handleShare = () => {
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
     if (navigator.share) {
       navigator.share({
         title: post.title,
         text: post.content.substring(0, 100) + '...',
-        url: window.location.href,
+        url: `${window.location.origin}/community/post/${post.id}`,
       });
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(`${window.location.origin}/community/post/${post.id}`);
       toast({
         title: "Lien copié",
         description: "Le lien du post a été copié dans le presse-papiers",
       });
     }
+  };
+
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/community/post/${post.id}`);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/community/post/${post.id}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -91,7 +106,10 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card 
+      className="hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -119,7 +137,11 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
               )}
             </div>
           </div>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </div>
@@ -150,9 +172,9 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
           {post.content.length > 300 ? (
             <>
               {post.content.substring(0, 300)}...
-              <button className="text-eco-green hover:underline ml-2">
+              <span className="text-eco-green hover:underline ml-2">
                 Lire plus
-              </button>
+              </span>
             </>
           ) : (
             post.content
@@ -197,12 +219,22 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
               {likesCount}
             </Button>
 
-            <Button variant="ghost" size="sm" className="text-gray-500 hover:bg-blue-50 hover:text-blue-600">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleCommentClick}
+              className="text-gray-500 hover:bg-blue-50 hover:text-blue-600"
+            >
               <MessageCircle className="h-4 w-4 mr-2" />
               {post.comments_count}
             </Button>
 
-            <Button variant="ghost" size="sm" onClick={handleShare} className="text-gray-500 hover:bg-green-50 hover:text-green-600">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleShare} 
+              className="text-gray-500 hover:bg-green-50 hover:text-green-600"
+            >
               <Share2 className="h-4 w-4 mr-2" />
               Partager
             </Button>

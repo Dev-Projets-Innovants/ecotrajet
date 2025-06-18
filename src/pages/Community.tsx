@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import ForumPostCard from '@/components/forum/ForumPostCard';
 import CreatePostDialog from '@/components/forum/CreatePostDialog';
+import ModerationWarning from '@/components/forum/ModerationWarning';
 import { forumService, ForumPost, ForumCategory } from '@/services/forumService';
 import { toast } from '@/hooks/use-toast';
 
@@ -70,7 +71,7 @@ const Community = () => {
           ...post,
           forum_categories: post.forum_categories ? {
             ...post.forum_categories,
-            description: null, // Set description to null since it's not included in the query
+            description: null,
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -133,6 +134,9 @@ const Community = () => {
             de la communauté pour une mobilité plus durable.
           </p>
         </div>
+
+        {/* Message de modération */}
+        <ModerationWarning />
 
         {/* Controls */}
         <div className="flex flex-col lg:flex-row gap-4 mb-8">
