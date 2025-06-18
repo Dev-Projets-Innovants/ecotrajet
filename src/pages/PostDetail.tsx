@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
@@ -34,7 +33,18 @@ const PostDetail = () => {
       if (error) throw error;
       
       if (data) {
-        setPost(data);
+        // Transform the data to match ForumPost interface
+        const transformedPost = {
+          ...data,
+          forum_categories: data.forum_categories ? {
+            ...data.forum_categories,
+            description: null,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          } : undefined
+        };
+        setPost(transformedPost);
       }
     } catch (error) {
       console.error('Error fetching post:', error);
