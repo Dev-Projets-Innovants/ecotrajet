@@ -66,7 +66,7 @@ const PostDetail = () => {
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold text-gray-900">
-                Commentaires ({post.comments_count})
+                Commentaires ({Math.max(0, post.comments_count)})
               </h2>
             </CardHeader>
             <CardContent>

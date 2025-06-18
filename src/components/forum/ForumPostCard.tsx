@@ -1,14 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Heart, MessageCircle, Share2, MapPin, Tag, Clock, User, Flag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ForumPost, forumService } from '@/services/forum';
-import { useRealtimeLikes } from '@/hooks/useRealtimeLikes';
-import { toast } from '@/hooks/use-toast';
+import { ForumPost } from '@/services/forum';
+import { usePostInteractions } from '@/hooks/usePostInteractions';
 
 interface ForumPostCardProps {
   post: ForumPost;
@@ -19,7 +18,14 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   post, 
   showRealTimeUpdates = false 
 }) => {
-  const { isLiked, isChecking, isToggling, setIsToggling } = useRealtimeLikes(post.id);
+  const { 
+    isLiked, 
+    isChecking, 
+    isToggling, 
+    likesCount, 
+    commentsCount, 
+    toggleLike 
+  } = usePostInteractions(post.id, post.likes_count, post.comments_count);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -38,30 +44,6 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   const getUserInitials = () => {
     const name = getUserDisplayName();
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-  };
-
-  const handleLike = async () => {
-    if (isToggling || isChecking) {
-      console.log('Like action blocked - already in progress');
-      return;
-    }
-    
-    console.log('Toggling like for post:', post.id, 'current state:', isLiked);
-    setIsToggling(true);
-    
-    try {
-      await forumService.togglePostLike(post.id);
-      console.log('Like toggle successful');
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de liker ce post",
-        variant: "destructive",
-      });
-    } finally {
-      setIsToggling(false);
-    }
   };
 
   return (
@@ -155,18 +137,18 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleLike}
+                onClick={toggleLike}
                 disabled={isToggling || isChecking}
                 className={`hover:bg-red-50 ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
               >
                 <Heart className={`h-4 w-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
-                {Math.max(0, post.likes_count)}
+                {likesCount}
               </Button>
               
               <Link to={`/community/post/${post.id}`}>
                 <Button variant="ghost" size="sm" className="text-gray-500 hover:bg-blue-50 hover:text-blue-600">
                   <MessageCircle className="h-4 w-4 mr-1" />
-                  {Math.max(0, post.comments_count)}
+                  {commentsCount}
                 </Button>
               </Link>
               
