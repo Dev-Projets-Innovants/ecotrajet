@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
@@ -8,7 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ForumPostCard from '@/components/forum/ForumPostCard';
 import CommentSection from '@/components/forum/CommentSection';
-import { forumService, ForumPost } from '@/services/forumService';
+import { forumService, ForumPost } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 const PostDetail = () => {

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { forumService, ForumComment } from '@/services/forumService';
+import { forumService, ForumComment } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 interface CommentWithReplies extends ForumComment {

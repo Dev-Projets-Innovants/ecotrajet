@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ForumCategory } from '@/services/forumService';
+import { ForumCategory } from '@/services/forum';
 
 interface CommunityControlsProps {
   searchQuery: string;

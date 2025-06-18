@@ -4,7 +4,7 @@ import { Heart, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { forumService } from '@/services/forumService';
+import { forumService } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 interface CommentWithReplies {

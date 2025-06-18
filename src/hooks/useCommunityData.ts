@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { forumService, ForumPost, ForumCategory } from '@/services/forumService';
+import { forumService, ForumPost, ForumCategory } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 export const useCommunityData = () => {

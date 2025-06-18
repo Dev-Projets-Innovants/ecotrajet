@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ForumPostCard from './ForumPostCard';
-import { ForumPost } from '@/services/forumService';
+import { ForumPost } from '@/services/forum';
 
 interface PostsListProps {
   posts: ForumPost[];

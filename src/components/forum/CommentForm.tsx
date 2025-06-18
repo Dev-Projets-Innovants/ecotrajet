@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { forumService } from '@/services/forumService';
+import { forumService } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 interface CommentFormProps {

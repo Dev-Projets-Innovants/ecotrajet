@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ForumPost, forumService } from '@/services/forumService';
+import { ForumPost, forumService } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 
 interface ForumPostCardProps {

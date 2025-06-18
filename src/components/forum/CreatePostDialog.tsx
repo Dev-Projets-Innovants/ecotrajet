@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ForumCategory, forumService } from '@/services/forumService';
+import { ForumCategory, forumService } from '@/services/forum';
 import { toast } from '@/hooks/use-toast';
 import PostFormRules from './PostFormRules';
 import PostFormFields from './PostFormFields';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Image, MapPin, Tag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ForumCategory } from '@/services/forumService';
+import { ForumCategory } from '@/services/forum';
 import ImageUpload from './ImageUpload';
 
 interface PostFormData {
