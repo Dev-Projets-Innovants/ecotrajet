@@ -1,20 +1,25 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 import { VelibAvailabilityTrend } from '@/services/admin';
 
 interface OptimizedVelibAvailabilityChartProps {
   data: VelibAvailabilityTrend[];
   config: any;
   isLoading?: boolean;
+  timeRange?: string;
 }
 
 const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartProps> = ({ 
   data, 
   config, 
-  isLoading = false 
+  isLoading = false,
+  timeRange = '24h'
 }) => {
   if (isLoading) {
     return (
@@ -32,11 +37,43 @@ const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartP
     );
   }
 
+  const getTimeRangeDescription = () => {
+    switch (timeRange) {
+      case '7d': return 'sur les 7 derniers jours';
+      case '30d': return 'sur les 30 derniers jours';
+      default: return 'sur les dernières 24h';
+    }
+  };
+
+  if (data.length === 0) {
+    return (
+      <Card className="h-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Disponibilité des vélos par heure</CardTitle>
+          <CardDescription className="text-sm">
+            Évolution de la disponibilité {getTimeRangeDescription()}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Aucune donnée de disponibilité trouvée pour la période sélectionnée. 
+              Vérifiez que la synchronisation des données Vélib fonctionne correctement.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Disponibilité des vélos par heure</CardTitle>
-        <CardDescription className="text-sm">Évolution de la disponibilité sur les dernières 24h</CardDescription>
+        <CardDescription className="text-sm">
+          Évolution de la disponibilité {getTimeRangeDescription()} ({data.length} points de données)
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <div className="w-full" style={{ aspectRatio: '16/9' }}>
@@ -51,10 +88,10 @@ const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartP
                   dataKey="hour" 
                   className="text-xs fill-muted-foreground" 
                   tick={{ fontSize: 10 }}
-                  angle={-45}
-                  textAnchor="end"
+                  angle={timeRange === '24h' ? -45 : 0}
+                  textAnchor={timeRange === '24h' ? "end" : "middle"}
                   height={50}
-                  interval={0}
+                  interval={timeRange === '24h' ? 0 : 'preserveStartEnd'}
                 />
                 <YAxis 
                   className="text-xs fill-muted-foreground" 
@@ -74,8 +111,8 @@ const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartP
                   dataKey="bikes"
                   stroke="#10b981"
                   strokeWidth={3}
-                  dot={{ fill: "#10b981", strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 7, stroke: "#10b981", strokeWidth: 2, fill: "#ffffff" }}
+                  dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "#ffffff" }}
                   name="Vélos disponibles"
                 />
                 <Line
@@ -83,8 +120,8 @@ const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartP
                   dataKey="electric"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 7, stroke: "#3b82f6", strokeWidth: 2, fill: "#ffffff" }}
+                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "#ffffff" }}
                   name="Vélos électriques"
                 />
               </LineChart>
