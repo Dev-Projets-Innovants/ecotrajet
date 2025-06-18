@@ -236,6 +236,8 @@ const AdminExperiences = () => {
         isOpen={isViewDialogOpen}
         onClose={() => setIsViewDialogOpen(false)}
         experience={selectedExperience}
+        onApprove={handleApprove}
+        onReject={handleReject}
       />
 
       <ExperienceEditDialog
