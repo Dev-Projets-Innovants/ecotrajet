@@ -22,6 +22,15 @@ export interface CreateExperienceData {
   category?: string;
 }
 
+export interface UpdateExperienceData {
+  experience_text?: string;
+  name?: string;
+  rating?: number;
+  image_url?: string;
+  category?: string;
+  is_approved?: boolean;
+}
+
 export const userExperiencesService = {
   // Create a new experience
   async createExperience(data: CreateExperienceData): Promise<{ data: UserExperience | null; error: any }> {
@@ -69,5 +78,68 @@ export const userExperiencesService = {
       .order('created_at', { ascending: false });
 
     return { data, error };
+  },
+
+  // Admin functions
+  // Get all experiences (for admin)
+  async getAllExperiences(): Promise<{ data: UserExperience[] | null; error: any }> {
+    const { data, error } = await supabase
+      .from('user_experiences')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    return { data, error };
+  },
+
+  // Get experiences by status (for admin)
+  async getExperiencesByStatus(status: 'pending' | 'approved' | 'rejected'): Promise<{ data: UserExperience[] | null; error: any }> {
+    let isApproved: boolean | null = null;
+    
+    if (status === 'approved') isApproved = true;
+    if (status === 'rejected') isApproved = false;
+    
+    const query = supabase
+      .from('user_experiences')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (isApproved !== null) {
+      query.eq('is_approved', isApproved);
+    }
+
+    const { data, error } = await query;
+    return { data, error };
+  },
+
+  // Update experience (for admin)
+  async updateExperience(id: string, data: UpdateExperienceData): Promise<{ data: UserExperience | null; error: any }> {
+    const { data: experience, error } = await supabase
+      .from('user_experiences')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    return { data: experience, error };
+  },
+
+  // Approve experience (for admin)
+  async approveExperience(id: string): Promise<{ data: UserExperience | null; error: any }> {
+    return this.updateExperience(id, { is_approved: true });
+  },
+
+  // Reject experience (for admin)
+  async rejectExperience(id: string): Promise<{ data: UserExperience | null; error: any }> {
+    return this.updateExperience(id, { is_approved: false });
+  },
+
+  // Delete experience (for admin)
+  async deleteExperience(id: string): Promise<{ error: any }> {
+    const { error } = await supabase
+      .from('user_experiences')
+      .delete()
+      .eq('id', id);
+
+    return { error };
   }
 };

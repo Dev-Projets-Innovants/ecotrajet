@@ -30,6 +30,7 @@ import Rewards from "./pages/Rewards";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminContent from "./pages/admin/AdminContent";
+import AdminExperiences from "./pages/admin/AdminExperiences";
 import AdminChallenges from "./pages/admin/AdminChallenges";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminNotifications from "./pages/admin/AdminNotifications";
@@ -105,6 +106,7 @@ function App() {
                 <Route path="/admin/rewards" element={<AdminRewards />} />
                 <Route path="/admin/challenges" element={<AdminChallenges />} />
                 <Route path="/admin/content" element={<AdminContent />} />
+                <Route path="/admin/experiences" element={<AdminExperiences />} />
                 <Route path="/admin/analytics" element={<AdminAnalytics />} />
                 <Route path="/admin/notifications" element={<AdminNotifications />} />
                 <Route path="/admin/profile" element={<AdminProfile />} />
