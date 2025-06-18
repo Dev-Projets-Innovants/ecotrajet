@@ -288,7 +288,13 @@ const AdminContent = () => {
         isOpen={itemDialogOpen}
         onClose={() => setItemDialogOpen(false)}
         selectedItem={selectedItem}
-        onModerate={selectedItem?.type === 'forum_post' ? handleModeratePost : handleModerateItem}
+        onModerate={(id: string | number, status: string, type?: string) => {
+          if (selectedItem?.type === 'forum_post' && typeof id === 'string') {
+            handleModeratePost(id, status as 'approved' | 'rejected');
+          } else if (typeof id === 'number' && type) {
+            handleModerateItem(id, status, type);
+          }
+        }}
       />
     </AdminLayout>
   );

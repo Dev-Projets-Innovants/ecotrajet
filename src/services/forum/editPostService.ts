@@ -62,7 +62,11 @@ export const editPostService = {
           id,
           name,
           color,
-          icon
+          icon,
+          description,
+          is_active,
+          created_at,
+          updated_at
         )
       `)
       .single();

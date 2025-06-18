@@ -52,8 +52,12 @@ const EditPostForm: React.FC<EditPostFormProps> = ({
     }
   };
 
-  const handleImageUpload = (imageUrl: string) => {
+  const handleImageUploaded = (imageUrl: string) => {
     setFormData(prev => ({ ...prev, image_url: imageUrl }));
+  };
+
+  const handleImageRemoved = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }));
   };
 
   return (
@@ -124,8 +128,9 @@ const EditPostForm: React.FC<EditPostFormProps> = ({
       </div>
 
       <ImageUpload
-        currentImageUrl={formData.image_url}
-        onImageUpload={handleImageUpload}
+        imageUrl={formData.image_url}
+        onImageUploaded={handleImageUploaded}
+        onImageRemoved={handleImageRemoved}
       />
 
       <div className="flex justify-end space-x-2 pt-4">

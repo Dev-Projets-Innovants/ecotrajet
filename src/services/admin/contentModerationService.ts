@@ -21,7 +21,11 @@ export const contentModerationService = {
           id,
           name,
           color,
-          icon
+          icon,
+          description,
+          is_active,
+          created_at,
+          updated_at
         )
       `)
       .order('created_at', { ascending: false });
