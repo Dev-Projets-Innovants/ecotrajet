@@ -27,6 +27,11 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
     toggleLike 
   } = usePostInteractions(post.id, post.likes_count, post.comments_count);
 
+  // Debug logs pour l'image
+  console.log('Post data:', post);
+  console.log('Image URL:', post.image_url);
+  console.log('Has image:', !!post.image_url);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -105,14 +110,28 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
               {post.content}
             </p>
 
-            {/* Image */}
+            {/* Image avec debug amélioré */}
             {post.image_url && (
               <div className="mb-4">
+                <div className="text-xs text-gray-500 mb-2">
+                  Debug: URL de l'image = {post.image_url}
+                </div>
                 <img
                   src={post.image_url}
                   alt="Image du post"
                   className="w-full h-64 object-cover rounded-lg border"
+                  onLoad={() => console.log('Image chargée avec succès:', post.image_url)}
+                  onError={(e) => {
+                    console.error('Erreur de chargement de l\'image:', post.image_url, e);
+                    console.log('Event details:', e.currentTarget);
+                  }}
                 />
+              </div>
+            )}
+
+            {!post.image_url && (
+              <div className="text-xs text-gray-500 mb-2">
+                Debug: Aucune URL d'image trouvée
               </div>
             )}
 
