@@ -26,7 +26,6 @@ import SignIn from "./pages/SignIn";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import Guide from "./pages/Guide";
-import ArticleDetail from "./pages/ArticleDetail";
 import Rewards from "./pages/Rewards";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -83,7 +82,6 @@ function App() {
                 {/* Routes utilisateur authentifié */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/guide" element={<Guide />} />
-                <Route path="/guide/article/:id" element={<ArticleDetail />} />
                 <Route path="/tutorial-videos" element={<TutorialVideos />} />
                 <Route path="/rewards" element={<Rewards />} />
                 <Route path="/carbon-calculator" element={<CarbonCalculator />} />
