@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -32,11 +33,34 @@ const OptimizedVelibAvailabilityChart: React.FC<OptimizedVelibAvailabilityChartP
     );
   }
 
+  // Vérifier si nous avons des données
+  if (!data || data.length === 0) {
+    return (
+      <Card className="h-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Disponibilité des vélos par heure</CardTitle>
+          <CardDescription className="text-sm">Évolution de la disponibilité sur les dernières 24h</CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+          <div className="h-[280px] w-full flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <p className="text-lg mb-2">Aucune donnée disponible</p>
+              <p className="text-sm">Les données Vélib' des dernières 24h ne sont pas disponibles.</p>
+              <p className="text-xs mt-1">La synchronisation des données peut être en cours.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Disponibilité des vélos par heure</CardTitle>
-        <CardDescription className="text-sm">Évolution de la disponibilité sur les dernières 24h</CardDescription>
+        <CardDescription className="text-sm">
+          Évolution de la disponibilité sur les dernières 24h ({data.length} points de données)
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <div className="w-full" style={{ aspectRatio: '16/9' }}>

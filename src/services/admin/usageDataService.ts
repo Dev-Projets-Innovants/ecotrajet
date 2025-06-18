@@ -18,10 +18,17 @@ export async function getVelibUsageData(): Promise<VelibUsageData[]> {
       throw error;
     }
 
+    console.log('Usage data count:', data?.length || 0);
+
+    if (!data || data.length === 0) {
+      console.warn('No usage data found for the last 7 days');
+      return [];
+    }
+
     // Grouper par jour
     const dailyData: { [key: string]: { bikes: number[], docks: number[] } } = {};
     
-    data?.forEach(record => {
+    data.forEach(record => {
       const date = new Date(record.timestamp).toISOString().split('T')[0];
       
       if (!dailyData[date]) {
@@ -32,7 +39,7 @@ export async function getVelibUsageData(): Promise<VelibUsageData[]> {
       dailyData[date].docks.push(record.numdocksavailable || 0);
     });
 
-    return Object.entries(dailyData).map(([date, data]) => {
+    const results = Object.entries(dailyData).map(([date, data]) => {
       const avgBikes = data.bikes.reduce((sum, val) => sum + val, 0) / data.bikes.length;
       const avgDocks = data.docks.reduce((sum, val) => sum + val, 0) / data.docks.length;
       const totalCapacity = avgBikes + avgDocks;
@@ -42,9 +49,16 @@ export async function getVelibUsageData(): Promise<VelibUsageData[]> {
         date: new Date(date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
         totalBikes: Math.round(avgBikes),
         totalDocks: Math.round(avgDocks),
-        occupancyRate: Math.round(occupancyRate)
+        occupancyRate: Math.round(occupancyRate),
+        rawDate: date // Garder la date brute pour le tri
       };
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }).sort((a, b) => {
+      // Trier par date réelle plutôt que par string formatée
+      return new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime();
+    }).map(({ rawDate, ...rest }) => rest); // Retirer rawDate du résultat final
+
+    console.log('Processed usage data:', results);
+    return results;
   } catch (error) {
     console.error('Error in getVelibUsageData:', error);
     return [];

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -32,11 +33,34 @@ const OptimizedVelibUsageChart: React.FC<OptimizedVelibUsageChartProps> = ({
     );
   }
 
+  // Vérifier si nous avons des données
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Évolution de l'utilisation</CardTitle>
+          <CardDescription>Taux d'occupation des stations sur 7 jours</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] w-full flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <p className="text-lg mb-2">Aucune donnée disponible</p>
+              <p className="text-sm">Les données Vélib' des 7 derniers jours ne sont pas disponibles.</p>
+              <p className="text-xs mt-1">La synchronisation des données peut être en cours.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Évolution de l'utilisation</CardTitle>
-        <CardDescription>Taux d'occupation des stations sur 7 jours</CardDescription>
+        <CardDescription>
+          Taux d'occupation des stations sur 7 jours ({data.length} points de données)
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="w-full" style={{ aspectRatio: '16/9' }}>
