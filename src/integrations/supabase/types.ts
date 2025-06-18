@@ -148,7 +148,6 @@ export type Database = {
           created_at: string
           experience_text: string
           id: string
-          image_url: string | null
           is_approved: boolean
           name: string | null
           rating: number
@@ -160,7 +159,6 @@ export type Database = {
           created_at?: string
           experience_text: string
           id?: string
-          image_url?: string | null
           is_approved?: boolean
           name?: string | null
           rating: number
@@ -172,7 +170,6 @@ export type Database = {
           created_at?: string
           experience_text?: string
           id?: string
-          image_url?: string | null
           is_approved?: boolean
           name?: string | null
           rating?: number

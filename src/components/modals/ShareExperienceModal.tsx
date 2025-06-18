@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageSquare, Star, Send, Image as ImageIcon, X } from 'lucide-react';
+import { MessageSquare, Star, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -24,29 +24,12 @@ const ShareExperienceModal: React.FC<ShareExperienceModalProps> = ({ open, onOpe
   const [experience, setExperience] = useState('');
   const [name, setName] = useState('');
   const [rating, setRating] = useState('5');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      
-      // Create a preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!experience.trim()) {
       toast({
         title: "Champ requis",
@@ -59,15 +42,10 @@ const ShareExperienceModal: React.FC<ShareExperienceModalProps> = ({ open, onOpe
     setIsSubmitting(true);
     
     try {
-      // For now, we'll store the image preview as base64 if an image is selected
-      // In a production app, you'd want to upload to Supabase Storage first
-      const imageUrl = imagePreview || undefined;
-      
       const { data, error } = await userExperiencesService.createExperience({
         experience_text: experience.trim(),
         name: name.trim() || undefined,
         rating: parseInt(rating),
-        image_url: imageUrl,
         category: 'bike_maintenance'
       });
 
@@ -105,8 +83,6 @@ const ShareExperienceModal: React.FC<ShareExperienceModalProps> = ({ open, onOpe
     setExperience('');
     setName('');
     setRating('5');
-    setSelectedFile(null);
-    setImagePreview(null);
     setIsSubmitting(false);
     onOpenChange(false);
   };
@@ -181,58 +157,6 @@ const ShareExperienceModal: React.FC<ShareExperienceModalProps> = ({ open, onOpe
                 </button>
               ))}
             </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="photo" className="text-base font-medium">
-              Ajouter une photo (optionnel)
-            </Label>
-            <div className="mt-2 flex items-center space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => document.getElementById('photo')?.click()}
-                className="flex items-center space-x-2"
-                disabled={isSubmitting}
-              >
-                <ImageIcon className="h-4 w-4" />
-                <span>Choisir une image</span>
-              </Button>
-              <Input
-                id="photo"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isSubmitting}
-              />
-              <span className="text-sm text-gray-500">
-                {selectedFile ? selectedFile.name : 'Aucun fichier sélectionné'}
-              </span>
-            </div>
-            
-            {imagePreview && (
-              <div className="mt-4">
-                <div className="relative w-32 h-32 rounded-md overflow-hidden border border-gray-200">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedFile(null);
-                      setImagePreview(null);
-                    }}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    disabled={isSubmitting}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
           
           <div className="flex justify-end space-x-3 pt-4">

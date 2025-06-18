@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageSquare, Star, Send, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Star, Send } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -15,30 +15,13 @@ const ShareExperience = () => {
   const [experience, setExperience] = useState('');
   const [name, setName] = useState('');
   const [rating, setRating] = useState('5');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      
-      // Create a preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!experience.trim()) {
       toast({
         title: "Champ requis",
@@ -51,15 +34,10 @@ const ShareExperience = () => {
     setIsSubmitting(true);
     
     try {
-      // For now, we'll store the image preview as base64 if an image is selected
-      // In a production app, you'd want to upload to Supabase Storage first
-      const imageUrl = imagePreview || undefined;
-      
       const { data, error } = await userExperiencesService.createExperience({
         experience_text: experience.trim(),
         name: name.trim() || undefined,
         rating: parseInt(rating),
-        image_url: imageUrl,
         category: 'bike_maintenance'
       });
 
@@ -175,47 +153,6 @@ const ShareExperience = () => {
                       </button>
                     ))}
                   </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="photo" className="text-base font-medium">
-                    Ajouter une photo (optionnel)
-                  </Label>
-                  <div className="mt-2 flex items-center space-x-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('photo')?.click()}
-                      className="flex items-center space-x-2"
-                      disabled={isSubmitting}
-                    >
-                      <ImageIcon className="h-5 w-5" />
-                      <span>Choisir une image</span>
-                    </Button>
-                    <Input
-                      id="photo"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      disabled={isSubmitting}
-                    />
-                    <span className="text-sm text-gray-500">
-                      {selectedFile ? selectedFile.name : 'Aucun fichier sélectionné'}
-                    </span>
-                  </div>
-                  
-                  {imagePreview && (
-                    <div className="mt-4">
-                      <div className="relative w-40 h-40 rounded-md overflow-hidden border border-gray-200">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 <div className="border-t pt-6">

@@ -7,7 +7,6 @@ export interface UserExperience {
   name?: string;
   experience_text: string;
   rating: number;
-  image_url?: string;
   is_approved: boolean;
   category: string;
   created_at: string;
@@ -18,7 +17,6 @@ export interface CreateExperienceData {
   experience_text: string;
   name?: string;
   rating: number;
-  image_url?: string;
   category?: string;
 }
 
@@ -26,7 +24,6 @@ export interface UpdateExperienceData {
   experience_text?: string;
   name?: string;
   rating?: number;
-  image_url?: string;
   category?: string;
   is_approved?: boolean;
 }
