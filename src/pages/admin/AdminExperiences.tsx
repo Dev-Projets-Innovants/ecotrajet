@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -221,9 +220,7 @@ const AdminExperiences = () => {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           stats={stats}
-        />
-        
-        <TabsContent value={activeTab} className="mt-6">
+        >
           <ExperienceTable
             experiences={filteredExperiences}
             onViewExperience={handleViewExperience}
@@ -232,7 +229,7 @@ const AdminExperiences = () => {
             onApprove={handleApprove}
             onReject={handleReject}
           />
-        </TabsContent>
+        </ExperienceTabsHeader>
       </div>
 
       <ExperienceViewDialog

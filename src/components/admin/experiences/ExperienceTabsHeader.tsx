@@ -7,6 +7,7 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
+  TabsContent,
 } from "@/components/ui/tabs";
 
 interface ExperienceTabsHeaderProps {
@@ -19,6 +20,7 @@ interface ExperienceTabsHeaderProps {
     approved: number;
     pending: number;
   };
+  children: React.ReactNode;
 }
 
 const ExperienceTabsHeader: React.FC<ExperienceTabsHeaderProps> = ({
@@ -26,7 +28,8 @@ const ExperienceTabsHeader: React.FC<ExperienceTabsHeaderProps> = ({
   setActiveTab,
   searchQuery,
   setSearchQuery,
-  stats
+  stats,
+  children
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -52,6 +55,10 @@ const ExperienceTabsHeader: React.FC<ExperienceTabsHeaderProps> = ({
           Filtrer
         </Button>
       </div>
+
+      <TabsContent value={activeTab} className="mt-6">
+        {children}
+      </TabsContent>
     </Tabs>
   );
 };
