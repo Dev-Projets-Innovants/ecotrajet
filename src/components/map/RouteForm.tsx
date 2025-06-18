@@ -81,23 +81,58 @@ const RouteForm = ({ selectedTransportType, setSelectedTransportType }: RouteFor
           value={endAddress?.display_name || ''}
         />
         
-        <div className="bg-eco-light-green/20 p-4 rounded-lg border border-eco-green/20">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Bike className="h-6 w-6 text-eco-green" />
-            <h3 className="font-medium text-eco-green">Mode de transport : Vélo</h3>
+        {/* Section Transport Mode avec design moderne et image */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-eco-green/10 to-eco-blue/10 p-6 rounded-xl border border-eco-green/20">
+          {/* Image de fond */}
+          <div className="absolute inset-0 opacity-20">
+            <img 
+              src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+              alt="Vélib' Paris"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="text-center">
-            <Button 
-              variant="default"
-              className="bg-eco-green hover:bg-eco-dark-green text-white px-8 py-2"
-              disabled
-            >
-              <Bike className="h-4 w-4 mr-2" />
-              <span>Vélo sélectionné</span>
-            </Button>
-            <p className="text-xs text-gray-500 mt-2">
-              Mode optimisé pour les trajets écologiques et la santé
-            </p>
+          
+          {/* Contenu par-dessus l'image */}
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-eco-green p-2 rounded-full">
+                  <Bike className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-eco-dark-blue text-lg">Mode de transport</h3>
+                  <p className="text-sm text-gray-600">Mobilité écologique</p>
+                </div>
+              </div>
+              <div className="bg-eco-green/10 px-3 py-1 rounded-full">
+                <span className="text-eco-green font-medium text-sm">✓ Vélo sélectionné</span>
+              </div>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-white/50">
+              <div className="flex items-center gap-3 mb-3">
+                <Bike className="h-5 w-5 text-eco-green" />
+                <span className="font-medium text-eco-dark-blue">Vélib' Paris</span>
+              </div>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                Mode optimisé pour les trajets écologiques et la santé. 
+                Profitez du réseau Vélib' avec plus de 1 400 stations dans Paris !
+              </p>
+              <div className="flex gap-4 mt-3 text-xs text-gray-600">
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  Zéro émission
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Exercice physique
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  Économique
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         
