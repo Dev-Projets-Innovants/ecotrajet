@@ -3,6 +3,7 @@ import React from 'react';
 import { Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Tabs,
   TabsList,
@@ -14,13 +15,22 @@ interface ContentModerationHeaderProps {
   onTabChange: (value: string) => void;
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  filters?: {
+    status: 'all' | 'pending' | 'approved' | 'rejected';
+    search: string;
+  };
+  onFiltersChange?: (filters: { status?: 'all' | 'pending' | 'approved' | 'rejected' }) => void;
+  showForumPosts?: boolean;
 }
 
 const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
   activeTab,
   onTabChange,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  filters,
+  onFiltersChange,
+  showForumPosts = false
 }) => {
   return (
     <>
@@ -29,7 +39,12 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
         onValueChange={onTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className={`grid w-full ${showForumPosts ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {showForumPosts && (
+            <TabsTrigger value="posts" className="flex items-center gap-2">
+              Posts du Forum
+            </TabsTrigger>
+          )}
           <TabsTrigger value="testimonials" className="flex items-center gap-2">
             Témoignages
           </TabsTrigger>
@@ -43,12 +58,37 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Input
               type="search"
-              placeholder={`Rechercher un ${activeTab === 'testimonials' ? 'témoignage' : 'photo'}...`}
+              placeholder={`Rechercher ${
+                activeTab === 'posts' ? 'un post' :
+                activeTab === 'testimonials' ? 'un témoignage' : 
+                'une photo'
+              }...`}
               className="pl-8"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
+          
+          {/* Filtres pour les posts du forum */}
+          {activeTab === 'posts' && filters && onFiltersChange && (
+            <Select
+              value={filters.status}
+              onValueChange={(value: 'all' | 'pending' | 'approved' | 'rejected') => 
+                onFiltersChange({ status: value })
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="approved">Approuvés</SelectItem>
+                <SelectItem value="rejected">Rejetés</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          
           <Button variant="outline" className="gap-2">
             <Filter className="h-4 w-4" />
             Filtrer

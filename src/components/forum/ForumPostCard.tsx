@@ -1,22 +1,28 @@
 
-import React from 'react';
-import { Heart, MessageCircle, Share2, MapPin, Tag, Clock, User, Flag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, MessageCircle, Share2, MapPin, Tag, Clock, User, Flag, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ForumPost } from '@/services/forum';
+import { ForumPost, ForumCategory } from '@/services/forum';
 import { usePostInteractions } from '@/hooks/usePostInteractions';
+import { useEditPost } from '@/hooks/useEditPost';
+import EditPostDialog from './EditPostDialog';
 
 interface ForumPostCardProps {
   post: ForumPost;
   showRealTimeUpdates?: boolean;
+  categories?: ForumCategory[];
+  onPostUpdated?: (updatedPost: ForumPost) => void;
 }
 
 const ForumPostCard: React.FC<ForumPostCardProps> = ({ 
   post, 
-  showRealTimeUpdates = false 
+  showRealTimeUpdates = false,
+  categories = [],
+  onPostUpdated
 }) => {
   const { 
     isLiked, 
@@ -26,6 +32,13 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
     commentsCount, 
     toggleLike 
   } = usePostInteractions(post.id, post.likes_count, post.comments_count);
+
+  const { canEdit, checkEditPermission } = useEditPost();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  useEffect(() => {
+    checkEditPermission(post.id);
+  }, [post.id]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -44,6 +57,30 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   const getUserInitials = () => {
     const name = getUserDisplayName();
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
+
+  const handlePostUpdated = (updatedPost: ForumPost) => {
+    if (onPostUpdated) {
+      onPostUpdated(updatedPost);
+    }
+  };
+
+  const getPostStatus = () => {
+    if (!post.is_approved && !post.is_reported) {
+      return (
+        <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
+          En attente de modération
+        </Badge>
+      );
+    }
+    if (post.is_reported) {
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Rejeté
+        </Badge>
+      );
+    }
+    return null;
   };
 
   return (
@@ -89,7 +126,26 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
               </div>
             </div>
           </div>
+          
+          {/* Bouton d'édition */}
+          {canEdit && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditDialogOpen(true)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
         </div>
+        
+        {/* Statut du post */}
+        {getPostStatus() && (
+          <div className="mt-2">
+            {getPostStatus()}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="pt-0">
@@ -164,6 +220,17 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
           </div>
         </div>
       </CardContent>
+
+      {/* Dialog d'édition */}
+      {canEdit && (
+        <EditPostDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          post={post}
+          categories={categories}
+          onPostUpdated={handlePostUpdated}
+        />
+      )}
     </Card>
   );
 };
