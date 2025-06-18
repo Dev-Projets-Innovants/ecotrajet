@@ -39,6 +39,19 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      category_id: '',
+      location: '',
+      tags: '',
+      user_name: '',
+      user_email: '',
+      image_url: '',
+    });
+  };
+
   const validateForm = () => {
     const errors = [];
 
@@ -91,8 +104,11 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submission started with data:', formData);
+    
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
+      console.log('Validation errors:', validationErrors);
       toast({
         title: "Erreur de validation",
         description: validationErrors.join(", "),
@@ -115,30 +131,26 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
         image_url: formData.image_url || undefined,
       };
 
+      console.log('Sending post data:', postData);
+
       const { error } = await forumService.createPost(postData);
       
       if (error) {
+        console.error('Create post error:', error);
         throw error;
       }
+
+      console.log('Post created successfully');
 
       toast({
         title: "Succès",
         description: "Votre post a été créé avec succès !",
       });
 
-      // Reset form
-      setFormData({
-        title: '',
-        content: '',
-        category_id: '',
-        location: '',
-        tags: '',
-        user_name: '',
-        user_email: '',
-        image_url: '',
-      });
-
+      // Reset form and close dialog
+      resetForm();
       onPostCreated();
+      onClose();
     } catch (error) {
       console.error('Error creating post:', error);
       toast({
@@ -153,6 +165,7 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
 
   const handleClose = () => {
     if (!isSubmitting) {
+      resetForm();
       onClose();
     }
   };
@@ -171,12 +184,24 @@ const CreatePostDialog: React.FC<CreatePostDialogProps> = ({
 
   // Vérifier si le formulaire est valide pour activer/désactiver le bouton
   const isFormValid = () => {
-    return formData.user_name.trim() &&
+    const isValid = formData.user_name.trim() &&
            formData.user_email.trim() &&
            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.user_email) &&
            formData.title.trim().length >= 5 &&
            formData.category_id &&
            formData.content.trim().length >= 20;
+    
+    console.log('Form validation check:', {
+      user_name: formData.user_name.trim(),
+      user_email: formData.user_email.trim(),
+      email_valid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.user_email),
+      title_length: formData.title.trim().length,
+      category_id: formData.category_id,
+      content_length: formData.content.trim().length,
+      isValid
+    });
+    
+    return isValid;
   };
 
   return (
