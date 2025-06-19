@@ -37,25 +37,25 @@ import { mockUserRewards, mockChallenges, mockLeaderboard, mockCollectiveImpact 
 
 const Rewards = () => {
   const navigate = useNavigate();
-  const { user, isAdmin, isLoading } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("progress");
 
   // Redirect admin users to admin dashboard
   useEffect(() => {
-    if (!isLoading && isAdmin) {
+    if (!loading && isAdmin) {
       navigate('/admin/dashboard');
     }
-  }, [isAdmin, isLoading, navigate]);
+  }, [isAdmin, loading, navigate]);
 
   // Redirect unauthenticated users to sign in
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!loading && !user) {
       navigate('/signin');
     }
-  }, [user, isLoading, navigate]);
+  }, [user, loading, navigate]);
 
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
