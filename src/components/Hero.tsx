@@ -3,8 +3,11 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
     <section className="relative min-h-screen flex items-center pt-16 pb-20 overflow-hidden">
       {/* Brighter background image with bicycles in Paris */}
@@ -47,8 +50,8 @@ const Hero = () => {
                 className="group rounded-full px-4 py-5 h-12 w-full sm:w-auto bg-eco-green hover:bg-eco-dark-green text-white shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm"
                 asChild
               >
-                <Link to="/signup">
-                  <span>Commencer maintenant</span>
+                <Link to={user ? "/dashboard" : "/signup"}>
+                  <span>{user ? "Accéder au tableau de bord" : "Commencer maintenant"}</span>
                   <span className="ml-2">
                     <ArrowRight size={18} />
                   </span>
