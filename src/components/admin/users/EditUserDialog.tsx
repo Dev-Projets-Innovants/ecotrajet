@@ -3,29 +3,26 @@ import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { AdminUser } from '@/services/admin/usersService';
-import { Save } from 'lucide-react';
 
 interface EditUserDialogProps {
   user: AdminUser | null;
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onSave: (userId: string, updates: Partial<AdminUser>) => Promise<void>;
 }
 
 export const EditUserDialog: React.FC<EditUserDialogProps> = ({
   user,
   isOpen,
-  onOpenChange,
+  onClose,
   onSave
 }) => {
   const [formData, setFormData] = useState({
@@ -36,7 +33,7 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
     bio: '',
     is_admin: false
   });
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -51,106 +48,108 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
     }
   }, [user]);
 
-  const handleSave = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user) return;
-    
-    setIsSaving(true);
+
+    setIsLoading(true);
     try {
       await onSave(user.id, formData);
-      onOpenChange(false);
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Modifier l'utilisateur</DialogTitle>
-          <DialogDescription>
-            Modifiez les informations de l'utilisateur.
-          </DialogDescription>
         </DialogHeader>
-        
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Prénom</label>
-            <Input 
-              className="col-span-3" 
-              value={formData.first_name}
-              onChange={(e) => handleInputChange('first_name', e.target.value)}
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="first_name">Prénom</Label>
+              <Input
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  first_name: e.target.value
+                }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="last_name">Nom</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  last_name: e.target.value
+                }))}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Nom</label>
-            <Input 
-              className="col-span-3" 
-              value={formData.last_name}
-              onChange={(e) => handleInputChange('last_name', e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Email</label>
-            <Input 
-              className="col-span-3" 
+          
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                email: e.target.value
+              }))}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Ville</label>
-            <Input 
-              className="col-span-3" 
+          
+          <div>
+            <Label htmlFor="city">Ville</Label>
+            <Input
+              id="city"
               value={formData.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                city: e.target.value
+              }))}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Bio</label>
-            <Textarea 
-              className="col-span-3" 
+          
+          <div>
+            <Label htmlFor="bio">Bio</Label>
+            <Input
+              id="bio"
               value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
-              rows={3}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                bio: e.target.value
+              }))}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Admin</label>
-            <Switch 
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="is_admin"
               checked={formData.is_admin}
-              onCheckedChange={(checked) => handleInputChange('is_admin', checked)}
+              onCheckedChange={(checked) => setFormData(prev => ({
+                ...prev,
+                is_admin: checked
+              }))}
             />
+            <Label htmlFor="is_admin">Administrateur</Label>
           </div>
-        </div>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Annuler
-          </Button>
-          <Button 
-            onClick={handleSave} 
-            disabled={isSaving}
-            className="bg-eco-green hover:bg-eco-dark-green"
-          >
-            {isSaving ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Enregistrer
-          </Button>
-        </DialogFooter>
+          
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Annuler
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

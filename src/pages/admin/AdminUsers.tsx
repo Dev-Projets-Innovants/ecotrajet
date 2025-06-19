@@ -1,29 +1,35 @@
+
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { UserTable } from '@/components/admin/users/UserTable';
 import { UserTableHeader } from '@/components/admin/users/UserTableHeader';
 import { UserTableFilters } from '@/components/admin/users/UserTableFilters';
+import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
+import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
 import { useAdminUsers } from '@/hooks/useAdminUsers';
+import { AdminUser } from '@/services/admin/usersService';
 import { toast } from '@/hooks/use-toast';
 
 const AdminUsers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [deletingUser, setDeletingUser] = useState<AdminUser | null>(null);
 
   const {
     users,
-    totalUsers,
-    loading,
-    currentPage,
-    setCurrentPage,
-    refetch
-  } = useAdminUsers({ searchQuery, roleFilter });
+    isLoading,
+    error,
+    refetchUsers,
+    updateUser,
+    deleteUser
+  } = useAdminUsers();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await refetch();
+      await refetchUsers();
       toast({
         title: "Données actualisées",
         description: "La liste des utilisateurs a été mise à jour",
@@ -40,6 +46,32 @@ const AdminUsers = () => {
     }
   };
 
+  const handleEditUser = (user: AdminUser) => {
+    setEditingUser(user);
+  };
+
+  const handleDeleteUser = (user: AdminUser) => {
+    setDeletingUser(user);
+  };
+
+  const handleSaveUser = async (userId: string, updates: Partial<AdminUser>) => {
+    try {
+      await updateUser(userId, updates);
+      setEditingUser(null);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleConfirmDelete = async (userId: string) => {
+    try {
+      await deleteUser(userId);
+      setDeletingUser(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = !searchQuery || 
       user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,10 +85,24 @@ const AdminUsers = () => {
     return matchesSearch && matchesRole;
   });
 
+  if (error) {
+    return (
+      <AdminLayout title="Gestion des utilisateurs">
+        <div className="text-center text-red-600">
+          <p>Erreur lors du chargement des utilisateurs: {error}</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout title="Gestion des utilisateurs">
       <div className="space-y-6">
-        <UserTableHeader totalUsers={totalUsers} />
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">
+            {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''}
+          </h2>
+        </div>
         
         <UserTableFilters
           searchQuery={searchQuery}
@@ -69,12 +115,25 @@ const AdminUsers = () => {
 
         <UserTable
           users={filteredUsers}
-          loading={loading}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          totalUsers={filteredUsers.length}
+          isLoading={isLoading}
+          onEditUser={handleEditUser}
+          onDeleteUser={handleDeleteUser}
         />
       </div>
+
+      <EditUserDialog
+        user={editingUser}
+        isOpen={!!editingUser}
+        onClose={() => setEditingUser(null)}
+        onSave={handleSaveUser}
+      />
+
+      <DeleteUserDialog
+        user={deletingUser}
+        isOpen={!!deletingUser}
+        onClose={() => setDeletingUser(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </AdminLayout>
   );
 };
