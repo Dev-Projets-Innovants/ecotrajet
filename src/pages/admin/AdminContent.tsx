@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
-import { MessageSquare, FileText, AlertCircle } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import ContentModerationHeader from '@/components/admin/content/ContentModerationHeader';
-import ForumPostsTable from '@/components/admin/content/ForumPostsTable';
-import CommentsTable from '@/components/admin/content/CommentsTable';
 import ContentViewDialog from '@/components/admin/content/ContentViewDialog';
+import PendingItemsAlert from '@/components/admin/content/PendingItemsAlert';
+import ModerationStatsCards from '@/components/admin/content/ModerationStatsCards';
+import ModerationTabContent from '@/components/admin/content/ModerationTabContent';
 import { useAdminContent } from '@/hooks/useAdminContent';
 import { useAdminComments } from '@/hooks/useAdminComments';
 import { AdminForumPost } from '@/services/admin/contentModerationService';
@@ -125,65 +124,16 @@ const AdminContent = () => {
   return (
     <AdminLayout title="Modération des contenus">
       <div className="space-y-6">
-        {/* Alerte si des éléments sont en attente */}
-        {pendingCount > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center space-x-3">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
-            <div className="flex-1">
-              <p className="text-amber-800 font-medium">
-                {pendingCount} élément{pendingCount > 1 ? 's' : ''} en attente de modération
-              </p>
-              <p className="text-amber-700 text-sm">
-                {postStats.pending} post{postStats.pending > 1 ? 's' : ''} 
-                {postStats.pending > 0 && commentStats.pending > 0 && ' et '}
-                {commentStats.pending > 0 && `${commentStats.pending} commentaire${commentStats.pending > 1 ? 's' : ''}`}
-              </p>
-            </div>
-          </div>
-        )}
+        <PendingItemsAlert
+          pendingCount={pendingCount}
+          postsPendingCount={postStats.pending}
+          commentsPendingCount={commentStats.pending}
+        />
 
-        {/* En-tête avec statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total {activeTab === 'posts' ? 'Posts' : 'Commentaires'}</p>
-                <p className="text-2xl font-bold">{currentStats.total}</p>
-              </div>
-              <FileText className="h-8 w-8 text-blue-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">En attente</p>
-                <p className="text-2xl font-bold text-amber-600">{currentStats.pending}</p>
-              </div>
-              <MessageSquare className="h-8 w-8 text-amber-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Approuvés</p>
-                <p className="text-2xl font-bold text-green-600">{currentStats.approved}</p>
-              </div>
-              <MessageSquare className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Rejetés</p>
-                <p className="text-2xl font-bold text-red-600">{currentStats.rejected}</p>
-              </div>
-              <MessageSquare className="h-8 w-8 text-red-500" />
-            </div>
-          </div>
-        </div>
+        <ModerationStatsCards
+          stats={currentStats}
+          activeTab={activeTab}
+        />
 
         <ContentModerationHeader
           activeTab={activeTab}
@@ -195,41 +145,17 @@ const AdminContent = () => {
           showForumPosts={true}
         />
         
-        <div className="mt-6">
-          {activeTab === 'posts' && (
-            <div>
-              {forumLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green"></div>
-                </div>
-              ) : (
-                <ForumPostsTable
-                  posts={filteredForumPosts}
-                  onViewPost={handleViewPost}
-                  onApprovePost={(postId) => handleModeratePost(postId, 'approved')}
-                  onRejectPost={(postId) => handleModeratePost(postId, 'rejected')}
-                />
-              )}
-            </div>
-          )}
-          
-          {activeTab === 'comments' && (
-            <div>
-              {commentsLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green"></div>
-                </div>
-              ) : (
-                <CommentsTable
-                  comments={filteredComments}
-                  onViewComment={handleViewComment}
-                  onApproveComment={(commentId) => handleModerateComment(commentId, 'approved')}
-                  onRejectComment={(commentId) => handleModerateComment(commentId, 'rejected')}
-                />
-              )}
-            </div>
-          )}
-        </div>
+        <ModerationTabContent
+          activeTab={activeTab}
+          forumLoading={forumLoading}
+          commentsLoading={commentsLoading}
+          filteredForumPosts={filteredForumPosts}
+          filteredComments={filteredComments}
+          onViewPost={handleViewPost}
+          onViewComment={handleViewComment}
+          onModeratePost={handleModeratePost}
+          onModerateComment={handleModerateComment}
+        />
       </div>
 
       <ContentViewDialog
