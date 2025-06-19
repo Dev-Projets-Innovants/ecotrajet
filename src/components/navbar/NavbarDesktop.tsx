@@ -11,7 +11,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { MapPin, BarChart, Trophy, Users, BookOpen, Calculator, LogOut, Shield } from 'lucide-react';
+import { MapPin, BarChart, Trophy, Users, BookOpen, Calculator, LogOut, Shield, LayoutDashboard } from 'lucide-react';
 
 interface NavbarDesktopProps {
   isAuthenticated: boolean;
@@ -125,6 +125,14 @@ const NavbarDesktop = ({
               <Button variant="ghost" className={`flex items-center ${textColorClass}`}>
                 <Shield className="mr-2 h-4 w-4" />
                 Admin
+              </Button>
+            </NavLink>
+          )}
+          {!isAdmin && (
+            <NavLink to="/dashboard" onClick={handleDashboardClick} className={textColorClass}>
+              <Button variant="ghost" className={`flex items-center ${textColorClass}`}>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Dashboard
               </Button>
             </NavLink>
           )}

@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { 
   X, Menu, MapPin, BarChart, Users, Trophy, 
-  Calculator, BookOpen, LogOut, UserCircle, Bell, Shield
+  Calculator, BookOpen, LogOut, UserCircle, Bell, Shield, LayoutDashboard
 } from 'lucide-react';
 
 interface NavbarMobileProps {
@@ -137,6 +137,17 @@ const NavbarMobile = ({
                       label="Tableau de bord admin" 
                       onClick={() => { 
                         handleAdminDashboardClick?.(); 
+                        toggleMobileMenu(); 
+                      }}
+                    />
+                  )}
+                  {!isAdmin && (
+                    <MobileNavItem 
+                      href="/dashboard" 
+                      icon={<LayoutDashboard className="h-5 w-5 text-eco-green" />}
+                      label="Dashboard" 
+                      onClick={(e) => { 
+                        handleDashboardClick(e); 
                         toggleMobileMenu(); 
                       }}
                     />
