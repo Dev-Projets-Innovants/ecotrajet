@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageSquare, FileText } from 'lucide-react';
+import { MessageSquare, FileText, AlertCircle } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
@@ -55,8 +55,16 @@ const AdminContent = () => {
     try {
       if (newStatus === 'approved') {
         await approvePost(id);
+        toast({
+          title: "Post approuvé",
+          description: "Le post est maintenant visible publiquement",
+        });
       } else {
         await rejectPost(id);
+        toast({
+          title: "Post rejeté",
+          description: "Le post a été rejeté et n'est plus visible",
+        });
       }
       setItemDialogOpen(false);
     } catch (error) {
@@ -68,8 +76,16 @@ const AdminContent = () => {
     try {
       if (newStatus === 'approved') {
         await approveComment(id);
+        toast({
+          title: "Commentaire approuvé",
+          description: "Le commentaire est maintenant visible",
+        });
       } else {
         await rejectComment(id);
+        toast({
+          title: "Commentaire rejeté", 
+          description: "Le commentaire a été rejeté",
+        });
       }
       setItemDialogOpen(false);
     } catch (error) {
@@ -103,9 +119,29 @@ const AdminContent = () => {
   const currentStats = activeTab === 'posts' ? postStats : commentStats;
   const updateCurrentFilters = activeTab === 'posts' ? updatePostFilters : updateCommentFilters;
 
+  // Calcul du nombre d'éléments en attente pour l'alerte
+  const pendingCount = postStats.pending + commentStats.pending;
+
   return (
     <AdminLayout title="Modération des contenus">
       <div className="space-y-6">
+        {/* Alerte si des éléments sont en attente */}
+        {pendingCount > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center space-x-3">
+            <AlertCircle className="h-5 w-5 text-amber-600" />
+            <div className="flex-1">
+              <p className="text-amber-800 font-medium">
+                {pendingCount} élément{pendingCount > 1 ? 's' : ''} en attente de modération
+              </p>
+              <p className="text-amber-700 text-sm">
+                {postStats.pending} post{postStats.pending > 1 ? 's' : ''} 
+                {postStats.pending > 0 && commentStats.pending > 0 && ' et '}
+                {commentStats.pending > 0 && `${commentStats.pending} commentaire${commentStats.pending > 1 ? 's' : ''}`}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* En-tête avec statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">

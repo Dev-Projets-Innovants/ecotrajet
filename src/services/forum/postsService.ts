@@ -27,7 +27,10 @@ export const postsService = {
   },
 
   async getPostById(id: string) {
-    return await supabase
+    // Permettre aux utilisateurs de voir leurs propres posts même s'ils ne sont pas approuvés
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let query = supabase
       .from('forum_posts')
       .select(`
         *,
@@ -38,8 +41,14 @@ export const postsService = {
           icon
         )
       `)
-      .eq('id', id)
-      .single();
+      .eq('id', id);
+
+    // Si l'utilisateur n'est pas connecté ou ce n'est pas son post, vérifier l'approbation
+    if (!user) {
+      query = query.eq('is_approved', true);
+    }
+
+    return await query.single();
   },
 
   async createPost(post: {
@@ -65,6 +74,7 @@ export const postsService = {
           user_id: user.id,
           user_name: post.user_name || user.user_metadata?.first_name || null,
           user_email: post.user_email || user.email || null,
+          is_approved: false // Nouveau post en attente de modération
         })
         .select()
         .single();
@@ -76,6 +86,7 @@ export const postsService = {
         .insert({
           ...post,
           user_identifier: userIdentifier,
+          is_approved: false // Nouveau post en attente de modération
         })
         .select()
         .single();
