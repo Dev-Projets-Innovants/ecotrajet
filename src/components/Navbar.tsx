@@ -54,11 +54,11 @@ const Navbar = () => {
   // Function to handle user logout
   const handleLogout = async () => {
     try {
-      const result = await signOut();
-      if (result.error) {
+      const { error } = await signOut();
+      if (error) {
         toast({
           title: "Erreur de déconnexion",
-          description: result.error.message,
+          description: error.message,
           variant: "destructive"
         });
         return;

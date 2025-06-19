@@ -1,115 +1,128 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { initializeUserChallenges } from '@/services/userService';
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
 import { AuthService, UserProfile } from '@/services/auth/authService';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   profile: UserProfile | null;
+  isLoading: boolean;
   isAdmin: boolean;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ data: any; error: any }>;
-  signOut: () => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signOut: () => Promise<any>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<any>;
   refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const refreshProfile = async () => {
-    if (user?.id) {
-      const userProfile = await AuthService.getUserProfile(user.id);
-      setProfile(userProfile);
-      if (userProfile) {
-        setIsAdmin(userProfile.is_admin);
-      }
-    }
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await refreshProfile();
-        // Initialiser les défis pour l'utilisateur
-        await initializeUserChallenges(session.user.id);
-      }
-      
-      setLoading(false);
-    };
-
-    getSession();
-
     // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = AuthService.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await refreshProfile();
-          // Initialiser les défis pour les nouveaux utilisateurs
-          if (event === 'SIGNED_IN') {
-            await initializeUserChallenges(session.user.id);
-          }
+          // Récupérer le profil utilisateur
+          setTimeout(async () => {
+            const userProfile = await AuthService.getUserProfile(session.user.id);
+            setProfile(userProfile);
+            setIsLoading(false);
+          }, 0);
         } else {
           setProfile(null);
-          setIsAdmin(false);
+          setIsLoading(false);
         }
-        
-        setLoading(false);
       }
     );
+
+    // Vérifier la session existante
+    AuthService.getCurrentSession().then(({ session }) => {
+      if (session) {
+        setSession(session);
+        setUser(session.user);
+        AuthService.getUserProfile(session.user.id).then(profile => {
+          setProfile(profile);
+          setIsLoading(false);
+        });
+      } else {
+        setIsLoading(false);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    return await AuthService.signIn(email, password);
+  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    const result = await AuthService.signUp(email, password, firstName, lastName);
+    return result;
   };
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
-    return await AuthService.signUp(email, password, firstName, lastName);
+  const signIn = async (email: string, password: string) => {
+    const result = await AuthService.signIn(email, password);
+    return result;
   };
 
   const signOut = async () => {
     const result = await AuthService.signOut();
     if (!result.error) {
       setUser(null);
+      setSession(null);
       setProfile(null);
-      setIsAdmin(false);
     }
     return result;
   };
 
-  const value = {
-    user,
-    profile,
-    isAdmin,
-    loading,
-    signIn,
-    signUp,
-    signOut,
-    refreshProfile,
+  const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (!user) return { error: 'No user logged in' };
+    
+    const result = await AuthService.updateUserProfile(user.id, updates);
+    if (result.data) {
+      setProfile(result.data);
+    }
+    return result;
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  const refreshProfile = async () => {
+    if (!user) return;
+    const userProfile = await AuthService.getUserProfile(user.id);
+    setProfile(userProfile);
+  };
 
-export const useAuth = () => {
+  const isAdmin = profile?.is_admin || false;
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      session,
+      profile,
+      isLoading,
+      isAdmin,
+      signUp,
+      signIn,
+      signOut,
+      updateProfile,
+      refreshProfile
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}

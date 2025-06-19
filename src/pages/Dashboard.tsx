@@ -1,383 +1,401 @@
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Leaf, 
+  LogOut, 
+  MapPin, 
+  Calendar, 
+  Droplets, 
+  Award, 
+  Flame, 
+  Wind, 
+  Target,
+  TrendingUp
+} from "lucide-react";
+import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { Plus, Leaf, Car, Flame, Award, Target, Calendar, MapPin } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useUserStatistics } from '@/hooks/useUserStatistics';
-import { useUserBadges } from '@/hooks/useUserBadges';
-import { useUserChallenges } from '@/hooks/useUserChallenges';
-import { useUserTrips } from '@/hooks/useUserTrips';
-import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Layout } from "@/components/Layout";
+import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+
+const userData = {
+  name: "Thomas Dubois",
+  level: "Aventurier Écologique",
+  profileImage: "https://i.pravatar.cc/150?img=37",
+  stats: {
+    trips: 27,
+    co2Saved: 32.4, // en kg
+    distance: 128.3, // en km
+    calories: 3520, // en calories
+    treesEquivalent: 3.2
+  },
+  badges: [
+    { id: 1, title: "Premier Trajet", icon: "🚲", date: "15 mai", description: "Premier trajet effectué avec EcoTrajet" },
+    { id: 2, title: "10 Trajets", icon: "🏆", date: "2 juin", description: "10 trajets écologiques complétés" },
+    { id: 3, title: "CO2 -10kg", icon: "🌿", date: "8 juin", description: "10kg de CO2 économisés" },
+  ],
+  challenges: [
+    { id: 1, title: "30 jours consécutifs", progress: 70, target: 30, current: 21 },
+    { id: 2, title: "Cycliste passionné", progress: 40, target: 200, current: 80 },
+    { id: 3, title: "Écologie urbaine", progress: 90, target: 50, current: 45 },
+  ]
+};
+
+const monthlyTripsData = [
+  { name: 'Jan', trips: 4 },
+  { name: 'Fév', trips: 6 },
+  { name: 'Mar', trips: 8 },
+  { name: 'Avr', trips: 10 },
+  { name: 'Mai', trips: 12 },
+  { name: 'Juin', trips: 18 },
+  { name: 'Juil', trips: 27 },
+];
+
+const recentTrips = [
+  { id: 1, date: "12 juillet", from: "Bastille", to: "République", distance: "3,2 km", co2: "0,8 kg" },
+  { id: 2, date: "10 juillet", from: "Nation", to: "Père Lachaise", distance: "2,7 km", co2: "0,6 kg" },
+  { id: 3, date: "8 juillet", from: "Châtelet", to: "Gare du Nord", distance: "4,1 km", co2: "1,0 kg" },
+];
+
+const weatherData = {
+  condition: "Ensoleillé",
+  temperature: 24,
+  wind: 10, // km/h
+  rain: 0,
+  advice: "Conditions idéales pour un trajet à vélo ou en trottinette. N'oubliez pas votre crème solaire!"
+};
 
 const Dashboard = () => {
-  const { user, profile } = useAuth();
-  const { data: statistics } = useUserStatistics();
-  const { data: badges } = useUserBadges();
-  const { data: challenges } = useUserChallenges();
-  const { data: recentTrips } = useUserTrips(5); // Derniers 5 trajets
+  const navigate = useNavigate();
+  const { user, isLoading, signOut } = useAuth();
 
-  // Valeurs par défaut si pas de données
-  const stats = statistics || {
-    total_trips: 0,
-    total_distance_km: 0,
-    total_co2_saved_kg: 0,
-    total_calories_burned: 0,
-    trees_equivalent: 0
+  useEffect(() => {
+    console.log('Dashboard useEffect - user:', user, 'isLoading:', isLoading);
+    
+    if (!isLoading && !user) {
+      console.log('User not authenticated, redirecting to signin...');
+      toast({
+        title: "Accès refusé",
+        description: "Vous devez être connecté pour accéder à cette page.",
+        variant: "destructive",
+      });
+      navigate('/signin', { state: { from: '/dashboard' } });
+    }
+  }, [user, isLoading, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) {
+        toast({
+          title: "Erreur de déconnexion",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      navigate('/');
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès."
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite lors de la déconnexion.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const displayName = profile ? 
-    `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Utilisateur' 
-    : 'Utilisateur';
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <Layout title="Tableau de bord">
+        <div className="min-h-screen bg-gray-50 pt-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eco-green mx-auto mb-4"></div>
+            <p>Chargement...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Don't render dashboard if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* En-tête avec nom réel de l'utilisateur */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Bonjour {displayName} ! 👋
-        </h1>
-        <p className="text-gray-600">
-          Voici un aperçu de votre impact environnemental et de vos progrès.
-        </p>
-      </div>
-
-      {/* Statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CO₂ Économisé</CardTitle>
-            <Leaf className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {stats.total_co2_saved_kg.toFixed(1)} kg
+    <Layout title="Tableau de bord">
+      <div className="min-h-screen bg-gray-50 pt-6">
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-white rounded-lg p-6 shadow">
+            <div className="flex flex-col items-center">
+              <Avatar className="h-24 w-24 border-4 border-eco-light-green">
+                <AvatarImage src={userData.profileImage} alt={userData.name} />
+                <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
+              <h2 className="mt-4 text-xl font-bold">{userData.name}</h2>
+              <div className="flex items-center mt-1 space-x-1">
+                <Leaf className="h-4 w-4 text-eco-green" />
+                <span className="text-sm font-medium text-eco-green">{userData.level}</span>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Équivalent à {stats.trees_equivalent.toFixed(1)} arbres plantés
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Trajets Écologiques</CardTitle>
-            <Car className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.total_trips}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.total_distance_km.toFixed(1)} km parcourus
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Calories Brûlées</CardTitle>
-            <Flame className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {stats.total_calories_burned}
+            
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full mt-6 md:mt-0">
+              <Card className="bg-gradient-to-br from-eco-light-green to-white">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Trajets</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{userData.stats.trips}</div>
+                  <p className="text-xs text-muted-foreground mt-1">trajets écologiques</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-eco-light-green to-white">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">CO₂ Économisé</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{userData.stats.co2Saved} kg</div>
+                  <p className="text-xs text-muted-foreground mt-1">par rapport à la voiture</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-eco-light-green to-white">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Distance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{userData.stats.distance} km</div>
+                  <p className="text-xs text-muted-foreground mt-1">parcourus écologiquement</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-eco-light-green to-white">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Calories</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{userData.stats.calories}</div>
+                  <p className="text-xs text-muted-foreground mt-1">calories brûlées</p>
+                </CardContent>
+              </Card>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Grâce aux transports actifs
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Badges Obtenus</CardTitle>
-            <Award className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{badges?.length || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Accomplissements débloqués
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="trips">Mes Trajets</TabsTrigger>
-          <TabsTrigger value="challenges">Défis</TabsTrigger>
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Trajets récents */}
-            <Card>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <Card className="col-span-2">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Trajets Récents
-                </CardTitle>
-                <CardDescription>
-                  Vos derniers déplacements écologiques
-                </CardDescription>
+                <CardTitle>Évolution mensuelle</CardTitle>
+                <CardDescription>Vos trajets écologiques au fil des mois</CardDescription>
               </CardHeader>
-              <CardContent>
-                {recentTrips && recentTrips.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentTrips.map((trip) => (
-                      <div key={trip.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-sm">
-                            {trip.origin} → {trip.destination}
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            {trip.transport_mode.name} • {trip.distance_km} km
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-green-600">
-                            -{trip.co2_saved_kg.toFixed(2)} kg CO₂
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(trip.trip_date).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">
-                      Aucun trajet enregistré pour le moment
-                    </p>
-                    <Button asChild>
-                      <Link to="/carbon-calculator">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Ajouter un trajet
-                      </Link>
-                    </Button>
-                  </div>
-                )}
+              <CardContent className="aspect-video">
+                <ChartContainer
+                  config={{
+                    trips: { 
+                      color: "#4CAF50",
+                      label: "Trajets"
+                    },
+                  }}
+                  className="h-full w-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={monthlyTripsData}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                      className="text-xs sm:text-sm"
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="name" 
+                        className="text-[8px] sm:text-xs" 
+                        tick={{ fontSize: 10 }} 
+                      />
+                      <YAxis className="text-[8px] sm:text-xs" />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Area
+                        type="monotone"
+                        dataKey="trips"
+                        name="trips"
+                        stroke="#4CAF50"
+                        fill="#E8F5E9"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </CardContent>
             </Card>
 
-            {/* Progression des défis */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Défis en Cours
-                </CardTitle>
-                <CardDescription>
-                  Vos objectifs écologiques actuels
-                </CardDescription>
+                <CardTitle>Impact Écologique</CardTitle>
+                <CardDescription>Votre contribution à la planète</CardDescription>
               </CardHeader>
-              <CardContent>
-                {challenges && challenges.length > 0 ? (
-                  <div className="space-y-4">
-                    {challenges.slice(0, 3).map((challenge) => {
-                      const progressPercentage = Math.min(
-                        (challenge.current_value / challenge.challenge.target_value) * 100,
-                        100
-                      );
-                      
-                      return (
-                        <div key={challenge.id} className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <p className="font-medium text-sm">{challenge.challenge.title}</p>
-                            <Badge variant={challenge.is_completed ? "default" : "secondary"}>
-                              {challenge.is_completed ? "Terminé" : "En cours"}
-                            </Badge>
-                          </div>
-                          <Progress value={progressPercentage} className="h-2" />
-                          <p className="text-xs text-gray-600">
-                            {challenge.current_value} / {challenge.challenge.target_value}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <Target className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">
-                      Aucun défi en cours
-                    </p>
-                  </div>
-                )}
+              <CardContent className="flex flex-col items-center justify-center h-[240px]">
+                <div className="text-6xl mb-4 text-eco-green">🌳</div>
+                <div className="text-4xl font-bold text-eco-green">{userData.stats.treesEquivalent}</div>
+                <p className="text-sm text-center text-muted-foreground mt-2">
+                  Équivalent en arbres plantés <br/> grâce à vos trajets écologiques
+                </p>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <Card className="col-span-2">
+              <CardHeader>
+                <CardTitle>Trajets Récents</CardTitle>
+                <CardDescription>Vos derniers déplacements écologiques</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Départ</TableHead>
+                      <TableHead>Arrivée</TableHead>
+                      <TableHead>Distance</TableHead>
+                      <TableHead>CO₂ Économisé</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentTrips.map((trip) => (
+                      <TableRow key={trip.id}>
+                        <TableCell className="font-medium">{trip.date}</TableCell>
+                        <TableCell>{trip.from}</TableCell>
+                        <TableCell>{trip.to}</TableCell>
+                        <TableCell>{trip.distance}</TableCell>
+                        <TableCell>{trip.co2}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  Voir tous les trajets
+                </Button>
+              </CardFooter>
+            </Card>
 
-        <TabsContent value="trips">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique des Trajets</CardTitle>
-              <CardDescription>
-                Tous vos déplacements écologiques enregistrés
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {recentTrips && recentTrips.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Météo Paris</CardTitle>
+                <CardDescription>Conditions pour vos trajets</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <div className="text-5xl mb-2">☀️</div>
+                  <div className="text-3xl font-bold">{weatherData.temperature}°C</div>
+                  <p className="text-sm text-center mt-1">{weatherData.condition}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4 w-full mt-4">
+                    <div className="flex flex-col items-center">
+                      <Wind className="h-5 w-5 text-eco-green mb-1" />
+                      <span className="text-sm">{weatherData.wind} km/h</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <Droplets className="h-5 w-5 text-eco-green mb-1" />
+                      <span className="text-sm">{weatherData.rain}%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-eco-light-green/20 rounded-lg text-sm">
+                    <p>{weatherData.advice}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Badges & Récompenses</CardTitle>
+                  <CardDescription>Vos derniers accomplissements</CardDescription>
+                </div>
+                <Award className="h-5 w-5 text-eco-green" />
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-4">
-                  {recentTrips.map((trip) => (
-                    <div key={trip.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-semibold">
-                            {trip.origin} → {trip.destination}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(trip.trip_date).toLocaleDateString('fr-FR', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        <Badge variant="outline">{trip.transport_mode.name}</Badge>
+                  {userData.badges.map((badge) => (
+                    <div key={badge.id} className="flex items-start space-x-4 p-3 rounded-lg bg-muted/30">
+                      <div className="text-2xl">{badge.icon}</div>
+                      <div className="flex-1">
+                        <div className="font-medium">{badge.title}</div>
+                        <div className="text-sm text-muted-foreground">{badge.description}</div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600">Distance:</span>
-                          <p className="font-medium">{trip.distance_km} km</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">CO₂ économisé:</span>
-                          <p className="font-medium text-green-600">
-                            {trip.co2_saved_kg.toFixed(2)} kg
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">Calories:</span>
-                          <p className="font-medium text-orange-600">
-                            {trip.calories_burned} cal
-                          </p>
-                        </div>
+                      <Badge variant="outline">{badge.date}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  Tous les badges
+                </Button>
+              </CardFooter>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Défis en cours</CardTitle>
+                  <CardDescription>Relevez les défis pour gagner des récompenses</CardDescription>
+                </div>
+                <Target className="h-5 w-5 text-eco-green" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-5">
+                  {userData.challenges.map((challenge) => (
+                    <div key={challenge.id} className="space-y-1">
+                      <div className="flex justify-between">
+                        <span className="font-medium">{challenge.title}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {challenge.current}/{challenge.target}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-muted rounded overflow-hidden">
+                        <div 
+                          className="h-full bg-eco-green" 
+                          style={{ width: `${challenge.progress}%` }}
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun trajet enregistré</h3>
-                  <p className="text-gray-600 mb-6">
-                    Commencez à enregistrer vos trajets écologiques pour voir votre impact !
-                  </p>
-                  <Button asChild>
-                    <Link to="/carbon-calculator">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Enregistrer mon premier trajet
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="challenges">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {challenges && challenges.length > 0 ? (
-              challenges.map((challenge) => {
-                const progressPercentage = Math.min(
-                  (challenge.current_value / challenge.challenge.target_value) * 100,
-                  100
-                );
-                
-                return (
-                  <Card key={challenge.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">{challenge.challenge.title}</CardTitle>
-                          <CardDescription>{challenge.challenge.description}</CardDescription>
-                        </div>
-                        <Badge variant={challenge.is_completed ? "default" : "secondary"}>
-                          {challenge.is_completed ? "Terminé" : "En cours"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <Progress value={progressPercentage} className="h-3" />
-                        <div className="flex justify-between text-sm">
-                          <span>Progression: {challenge.current_value} / {challenge.challenge.target_value}</span>
-                          <span className="font-medium">+{challenge.challenge.reward_points} pts</span>
-                        </div>
-                        {challenge.is_completed && challenge.completed_at && (
-                          <p className="text-sm text-green-600">
-                            ✅ Terminé le {new Date(challenge.completed_at).toLocaleDateString('fr-FR')}
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            ) : (
-              <div className="col-span-2">
-                <Card>
-                  <CardContent className="text-center py-12">
-                    <Target className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucun défi disponible</h3>
-                    <p className="text-gray-600">
-                      Les défis apparaîtront ici au fur et à mesure que vous utilisez l'application.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  Voir tous les défis
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="badges">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {badges && badges.length > 0 ? (
-              badges.map((badge) => (
-                <Card key={badge.id}>
-                  <CardContent className="p-6 text-center">
-                    <div className="text-4xl mb-4">{badge.badge_icon}</div>
-                    <h3 className="font-semibold mb-2">{badge.badge_title}</h3>
-                    <p className="text-sm text-gray-600 mb-4">{badge.badge_description}</p>
-                    <Badge variant="outline">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(badge.earned_date).toLocaleDateString('fr-FR')}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="col-span-3">
-                <Card>
-                  <CardContent className="text-center py-12">
-                    <Award className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucun badge obtenu</h3>
-                    <p className="text-gray-600 mb-6">
-                      Commencez à utiliser l'application pour débloquer vos premiers badges !
-                    </p>
-                    <Button asChild>
-                      <Link to="/carbon-calculator">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Commencer un trajet
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </main>
+      </div>
+    </Layout>
   );
 };
 
