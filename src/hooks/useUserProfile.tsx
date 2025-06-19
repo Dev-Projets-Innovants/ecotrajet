@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthService, UserProfile } from '@/services/auth/authService';
 import { toast } from 'sonner';

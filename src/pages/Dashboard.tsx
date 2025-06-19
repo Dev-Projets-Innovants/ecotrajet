@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Plus, Leaf, Car, Flame, Award, Target, Calendar, MapPin } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserStatistics } from '@/hooks/useUserStatistics';
 import { useUserBadges } from '@/hooks/useUserBadges';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
@@ -14,7 +15,8 @@ import { useUserTrips } from '@/hooks/useUserTrips';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { data: profile } = useUserProfile();
   const { data: statistics } = useUserStatistics();
   const { data: badges } = useUserBadges();
   const { data: challenges } = useUserChallenges();
