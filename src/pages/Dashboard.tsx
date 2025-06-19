@@ -1,5 +1,5 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,11 +14,43 @@ import { useUserTrips } from '@/hooks/useUserTrips';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const { user, profile, isAdmin, loading } = useAuth();
   const { data: statistics } = useUserStatistics();
   const { data: badges } = useUserBadges();
   const { data: challenges } = useUserChallenges();
   const { data: recentTrips } = useUserTrips(5); // Derniers 5 trajets
+
+  // Rediriger les admins vers le dashboard admin
+  useEffect(() => {
+    if (!loading && isAdmin) {
+      navigate('/admin/dashboard');
+    }
+  }, [isAdmin, loading, navigate]);
+
+  // Rediriger les utilisateurs non connectés vers la page de connexion
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/signin');
+    }
+  }, [user, loading, navigate]);
+
+  // Afficher un état de chargement pendant la vérification
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Ne rien afficher pour les admins (ils seront redirigés)
+  if (isAdmin) {
+    return null;
+  }
 
   // Valeurs par défaut si pas de données
   const stats = statistics || {
