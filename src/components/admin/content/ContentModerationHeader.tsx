@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +21,8 @@ interface ContentModerationHeaderProps {
   };
   onFiltersChange?: (filters: { status?: 'all' | 'pending' | 'approved' | 'rejected' }) => void;
   showForumPosts?: boolean;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
@@ -30,7 +32,9 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
   onSearchChange,
   filters,
   onFiltersChange,
-  showForumPosts = false
+  showForumPosts = false,
+  onRefresh,
+  isRefreshing = false
 }) => {
   return (
     <>
@@ -90,6 +94,18 @@ const ContentModerationHeader: React.FC<ContentModerationHeaderProps> = ({
             <Filter className="h-4 w-4" />
             Filtrer
           </Button>
+
+          {onRefresh && (
+            <Button 
+              variant="outline" 
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
+          )}
         </div>
       </Tabs>
     </>

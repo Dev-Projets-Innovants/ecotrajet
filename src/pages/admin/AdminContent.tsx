@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { toast } from "@/hooks/use-toast";
@@ -17,6 +16,7 @@ const AdminContent = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Hook pour la modération des posts du forum
   const {
@@ -26,7 +26,8 @@ const AdminContent = () => {
     stats: postStats,
     updateFilters: updatePostFilters,
     approvePost,
-    rejectPost
+    rejectPost,
+    refetch: refetchPosts
   } = useAdminContent();
 
   // Hook pour la modération des commentaires
@@ -37,8 +38,29 @@ const AdminContent = () => {
     stats: commentStats,
     updateFilters: updateCommentFilters,
     approveComment,
-    rejectComment
+    rejectComment,
+    refetch: refetchComments
   } = useAdminComments();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchPosts(), refetchComments()]);
+      toast({
+        title: "Données actualisées",
+        description: "Les contenus ont été mis à jour",
+      });
+    } catch (error) {
+      console.error('Error refreshing content:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'actualiser les données",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleViewPost = (post: AdminForumPost) => {
     setSelectedItem({ ...post, type: 'forum_post' });
@@ -143,6 +165,8 @@ const AdminContent = () => {
           filters={currentFilters}
           onFiltersChange={updateCurrentFilters}
           showForumPosts={true}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
         />
         
         <ModerationTabContent
