@@ -3,20 +3,36 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { initializeUserChallenges } from '@/services/userService';
+import { AuthService, UserProfile } from '@/services/auth/authService';
 
 interface AuthContextType {
   user: User | null;
+  profile: UserProfile | null;
   isAdmin: boolean;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ data: any; error: any }>;
+  signOut: () => Promise<{ error?: any }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const refreshProfile = async () => {
+    if (user?.id) {
+      const userProfile = await AuthService.getUserProfile(user.id);
+      setProfile(userProfile);
+      if (userProfile) {
+        setIsAdmin(userProfile.is_admin);
+      }
+    }
+  };
 
   useEffect(() => {
     // Récupérer la session actuelle
@@ -25,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        await checkAdminStatus(session.user.id);
+        await refreshProfile();
         // Initialiser les défis pour l'utilisateur
         await initializeUserChallenges(session.user.id);
       }
@@ -41,12 +57,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkAdminStatus(session.user.id);
+          await refreshProfile();
           // Initialiser les défis pour les nouveaux utilisateurs
           if (event === 'SIGNED_IN') {
             await initializeUserChallenges(session.user.id);
           }
         } else {
+          setProfile(null);
           setIsAdmin(false);
         }
         
@@ -57,35 +74,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', userId)
-        .maybeSingle();
+  const signIn = async (email: string, password: string) => {
+    return await AuthService.signIn(email, password);
+  };
 
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(data?.is_admin ?? false);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-    }
+  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    return await AuthService.signUp(email, password, firstName, lastName);
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    const result = await AuthService.signOut();
+    if (!result.error) {
+      setUser(null);
+      setProfile(null);
+      setIsAdmin(false);
+    }
+    return result;
   };
 
   const value = {
     user,
+    profile,
     isAdmin,
     loading,
+    signIn,
+    signUp,
     signOut,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
