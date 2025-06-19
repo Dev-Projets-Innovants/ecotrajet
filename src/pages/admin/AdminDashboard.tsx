@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import OptimizedStatsCard from '@/components/admin/dashboard/OptimizedStatsCard';
 import OptimizedVelibAvailabilityChart from '@/components/admin/dashboard/OptimizedVelibAvailabilityChart';
@@ -8,7 +7,6 @@ import OptimizedVelibDistributionChart from '@/components/admin/dashboard/Optimi
 import OptimizedVelibUsageChart from '@/components/admin/dashboard/OptimizedVelibUsageChart';
 import DashboardFilters from '@/components/admin/dashboard/DashboardFilters';
 import { useOptimizedVelibData } from '@/hooks/useOptimizedVelibData';
-import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { 
   UserCheck, 
@@ -24,25 +22,9 @@ import {
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const { user, isAdmin, loading } = useAuth();
   const [timeRange, setTimeRange] = useState('24h');
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
-
-  // Rediriger les non-admins vers le dashboard utilisateur
-  useEffect(() => {
-    if (!loading && !isAdmin) {
-      navigate('/dashboard');
-    }
-  }, [isAdmin, loading, navigate]);
-
-  // Rediriger les utilisateurs non connectés vers la page de connexion
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/signin');
-    }
-  }, [user, loading, navigate]);
 
   const { 
     stats,
@@ -82,23 +64,6 @@ const AdminDashboard = () => {
       description: autoRefresh ? "Les données ne seront plus actualisées automatiquement." : "Les données seront actualisées toutes les 5 minutes.",
     });
   };
-
-  // Afficher un état de chargement pendant la vérification
-  if (loading) {
-    return (
-      <AdminLayout title="Tableau de bord">
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eco-green mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement...</p>
-        </div>
-      </AdminLayout>
-    );
-  }
-
-  // Ne rien afficher pour les non-admins (ils seront redirigés)
-  if (!isAdmin) {
-    return null;
-  }
 
   if (error && !stats) {
     return (
