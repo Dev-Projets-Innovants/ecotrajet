@@ -18,6 +18,7 @@ const Community = () => {
     setSelectedCategory,
     isLoading,
     handlePostCreated,
+    refreshPosts,
   } = useCommunityData();
 
   console.log('Community page - Posts count:', posts.length, 'Categories count:', categories.length);
@@ -31,6 +32,11 @@ const Community = () => {
     console.log('Post created, closing dialog and refreshing');
     setIsCreateDialogOpen(false);
     handlePostCreated();
+  };
+
+  const handlePostsChange = () => {
+    console.log('Posts changed, refreshing data');
+    refreshPosts();
   };
 
   if (isLoading) {
@@ -64,6 +70,7 @@ const Community = () => {
           searchQuery={searchQuery}
           onCreatePost={handleCreate}
           categories={categories}
+          onPostsChange={handlePostsChange}
         />
 
         <CreatePostDialog

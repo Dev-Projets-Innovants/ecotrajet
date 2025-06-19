@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, MapPin, Tag, Clock, User, Flag, Edit } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Heart, MessageCircle, Share2, MapPin, Tag, Clock, User, Flag, Edit, Trash2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -9,21 +8,26 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ForumPost, ForumCategory } from '@/services/forum';
 import { usePostInteractions } from '@/hooks/usePostInteractions';
 import { useEditPost } from '@/hooks/useEditPost';
+import { useDeletePost } from '@/hooks/useDeletePost';
 import EditPostDialog from './EditPostDialog';
+import DeletePostDialog from './DeletePostDialog';
 
 interface ForumPostCardProps {
   post: ForumPost;
   showRealTimeUpdates?: boolean;
   categories?: ForumCategory[];
   onPostUpdated?: (updatedPost: ForumPost) => void;
+  onPostDeleted?: (postId: string) => void;
 }
 
 const ForumPostCard: React.FC<ForumPostCardProps> = ({ 
   post, 
   showRealTimeUpdates = false,
   categories = [],
-  onPostUpdated
+  onPostUpdated,
+  onPostDeleted
 }) => {
+  const navigate = useNavigate();
   const { 
     isLiked, 
     isChecking, 
@@ -34,15 +38,18 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   } = usePostInteractions(post.id, post.likes_count, post.comments_count);
 
   const { canEdit, checkEditPermission } = useEditPost();
+  const { canDelete, isDeleting, checkDeletePermission, deletePost } = useDeletePost();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState<ForumPost>(post);
 
-  console.log('ForumPostCard rendered for post:', post.id, 'canEdit:', canEdit);
+  console.log('ForumPostCard rendered for post:', post.id, 'canEdit:', canEdit, 'canDelete:', canDelete);
 
   useEffect(() => {
-    console.log('Checking edit permission for post:', post.id);
+    console.log('Checking permissions for post:', post.id);
     checkEditPermission(post.id);
-  }, [post.id, checkEditPermission]);
+    checkDeletePermission(post.id);
+  }, [post.id, checkEditPermission, checkDeletePermission]);
 
   useEffect(() => {
     setCurrentPost(post);
@@ -78,6 +85,24 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   const handleEditClick = () => {
     console.log('Edit button clicked for post:', post.id);
     setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = () => {
+    console.log('Delete button clicked for post:', post.id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const success = await deletePost(post.id);
+    if (success) {
+      setIsDeleteDialogOpen(false);
+      if (onPostDeleted) {
+        onPostDeleted(post.id);
+      } else {
+        // Si on est sur la page de détail du post, rediriger vers la communauté
+        navigate('/community');
+      }
+    }
   };
 
   const getPostStatus = () => {
@@ -142,18 +167,31 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
             </div>
           </div>
           
-          {/* Bouton d'édition */}
-          {canEdit && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleEditClick}
-              className="text-gray-400 hover:text-gray-600"
-              title="Modifier ce post"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-          )}
+          {/* Boutons d'édition et de suppression */}
+          <div className="flex space-x-1">
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEditClick}
+                className="text-gray-400 hover:text-gray-600"
+                title="Modifier ce post"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDeleteClick}
+                className="text-gray-400 hover:text-red-600"
+                title="Supprimer ce post"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
         
         {/* Statut du post */}
@@ -250,6 +288,18 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
           onPostUpdated={handlePostUpdated}
         />
       )}
+
+      {/* Dialog de suppression */}
+      <DeletePostDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          console.log('Closing delete dialog');
+          setIsDeleteDialogOpen(false);
+        }}
+        onConfirm={handleDeleteConfirm}
+        post={currentPost}
+        isDeleting={isDeleting}
+      />
     </Card>
   );
 };

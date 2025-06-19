@@ -605,9 +605,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_delete_post: {
+        Args: { post_uuid: string }
+        Returns: boolean
+      }
       clean_old_availability_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      delete_post_with_relations: {
+        Args: { post_uuid: string }
+        Returns: boolean
       }
       get_current_user_identifier: {
         Args: Record<PropertyKey, never>

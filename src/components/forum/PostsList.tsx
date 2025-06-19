@@ -10,13 +10,15 @@ interface PostsListProps {
   searchQuery: string;
   onCreatePost: () => void;
   categories?: ForumCategory[];
+  onPostsChange?: () => void;
 }
 
 const PostsList: React.FC<PostsListProps> = ({ 
   posts, 
   searchQuery, 
   onCreatePost,
-  categories = []
+  categories = [],
+  onPostsChange
 }) => {
   console.log('PostsList - Posts:', posts.length, 'Categories:', categories.length, 'Search:', searchQuery);
 
@@ -62,6 +64,17 @@ const PostsList: React.FC<PostsListProps> = ({
   const handlePostUpdated = (updatedPost: ForumPost) => {
     console.log('Post updated in PostsList:', updatedPost.id);
     // Les posts seront automatiquement mis à jour via le hook useCommunityData
+    if (onPostsChange) {
+      onPostsChange();
+    }
+  };
+
+  const handlePostDeleted = (postId: string) => {
+    console.log('Post deleted in PostsList:', postId);
+    // Rafraîchir la liste des posts
+    if (onPostsChange) {
+      onPostsChange();
+    }
   };
 
   return (
@@ -72,6 +85,7 @@ const PostsList: React.FC<PostsListProps> = ({
           post={post} 
           categories={categories}
           onPostUpdated={handlePostUpdated}
+          onPostDeleted={handlePostDeleted}
         />
       ))}
     </div>

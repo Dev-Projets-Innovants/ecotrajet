@@ -81,6 +81,10 @@ export const useCommunityData = () => {
     });
   };
 
+  const refreshPosts = () => {
+    fetchPosts();
+  };
+
   return {
     posts,
     categories,
@@ -88,5 +92,6 @@ export const useCommunityData = () => {
     setSelectedCategory,
     isLoading,
     handlePostCreated,
+    refreshPosts,
   };
 };

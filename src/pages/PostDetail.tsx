@@ -54,6 +54,12 @@ const PostDetail = () => {
     // Le post sera automatiquement mis à jour via useRealtimePost
   };
 
+  const handlePostDeleted = (postId: string) => {
+    console.log('Post deleted in PostDetail:', postId);
+    // Rediriger vers la page communauté
+    navigate('/community');
+  };
+
   return (
     <Layout title={post.title}>
       <div className="container mx-auto px-4 py-8">
@@ -76,6 +82,7 @@ const PostDetail = () => {
             showRealTimeUpdates={true}
             categories={categories}
             onPostUpdated={handlePostUpdated}
+            onPostDeleted={handlePostDeleted}
           />
           
           {/* Section des commentaires */}
