@@ -24,6 +24,8 @@ const EditPostDialog: React.FC<EditPostDialogProps> = ({
   categories,
   onPostUpdated
 }) => {
+  console.log('EditPostDialog rendered with post:', post.id, 'isOpen:', isOpen);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

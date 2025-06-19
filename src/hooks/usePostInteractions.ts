@@ -20,13 +20,24 @@ export const usePostInteractions = (postId: string, initialLikesCount = 0, initi
   const [commentsCount, setCommentsCount] = useState(Math.max(0, initialCommentsCount));
   const [isLiked, setIsLiked] = useState(false);
 
+  console.log('usePostInteractions - Post ID:', postId, 'Initial likes:', initialLikesCount, 'Initial comments:', initialCommentsCount);
+
   const likesHook = usePostLikes(postId, initialLikesCount);
   const commentsHook = usePostComments(initialCommentsCount);
 
   const realtimeCallbacks = useCallback(() => ({
-    onLikeStateChange: (liked: boolean) => setIsLiked(liked),
-    onLikesCountChange: (count: number) => setLikesCount(count),
-    onCommentsCountChange: (count: number) => setCommentsCount(count)
+    onLikeStateChange: (liked: boolean) => {
+      console.log('Like state changed:', liked);
+      setIsLiked(liked);
+    },
+    onLikesCountChange: (count: number) => {
+      console.log('Likes count changed:', count);
+      setLikesCount(Math.max(0, count));
+    },
+    onCommentsCountChange: (count: number) => {
+      console.log('Comments count changed:', count);
+      setCommentsCount(Math.max(0, count));
+    }
   }), []);
 
   usePostRealtimeUpdates(postId, realtimeCallbacks());

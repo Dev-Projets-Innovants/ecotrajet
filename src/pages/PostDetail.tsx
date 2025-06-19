@@ -8,11 +8,17 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ForumPostCard from '@/components/forum/ForumPostCard';
 import CommentSection from '@/components/forum/CommentSection';
 import { useRealtimePost } from '@/hooks/useRealtimePost';
+import { useCommunityData } from '@/hooks/useCommunityData';
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { post, isLoading } = useRealtimePost(id!);
+  const { post, isLoading: postLoading } = useRealtimePost(id!);
+  const { categories, isLoading: categoriesLoading } = useCommunityData();
+
+  console.log('PostDetail - Post ID:', id, 'Post:', post, 'Categories:', categories);
+
+  const isLoading = postLoading || categoriesLoading;
 
   if (isLoading) {
     return (
@@ -43,6 +49,11 @@ const PostDetail = () => {
     );
   }
 
+  const handlePostUpdated = (updatedPost: any) => {
+    console.log('Post updated in PostDetail:', updatedPost.id);
+    // Le post sera automatiquement mis à jour via useRealtimePost
+  };
+
   return (
     <Layout title={post.title}>
       <div className="container mx-auto px-4 py-8">
@@ -60,7 +71,12 @@ const PostDetail = () => {
 
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Post principal avec mises à jour temps réel */}
-          <ForumPostCard post={post} showRealTimeUpdates={true} />
+          <ForumPostCard 
+            post={post} 
+            showRealTimeUpdates={true}
+            categories={categories}
+            onPostUpdated={handlePostUpdated}
+          />
           
           {/* Section des commentaires */}
           <Card>

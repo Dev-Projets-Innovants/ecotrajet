@@ -35,10 +35,18 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
 
   const { canEdit, checkEditPermission } = useEditPost();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [currentPost, setCurrentPost] = useState<ForumPost>(post);
+
+  console.log('ForumPostCard rendered for post:', post.id, 'canEdit:', canEdit);
 
   useEffect(() => {
+    console.log('Checking edit permission for post:', post.id);
     checkEditPermission(post.id);
-  }, [post.id]);
+  }, [post.id, checkEditPermission]);
+
+  useEffect(() => {
+    setCurrentPost(post);
+  }, [post]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,7 +59,7 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   };
 
   const getUserDisplayName = () => {
-    return post.user_name || 'Utilisateur anonyme';
+    return currentPost.user_name || 'Utilisateur anonyme';
   };
 
   const getUserInitials = () => {
@@ -60,20 +68,27 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
   };
 
   const handlePostUpdated = (updatedPost: ForumPost) => {
+    console.log('Post updated in ForumPostCard:', updatedPost.id);
+    setCurrentPost(updatedPost);
     if (onPostUpdated) {
       onPostUpdated(updatedPost);
     }
   };
 
+  const handleEditClick = () => {
+    console.log('Edit button clicked for post:', post.id);
+    setIsEditDialogOpen(true);
+  };
+
   const getPostStatus = () => {
-    if (!post.is_approved && !post.is_reported) {
+    if (!currentPost.is_approved && !currentPost.is_reported) {
       return (
         <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
           En attente de modération
         </Badge>
       );
     }
-    if (post.is_reported) {
+    if (currentPost.is_reported) {
       return (
         <Badge variant="destructive" className="text-xs">
           Rejeté
@@ -99,28 +114,28 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
                 <span className="font-medium text-gray-900 truncate">
                   {getUserDisplayName()}
                 </span>
-                {post.forum_categories && (
+                {currentPost.forum_categories && (
                   <Badge 
                     variant="secondary" 
                     className="text-xs"
                     style={{ 
-                      backgroundColor: post.forum_categories.color + '20',
-                      color: post.forum_categories.color,
-                      borderColor: post.forum_categories.color + '40'
+                      backgroundColor: currentPost.forum_categories.color + '20',
+                      color: currentPost.forum_categories.color,
+                      borderColor: currentPost.forum_categories.color + '40'
                     }}
                   >
-                    {post.forum_categories.name}
+                    {currentPost.forum_categories.name}
                   </Badge>
                 )}
               </div>
               
               <div className="flex items-center text-gray-500 text-sm space-x-2">
                 <Clock className="h-3 w-3" />
-                <span>{formatDate(post.created_at)}</span>
-                {post.location && (
+                <span>{formatDate(currentPost.created_at)}</span>
+                {currentPost.location && (
                   <>
                     <MapPin className="h-3 w-3 ml-2" />
-                    <span className="truncate">{post.location}</span>
+                    <span className="truncate">{currentPost.location}</span>
                   </>
                 )}
               </div>
@@ -132,8 +147,9 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsEditDialogOpen(true)}
+              onClick={handleEditClick}
               className="text-gray-400 hover:text-gray-600"
+              title="Modifier ce post"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -151,21 +167,21 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
       <CardContent className="pt-0">
         <div className="space-y-4">
           <div>
-            <Link to={`/community/post/${post.id}`} className="block group">
+            <Link to={`/community/post/${currentPost.id}`} className="block group">
               <h3 className="text-lg font-semibold text-gray-900 group-hover:text-eco-green transition-colors mb-2">
-                {post.title}
+                {currentPost.title}
               </h3>
             </Link>
             
             <p className="text-gray-700 line-clamp-3 mb-3">
-              {post.content}
+              {currentPost.content}
             </p>
 
             {/* Image */}
-            {post.image_url && (
+            {currentPost.image_url && (
               <div className="mb-4">
                 <img
-                  src={post.image_url}
+                  src={currentPost.image_url}
                   alt="Image du post"
                   className="w-full h-64 object-cover rounded-lg border"
                 />
@@ -173,11 +189,11 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
             )}
 
             {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
+            {currentPost.tags && currentPost.tags.length > 0 && (
               <div className="flex items-center space-x-2 mb-3">
                 <Tag className="h-4 w-4 text-gray-400" />
                 <div className="flex flex-wrap gap-1">
-                  {post.tags.map((tag, index) => (
+                  {currentPost.tags.map((tag, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {tag}
                     </Badge>
@@ -201,7 +217,7 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
                 {likesCount}
               </Button>
               
-              <Link to={`/community/post/${post.id}`}>
+              <Link to={`/community/post/${currentPost.id}`}>
                 <Button variant="ghost" size="sm" className="text-gray-500 hover:bg-blue-50 hover:text-blue-600">
                   <MessageCircle className="h-4 w-4 mr-1" />
                   {commentsCount}
@@ -222,11 +238,14 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({
       </CardContent>
 
       {/* Dialog d'édition */}
-      {canEdit && (
+      {canEdit && categories.length > 0 && (
         <EditPostDialog
           isOpen={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
-          post={post}
+          onClose={() => {
+            console.log('Closing edit dialog');
+            setIsEditDialogOpen(false);
+          }}
+          post={currentPost}
           categories={categories}
           onPostUpdated={handlePostUpdated}
         />

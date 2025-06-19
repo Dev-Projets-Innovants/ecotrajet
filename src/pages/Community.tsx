@@ -20,11 +20,15 @@ const Community = () => {
     handlePostCreated,
   } = useCommunityData();
 
-  const handleCreatePost = () => {
+  console.log('Community page - Posts count:', posts.length, 'Categories count:', categories.length);
+
+  const handleCreate = () => {
+    console.log('Create post button clicked');
     setIsCreateDialogOpen(true);
   };
 
   const onPostCreated = () => {
+    console.log('Post created, closing dialog and refreshing');
     setIsCreateDialogOpen(false);
     handlePostCreated();
   };
@@ -52,13 +56,14 @@ const Community = () => {
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           categories={categories}
-          onCreatePost={handleCreatePost}
+          onCreatePost={handleCreate}
         />
 
         <PostsList
           posts={posts}
           searchQuery={searchQuery}
-          onCreatePost={handleCreatePost}
+          onCreatePost={handleCreate}
+          categories={categories}
         />
 
         <CreatePostDialog

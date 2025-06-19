@@ -10,7 +10,9 @@ export const useEditPost = () => {
 
   const checkEditPermission = async (postId: string) => {
     try {
+      console.log('Checking edit permission for post:', postId);
       const permission = await editPostService.canEditPost(postId);
+      console.log('Edit permission result:', permission);
       setCanEdit(permission);
       return permission;
     } catch (error) {
@@ -29,8 +31,11 @@ export const useEditPost = () => {
     image_url?: string;
   }): Promise<ForumPost | null> => {
     try {
+      console.log('Updating post:', postId, 'with updates:', updates);
       setIsEditing(true);
+      
       const updatedPost = await editPostService.updatePost(postId, updates);
+      console.log('Post updated successfully:', updatedPost);
       
       toast({
         title: "Post modifié",
@@ -42,7 +47,7 @@ export const useEditPost = () => {
       console.error('Error updating post:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de modifier le post",
+        description: error instanceof Error ? error.message : "Impossible de modifier le post",
         variant: "destructive",
       });
       return null;
