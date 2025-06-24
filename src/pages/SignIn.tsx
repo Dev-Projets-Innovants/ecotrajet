@@ -151,13 +151,6 @@ const SignIn = () => {
             S'inscrire
           </Link>
         </p>
-        
-        {/* Admin login hint - can be removed in production */}
-        <div className="mt-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-center">
-          <p className="font-medium text-gray-500 dark:text-gray-400">Pour accéder au panneau admin:</p>
-          <p className="text-gray-500 dark:text-gray-400">Email: {ADMIN_CREDENTIALS.email}</p>
-          <p className="text-gray-500 dark:text-gray-400">Mot de passe: {ADMIN_CREDENTIALS.password}</p>
-        </div>
       </AuthLayout>
 
       {/* Icône flottante pour les identifiants admin */}
