@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
@@ -120,7 +119,7 @@ RÉPONSE ATTENDUE (JSON uniquement, sans formatage markdown):
 }
 `;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -213,6 +212,17 @@ RÉPONSE ATTENDUE (JSON uniquement, sans formatage markdown):
 async function getPersonalizedGuide({ userId, section = 'premiers-pas' }) {
   console.log('Génération guide personnalisé pour utilisateur:', userId, 'section:', section);
 
+  if (!GEMINI_API_KEY) {
+    console.error('Clé API Gemini manquante');
+    return new Response(
+      JSON.stringify({ 
+        error: 'Configuration manquante',
+        guide: getDefaultGuide(section) 
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     // Récupérer le profil utilisateur
     const { data: profile } = await supabase
@@ -260,26 +270,43 @@ Génère un guide personnalisé et engageant pour la section "${section}" en ten
 RÉPONSE ATTENDUE (JSON uniquement, sans formatage markdown):
 {
   "guide": {
-    "title": "Titre personnalisé",
-    "introduction": "Introduction engageante",
+    "title": "Titre personnalisé pour ${userContext.profile.city}",
+    "introduction": "Introduction engageante et personnalisée",
     "steps": [
       {
         "id": 1,
-        "title": "Étape 1",
-        "content": "Contenu détaillé",
-        "tips": ["Conseil 1", "Conseil 2"],
-        "citySpecific": "Conseil spécifique à la ville"
+        "title": "Première étape adaptée",
+        "content": "Contenu détaillé et personnalisé",
+        "tips": ["Conseil pratique 1", "Conseil pratique 2"],
+        "citySpecific": "Conseil spécifique à ${userContext.profile.city}"
+      },
+      {
+        "id": 2,
+        "title": "Deuxième étape progressive",
+        "content": "Contenu qui s'appuie sur l'étape précédente",
+        "tips": ["Conseil avancé 1", "Conseil avancé 2"],
+        "citySpecific": "Information locale pour ${userContext.profile.city}"
+      },
+      {
+        "id": 3,
+        "title": "Étape d'approfondissement",
+        "content": "Contenu pour aller plus loin",
+        "tips": ["Conseil expert 1", "Conseil expert 2"],
+        "citySpecific": "Ressource locale spécifique"
       }
     ],
-    "nextSteps": "Suggestions pour la suite",
-    "personalizedMessage": "Message motivant personnalisé"
+    "nextSteps": "Suggestions personnalisées pour continuer le parcours",
+    "personalizedMessage": "Message motivant personnalisé pour cet utilisateur"
   }
 }
 
-Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus avancé sinon.
+Rends le guide vraiment personnalisé selon le profil de l'utilisateur.
 `;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+    console.log('Appel API Gemini avec clé:', GEMINI_API_KEY ? 'Présente' : 'Manquante');
+
+    // Utiliser la bonne URL de l'API Gemini Flash
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -290,50 +317,35 @@ Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus a
         }],
         generationConfig: {
           temperature: 0.7,
-          topK: 1,
-          topP: 1,
+          topK: 40,
+          topP: 0.95,
           maxOutputTokens: 2000,
         }
       }),
     });
 
+    console.log('Statut réponse Gemini:', response.status);
+
     if (!response.ok) {
-      throw new Error(`Erreur API Gemini: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`Erreur API Gemini ${response.status}:`, errorText);
+      throw new Error(`Erreur API Gemini: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Réponse Gemini guide brute:', JSON.stringify(data, null, 2));
+    console.log('Réponse Gemini reçue, candidates:', data.candidates?.length || 0);
     
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!content) {
-      console.error('Contenu manquant dans la réponse Gemini pour le guide');
-      // Retourner un guide par défaut si Gemini échoue
-      const defaultGuide = {
-        guide: {
-          title: "Guide ÉcoTrajet Personnalisé",
-          introduction: "Bienvenue dans votre parcours vers une mobilité plus durable !",
-          steps: [
-            {
-              id: 1,
-              title: "Découvrir les options",
-              content: "Explorez les différents modes de transport écologiques disponibles dans votre ville.",
-              tips: ["Commencez par de courtes distances", "Testez différents moyens de transport"],
-              citySpecific: `Découvrez les options spécifiques à ${userContext.profile.city}`
-            }
-          ],
-          nextSteps: "Continuez à explorer nos guides pour approfondir vos connaissances.",
-          personalizedMessage: "Votre voyage vers l'éco-mobilité commence maintenant !"
-        }
-      };
-      
+      console.error('Contenu manquant dans la réponse Gemini');
       return new Response(
-        JSON.stringify(defaultGuide),
+        JSON.stringify({ guide: getDefaultGuide(section) }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Contenu Gemini guide:', content);
+    console.log('Contenu Gemini reçu:', content.substring(0, 200) + '...');
 
     // Nettoyer le contenu et extraire le JSON
     let cleanContent = content.trim();
@@ -344,27 +356,9 @@ Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus a
     // Trouver le JSON dans la réponse
     const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('Aucun JSON trouvé dans la réponse guide:', cleanContent);
-      const defaultGuide = {
-        guide: {
-          title: "Guide ÉcoTrajet Personnalisé",
-          introduction: "Bienvenue dans votre parcours vers une mobilité plus durable !",
-          steps: [
-            {
-              id: 1,
-              title: "Découvrir les options",
-              content: "Explorez les différents modes de transport écologiques disponibles dans votre ville.",
-              tips: ["Commencez par de courtes distances", "Testez différents moyens de transport"],
-              citySpecific: `Découvrez les options spécifiques à ${userContext.profile.city}`
-            }
-          ],
-          nextSteps: "Continuez à explorer nos guides pour approfondir vos connaissances.",
-          personalizedMessage: "Votre voyage vers l'éco-mobilité commence maintenant !"
-        }
-      };
-      
+      console.error('Aucun JSON trouvé dans la réponse:', cleanContent.substring(0, 500));
       return new Response(
-        JSON.stringify(defaultGuide),
+        JSON.stringify({ guide: getDefaultGuide(section) }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -372,33 +366,16 @@ Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus a
     let guide;
     try {
       guide = JSON.parse(jsonMatch[0]);
+      console.log('Guide parsé avec succès:', guide.guide?.title || 'Titre manquant');
     } catch (parseError) {
-      console.error('Erreur parsing JSON guide:', parseError, 'Contenu:', jsonMatch[0]);
-      const defaultGuide = {
-        guide: {
-          title: "Guide ÉcoTrajet Personnalisé",
-          introduction: "Bienvenue dans votre parcours vers une mobilité plus durable !",
-          steps: [
-            {
-              id: 1,
-              title: "Découvrir les options",
-              content: "Explorez les différents modes de transport écologiques disponibles dans votre ville.",
-              tips: ["Commencez par de courtes distances", "Testez différents moyens de transport"],
-              citySpecific: `Découvrez les options spécifiques à ${userContext.profile.city}`
-            }
-          ],
-          nextSteps: "Continuez à explorer nos guides pour approfondir vos connaissances.",
-          personalizedMessage: "Votre voyage vers l'éco-mobilité commence maintenant !"
-        }
-      };
-      
+      console.error('Erreur parsing JSON:', parseError, 'Contenu:', jsonMatch[0].substring(0, 500));
       return new Response(
-        JSON.stringify(defaultGuide),
+        JSON.stringify({ guide: getDefaultGuide(section) }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    console.log('Guide personnalisé généré pour section:', section);
+    console.log('Guide personnalisé généré avec succès pour section:', section);
 
     return new Response(
       JSON.stringify(guide),
@@ -408,28 +385,34 @@ Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus a
   } catch (error) {
     console.error('Erreur génération guide:', error);
     
-    // Retourner un guide par défaut en cas d'erreur
-    const defaultGuide = {
-      guide: {
-        title: "Guide ÉcoTrajet Personnalisé",
-        introduction: "Bienvenue dans votre parcours vers une mobilité plus durable !",
-        steps: [
-          {
-            id: 1,
-            title: "Découvrir les options",
-            content: "Explorez les différents modes de transport écologiques disponibles dans votre ville.",
-            tips: ["Commencez par de courtes distances", "Testez différents moyens de transport"],
-            citySpecific: "Découvrez les options spécifiques à votre ville"
-          }
-        ],
-        nextSteps: "Continuez à explorer nos guides pour approfondir vos connaissances.",
-        personalizedMessage: "Votre voyage vers l'éco-mobilité commence maintenant !"
-      }
-    };
-    
     return new Response(
-      JSON.stringify(defaultGuide),
+      JSON.stringify({ guide: getDefaultGuide(section) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
+}
+
+function getDefaultGuide(section: string) {
+  return {
+    title: "Guide ÉcoTrajet - Premiers pas",
+    introduction: "Nous rencontrons actuellement des difficultés techniques avec la personnalisation. Voici un guide général pour commencer :",
+    steps: [
+      {
+        id: 1,
+        title: "Évaluez vos trajets actuels",
+        content: "Analysez vos déplacements quotidiens pour identifier les opportunités d'amélioration écologique.",
+        tips: ["Notez vos trajets récurrents", "Calculez les distances parcourues"],
+        citySpecific: "Explorez les options de transport disponibles dans votre ville"
+      },
+      {
+        id: 2,
+        title: "Découvrez les alternatives",
+        content: "Explorez les différents modes de transport écologiques disponibles.",
+        tips: ["Testez le vélo pour les courtes distances", "Utilisez les transports en commun"],
+        citySpecific: "Renseignez-vous sur les infrastructures locales"
+      }
+    ],
+    nextSteps: "Une fois les problèmes techniques résolus, vous pourrez accéder à un guide entièrement personnalisé.",
+    personalizedMessage: "Votre engagement pour l'éco-mobilité fait la différence !"
+  };
 }
