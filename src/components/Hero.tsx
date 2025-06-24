@@ -1,31 +1,27 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-
 const Hero = () => {
-  const { user, isAdmin } = useAuth();
-
-  return (
-    <section className="relative min-h-screen flex items-center pt-16 pb-20 overflow-hidden">
+  const {
+    user,
+    isAdmin
+  } = useAuth();
+  return <section className="relative min-h-screen flex items-center pt-16 pb-20 overflow-hidden">
       {/* Brighter background image with bicycles in Paris */}
       <div className="absolute inset-0 z-0 w-full h-full">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: 'url("https://www.apur.org/sites/default/files/images/publication/a-la-une/mobilites_emergentes_935_550.jpg")',
-            backgroundPosition: 'center'
-          }}
-        ></div>
+        <div className="absolute inset-0 bg-cover bg-center" style={{
+        backgroundImage: 'url("https://www.apur.org/sites/default/files/images/publication/a-la-une/mobilites_emergentes_935_550.jpg")',
+        backgroundPosition: 'center'
+      }}></div>
         <div className="absolute inset-0 bg-black/40"></div> {/* Dark overlay for better text readability */}
       </div>
       
       <div className="container max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <div className="mb-4">
-            <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-eco-green/80 text-white border border-eco-green/40 backdrop-blur-sm shadow-lg">
+            <span className="inline-block py-1 rounded-full text-sm font-medium bg-eco-green/80 text-white border border-eco-green/40 backdrop-blur-sm shadow-lg px-[11px]">
               Mobilité durable
             </span>
           </div>
@@ -46,12 +42,9 @@ const Hero = () => {
           
           <div className="flex justify-center items-center">
             <div className="w-full sm:w-auto">
-              <Button 
-                className="group rounded-full px-4 py-5 h-12 w-full sm:w-auto bg-eco-green hover:bg-eco-dark-green text-white shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm"
-                asChild
-              >
-                <Link to={user ? (isAdmin ? "/admin/dashboard" : "/dashboard") : "/signup"}>
-                  <span>{user ? (isAdmin ? "Accéder au tableau de bord admin" : "Accéder au tableau de bord") : "Commencer maintenant"}</span>
+              <Button className="group rounded-full px-4 py-5 h-12 w-full sm:w-auto bg-eco-green hover:bg-eco-dark-green text-white shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm" asChild>
+                <Link to={user ? isAdmin ? "/admin/dashboard" : "/dashboard" : "/signup"}>
+                  <span>{user ? isAdmin ? "Accéder au tableau de bord admin" : "Accéder au tableau de bord" : "Commencer maintenant"}</span>
                   <span className="ml-2">
                     <ArrowRight size={18} />
                   </span>
@@ -61,8 +54,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
