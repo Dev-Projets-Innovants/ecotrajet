@@ -17,7 +17,7 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import PersonalizedGuideSection from "@/components/guide/PersonalizedGuideSection";
+import PersonalizeGuideButton from "@/components/guide/PersonalizeGuideButton";
 
 const Guide = () => {
   const [activeTab, setActiveTab] = useState("premiers-pas");
@@ -89,9 +89,14 @@ const Guide = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Guide de l'Éco-Mobilité
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-lg mb-6">
             Tout ce que vous devez savoir pour adopter une mobilité respectueuse de l'environnement
           </p>
+          
+          {/* Bouton de personnalisation */}
+          <div className="mb-6">
+            <PersonalizeGuideButton />
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -103,9 +108,6 @@ const Guide = () => {
           </TabsList>
 
           <TabsContent value="premiers-pas" className="space-y-6">
-            <PersonalizedGuideSection section="premiers-pas" />
-            
-            {/* Guide statique de fallback */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
