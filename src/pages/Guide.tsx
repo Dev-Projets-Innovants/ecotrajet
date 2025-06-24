@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import PersonalizeGuideButton from "@/components/guide/PersonalizeGuideButton";
+import PersonalizedGuideSection from "@/components/guide/PersonalizedGuideSection";
 
 const Guide = () => {
   const [activeTab, setActiveTab] = useState("premiers-pas");
@@ -108,6 +108,9 @@ const Guide = () => {
           </TabsList>
 
           <TabsContent value="premiers-pas" className="space-y-6">
+            {/* Section du guide personnalisé */}
+            <PersonalizedGuideSection section="premiers-pas" />
+            
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
