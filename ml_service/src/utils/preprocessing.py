@@ -1,33 +1,43 @@
 
 """
-Préprocessing des données pour les modèles ML
+Module de préprocessing des données pour les modèles ML
 """
 
 import pandas as pd
 import numpy as np
-from typing import Tuple, List, Dict
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from datetime import datetime
+from typing import Tuple, Optional
+from sklearn.preprocessing import StandardScaler
+import math
+
+def calculate_distance_haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    Calculer la distance entre deux points GPS en utilisant la formule de Haversine
+    """
+    R = 6371  # Rayon de la Terre en km
+    
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    
+    a = (math.sin(delta_lat / 2) ** 2 + 
+         math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon / 2) ** 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    return R * c
 
 def preprocess_velib_data(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Préprocessing pour les données Vélib' (LSTM)
-    
-    Args:
-        df: DataFrame avec colonnes timestamp, stationcode, numbikesavailable, etc.
-    
-    Returns:
-        X: Features preprocessées
-        y: Target (disponibilité des vélos)
+    Préprocesser les données Vélib' pour l'entraînement LSTM
     """
     if df.empty:
         return np.array([]), np.array([])
     
-    # Création des features temporelles
+    # Créer des features temporelles
+    df = df.copy()
     df['hour'] = df['timestamp'].dt.hour
     df['day_of_week'] = df['timestamp'].dt.dayofweek
     df['month'] = df['timestamp'].dt.month
-    df['is_weekend'] = (df['day_of_week'] >= 5).astype(int)
     
     # Features cycliques pour capturer la périodicité
     df['hour_sin'] = np.sin(2 * np.pi * df['hour'] / 24)
@@ -35,153 +45,77 @@ def preprocess_velib_data(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     df['dow_sin'] = np.sin(2 * np.pi * df['day_of_week'] / 7)
     df['dow_cos'] = np.cos(2 * np.pi * df['day_of_week'] / 7)
     
-    # Calcul du taux d'occupation
-    df['occupation_rate'] = df['numbikesavailable'] / (df['numbikesavailable'] + df['numdocksavailable'])
-    df['occupation_rate'] = df['occupation_rate'].fillna(0)
-    
-    # Features pour les différents types de vélos
-    df['ebike_ratio'] = df['ebike'] / df['numbikesavailable'].replace(0, 1)
-    df['mechanical_ratio'] = df['mechanical'] / df['numbikesavailable'].replace(0, 1)
-    
-    # Sélection des features
+    # Sélectionner les features
     feature_columns = [
         'hour_sin', 'hour_cos', 'dow_sin', 'dow_cos',
-        'month', 'is_weekend', 'occupation_rate',
-        'ebike_ratio', 'mechanical_ratio',
-        'capacity'
+        'mechanical', 'ebike', 'numdocksavailable'
     ]
     
-    # Gestion des valeurs manquantes
-    for col in feature_columns:
-        if col in df.columns:
-            df[col] = df[col].fillna(df[col].median())
+    # Vérifier que toutes les colonnes existent
+    available_columns = [col for col in feature_columns if col in df.columns]
+    if not available_columns:
+        return np.array([]), np.array([])
     
-    X = df[feature_columns].values
-    y = df['numbikesavailable'].values
+    X = df[available_columns].fillna(0).values
+    y = df['numbikesavailable'].fillna(0).values
     
     return X, y
 
 def create_lstm_sequences(X: np.ndarray, y: np.ndarray, sequence_length: int = 24) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Création de séquences temporelles pour LSTM
-    
-    Args:
-        X: Features
-        y: Target
-        sequence_length: Longueur des séquences (24h par défaut)
-    
-    Returns:
-        X_seq: Séquences de features
-        y_seq: Targets correspondants
+    Créer des séquences pour l'entraînement LSTM
     """
     if len(X) < sequence_length:
         return np.array([]), np.array([])
     
     X_seq, y_seq = [], []
     
-    for i in range(sequence_length, len(X)):
-        X_seq.append(X[i-sequence_length:i])
-        y_seq.append(y[i])
+    for i in range(len(X) - sequence_length):
+        X_seq.append(X[i:(i + sequence_length)])
+        y_seq.append(y[i + sequence_length])
     
     return np.array(X_seq), np.array(y_seq)
 
 def preprocess_trends_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Préprocessing pour l'analyse des tendances (Prophet)
-    
-    Args:
-        df: DataFrame avec timestamp et métriques d'occupation
-    
-    Returns:
-        DataFrame formaté pour Prophet (ds, y)
+    Préprocesser les données pour Prophet (analyse des tendances)
     """
     if df.empty:
         return pd.DataFrame()
     
     # Agrégation quotidienne
-    daily_stats = df.groupby(df['timestamp'].dt.date).agg({
+    daily_data = df.groupby(df['timestamp'].dt.date).agg({
         'numbikesavailable': 'mean',
-        'numdocksavailable': 'mean',
-        'capacity': 'first'
+        'numdocksavailable': 'mean'
     }).reset_index()
     
-    # Calcul du taux d'occupation moyen par jour
-    daily_stats['occupation_rate'] = (
-        daily_stats['numbikesavailable'] / 
-        (daily_stats['numbikesavailable'] + daily_stats['numdocksavailable'])
+    # Calculer le taux d'occupation
+    daily_data['occupation_rate'] = (
+        daily_data['numbikesavailable'] / 
+        (daily_data['numbikesavailable'] + daily_data['numdocksavailable'])
     )
     
-    # Format Prophet
-    prophet_df = pd.DataFrame({
-        'ds': pd.to_datetime(daily_stats['timestamp']),
-        'y': daily_stats['occupation_rate']
+    # Format Prophet (ds = date, y = valeur à prédire)
+    prophet_data = pd.DataFrame({
+        'ds': pd.to_datetime(daily_data['timestamp']),
+        'y': daily_data['occupation_rate'].fillna(0.5)
     })
     
-    return prophet_df
+    return prophet_data
 
-def preprocess_carbon_data(transport_modes: List[Dict]) -> Dict:
+def preprocess_carbon_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Préprocessing pour les calculs d'empreinte carbone
-    
-    Args:
-        transport_modes: Liste des modes de transport avec facteurs CO2
-    
-    Returns:
-        Dictionnaire avec facteurs CO2 indexés par mode
+    Préprocesser les données pour les calculs carbone
     """
-    co2_factors = {}
+    if df.empty:
+        return pd.DataFrame()
     
-    for mode in transport_modes:
-        mode_name = mode.get('name', '').lower()
-        co2_factor = float(mode.get('co2_factor_per_km', 0))
-        
-        # Mapping des noms de modes
-        if 'velo' in mode_name or 'bike' in mode_name:
-            co2_factors['bike'] = co2_factor
-        elif 'metro' in mode_name or 'subway' in mode_name:
-            co2_factors['metro'] = co2_factor
-        elif 'bus' in mode_name:
-            co2_factors['bus'] = co2_factor
-        elif 'voiture' in mode_name or 'car' in mode_name:
-            co2_factors['car'] = co2_factor
-        elif 'marche' in mode_name or 'walk' in mode_name:
-            co2_factors['walk'] = co2_factor
-        
-        # Ajouter aussi le nom exact
-        co2_factors[mode_name] = co2_factor
+    # Nettoyer les données
+    df = df.copy()
+    df = df.dropna(subset=['distance_km', 'co2_saved_kg'])
     
-    # Valeurs par défaut si pas trouvées
-    default_factors = {
-        'walk': 0.0,
-        'bike': 0.0,
-        'metro': 0.05,
-        'bus': 0.08,
-        'car': 0.195,
-        'ebike': 0.01
-    }
+    # Supprimer les valeurs aberrantes
+    df = df[df['distance_km'] > 0]
+    df = df[df['distance_km'] < 100]  # Trajets < 100km
     
-    for mode, factor in default_factors.items():
-        if mode not in co2_factors:
-            co2_factors[mode] = factor
-    
-    return co2_factors
-
-def calculate_distance_haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """
-    Calcule la distance haversine entre deux points géographiques
-    
-    Returns:
-        Distance en kilomètres
-    """
-    R = 6371  # Rayon de la Terre en km
-    
-    dlat = np.radians(lat2 - lat1)
-    dlon = np.radians(lon2 - lon1)
-    
-    a = (np.sin(dlat/2)**2 + 
-         np.cos(np.radians(lat1)) * np.cos(np.radians(lat2)) * np.sin(dlon/2)**2)
-    
-    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
-    distance = R * c
-    
-    return distance
+    return df

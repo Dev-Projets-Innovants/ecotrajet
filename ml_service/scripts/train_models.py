@@ -28,7 +28,12 @@ except ImportError as e:
 
 # Imports locaux
 import sys
-sys.path.append('../')
+from pathlib import Path
+
+# Ajouter le répertoire racine au path
+root_dir = Path(__file__).parent.parent
+sys.path.append(str(root_dir))
+
 from src.utils.data_loader import data_loader, load_historical_velib_data
 from src.utils.preprocessing import (
     preprocess_velib_data, 
@@ -37,7 +42,7 @@ from src.utils.preprocessing import (
 )
 
 # Configuration
-MODELS_DIR = Path("../models")
+MODELS_DIR = root_dir / "models"
 MODELS_DIR.mkdir(exist_ok=True)
 
 class ModelTrainer:
