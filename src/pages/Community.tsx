@@ -5,7 +5,6 @@ import CommunityHeader from '@/components/forum/CommunityHeader';
 import CommunityControls from '@/components/forum/CommunityControls';
 import PostsList from '@/components/forum/PostsList';
 import CreatePostDialog from '@/components/forum/CreatePostDialog';
-import RecommendedPosts from '@/components/forum/RecommendedPosts';
 import { useCommunityData } from '@/hooks/useCommunityData';
 
 const Community = () => {
@@ -56,9 +55,6 @@ const Community = () => {
     <Layout title="Communauté ÉcoTrajet">
       <div className="container mx-auto px-4 py-8">
         <CommunityHeader />
-        
-        {/* Section des recommandations IA */}
-        <RecommendedPosts />
         
         <CommunityControls
           searchQuery={searchQuery}

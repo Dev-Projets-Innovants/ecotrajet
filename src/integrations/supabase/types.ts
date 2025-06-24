@@ -53,39 +53,6 @@ export type Database = {
           },
         ]
       }
-      challenges: {
-        Row: {
-          challenge_type: string
-          created_at: string | null
-          description: string
-          id: string
-          is_active: boolean | null
-          reward_points: number | null
-          target_value: number
-          title: string
-        }
-        Insert: {
-          challenge_type: string
-          created_at?: string | null
-          description: string
-          id?: string
-          is_active?: boolean | null
-          reward_points?: number | null
-          target_value: number
-          title: string
-        }
-        Update: {
-          challenge_type?: string
-          created_at?: string | null
-          description?: string
-          id?: string
-          is_active?: boolean | null
-          reward_points?: number | null
-          target_value?: number
-          title?: string
-        }
-        Relationships: []
-      }
       forum_categories: {
         Row: {
           color: string | null
@@ -422,33 +389,6 @@ export type Database = {
         }
         Relationships: []
       }
-      transport_modes: {
-        Row: {
-          calories_per_km: number | null
-          co2_factor_per_km: number
-          created_at: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-        }
-        Insert: {
-          calories_per_km?: number | null
-          co2_factor_per_km: number
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-        }
-        Update: {
-          calories_per_km?: number | null
-          co2_factor_per_km?: number
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-        }
-        Relationships: []
-      }
       user_alerts: {
         Row: {
           alert_type: string
@@ -496,74 +436,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "velib_stations"
             referencedColumns: ["stationcode"]
-          },
-        ]
-      }
-      user_badges: {
-        Row: {
-          badge_description: string
-          badge_icon: string
-          badge_title: string
-          created_at: string | null
-          earned_date: string | null
-          id: string
-          user_id: string
-        }
-        Insert: {
-          badge_description: string
-          badge_icon: string
-          badge_title: string
-          created_at?: string | null
-          earned_date?: string | null
-          id?: string
-          user_id: string
-        }
-        Update: {
-          badge_description?: string
-          badge_icon?: string
-          badge_title?: string
-          created_at?: string | null
-          earned_date?: string | null
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_challenges: {
-        Row: {
-          challenge_id: string
-          completed_at: string | null
-          created_at: string | null
-          current_value: number | null
-          id: string
-          is_completed: boolean | null
-          user_id: string
-        }
-        Insert: {
-          challenge_id: string
-          completed_at?: string | null
-          created_at?: string | null
-          current_value?: number | null
-          id?: string
-          is_completed?: boolean | null
-          user_id: string
-        }
-        Update: {
-          challenge_id?: string
-          completed_at?: string | null
-          created_at?: string | null
-          current_value?: number | null
-          id?: string
-          is_completed?: boolean | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_challenges_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "challenges"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -636,89 +508,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "velib_stations"
             referencedColumns: ["stationcode"]
-          },
-        ]
-      }
-      user_statistics: {
-        Row: {
-          created_at: string | null
-          id: string
-          last_updated: string | null
-          total_calories_burned: number | null
-          total_co2_saved_kg: number | null
-          total_distance_km: number | null
-          total_trips: number | null
-          trees_equivalent: number | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          last_updated?: string | null
-          total_calories_burned?: number | null
-          total_co2_saved_kg?: number | null
-          total_distance_km?: number | null
-          total_trips?: number | null
-          trees_equivalent?: number | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          last_updated?: string | null
-          total_calories_burned?: number | null
-          total_co2_saved_kg?: number | null
-          total_distance_km?: number | null
-          total_trips?: number | null
-          trees_equivalent?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_trips: {
-        Row: {
-          calories_burned: number | null
-          co2_saved_kg: number | null
-          created_at: string | null
-          destination: string
-          distance_km: number
-          id: string
-          origin: string
-          transport_mode_id: string
-          trip_date: string
-          user_id: string
-        }
-        Insert: {
-          calories_burned?: number | null
-          co2_saved_kg?: number | null
-          created_at?: string | null
-          destination: string
-          distance_km: number
-          id?: string
-          origin: string
-          transport_mode_id: string
-          trip_date?: string
-          user_id: string
-        }
-        Update: {
-          calories_burned?: number | null
-          co2_saved_kg?: number | null
-          created_at?: string | null
-          destination?: string
-          distance_km?: number
-          id?: string
-          origin?: string
-          transport_mode_id?: string
-          trip_date?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_trips_transport_mode_id_fkey"
-            columns: ["transport_mode_id"]
-            isOneToOne: false
-            referencedRelation: "transport_modes"
-            referencedColumns: ["id"]
           },
         ]
       }
