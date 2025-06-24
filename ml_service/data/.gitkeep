@@ -1,0 +1,7 @@
+
+# Ce dossier contient les données temporaires et le cache
+# 
+# Structure:
+# - raw/     : Données brutes téléchargées
+# - processed/: Données préprocessées 
+# - cache/   : Cache des requêtes API

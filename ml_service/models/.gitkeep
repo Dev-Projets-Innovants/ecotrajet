@@ -1,0 +1,11 @@
+
+# Ce dossier contient les modèles ML entraînés
+#
+# Fichiers générés:
+# - velib_lstm_model.h5      : Modèle LSTM Vélib'
+# - velib_scaler_x.pkl       : Scaler features LSTM
+# - velib_scaler_y.pkl       : Scaler targets LSTM
+# - trends_prophet_model.pkl : Modèle Prophet tendances
+# - carbon_rf_model.pkl      : Modèle Random Forest carbone
+# - training_report_*.json   : Rapports d'entraînement
+# - evaluation_report_*.json : Rapports d'évaluation
