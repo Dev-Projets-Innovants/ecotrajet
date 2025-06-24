@@ -1,0 +1,291 @@
+
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+);
+
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { action, ...params } = await req.json();
+    
+    switch (action) {
+      case 'forum-recommendations':
+        return await getForumRecommendations(params);
+      case 'personalized-guide':
+        return await getPersonalizedGuide(params);
+      default:
+        throw new Error('Action non supportée');
+    }
+  } catch (error) {
+    console.error('Erreur Gemini Recommendations:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
+
+async function getForumRecommendations({ userId, limit = 5 }) {
+  console.log('Génération de recommandations forum pour utilisateur:', userId);
+
+  // Récupérer le profil utilisateur
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  // Récupérer les posts existants avec leurs catégories
+  const { data: posts } = await supabase
+    .from('forum_posts')
+    .select(`
+      id, title, content, tags, location, created_at,
+      forum_categories (name, color)
+    `)
+    .eq('is_approved', true)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  // Récupérer l'historique des interactions utilisateur
+  const { data: likedPosts } = await supabase
+    .from('forum_post_likes')
+    .select('post_id')
+    .eq('user_id', userId);
+
+  const likedPostIds = likedPosts?.map(like => like.post_id) || [];
+
+  // Préparer le prompt pour Gemini
+  const userContext = {
+    profile: profile ? {
+      city: profile.city || 'Paris',
+      bio: profile.bio || '',
+      interests: profile.preferences || {}
+    } : { city: 'Paris', bio: '', interests: {} },
+    likedPosts: likedPostIds.length
+  };
+
+  const postsContext = posts?.map(post => ({
+    id: post.id,
+    title: post.title,
+    content: post.content.substring(0, 200),
+    category: post.forum_categories?.name || 'Général',
+    tags: post.tags || [],
+    location: post.location || '',
+    isLiked: likedPostIds.includes(post.id)
+  }));
+
+  const prompt = `
+Tu es un système de recommandation intelligent pour une plateforme d'éco-mobilité.
+
+PROFIL UTILISATEUR:
+- Ville: ${userContext.profile.city}
+- Bio: ${userContext.profile.bio}
+- Posts likés: ${userContext.likedPosts}
+
+POSTS DISPONIBLES:
+${JSON.stringify(postsContext, null, 2)}
+
+MISSION:
+Recommande ${limit} posts les plus pertinents pour cet utilisateur en fonction de:
+1. Sa localisation géographique
+2. Ses intérêts (déduits de sa bio et historique)
+3. La diversité des catégories
+4. La fraîcheur du contenu
+
+RÉPONSE ATTENDUE (JSON uniquement):
+{
+  "recommendations": [
+    {
+      "postId": "uuid",
+      "score": 0.95,
+      "reason": "Raison spécifique de la recommandation"
+    }
+  ]
+}
+`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 1000,
+        }
+      }),
+    });
+
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!content) {
+      throw new Error('Réponse Gemini invalide');
+    }
+
+    // Parser la réponse JSON de Gemini
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Format de réponse Gemini invalide');
+    }
+
+    const recommendations = JSON.parse(jsonMatch[0]);
+    
+    // Enrichir avec les données complètes des posts
+    const enrichedRecommendations = recommendations.recommendations.map(rec => {
+      const post = posts?.find(p => p.id === rec.postId);
+      return {
+        ...rec,
+        post: post || null
+      };
+    }).filter(rec => rec.post);
+
+    console.log('Recommandations générées:', enrichedRecommendations.length);
+
+    return new Response(
+      JSON.stringify({ recommendations: enrichedRecommendations }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Erreur API Gemini:', error);
+    throw error;
+  }
+}
+
+async function getPersonalizedGuide({ userId, section = 'premiers-pas' }) {
+  console.log('Génération guide personnalisé pour utilisateur:', userId, 'section:', section);
+
+  // Récupérer le profil utilisateur
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  // Récupérer quelques statistiques utilisateur si disponibles
+  const { data: stats } = await supabase
+    .from('user_statistics')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  // Préparer le contexte utilisateur
+  const userContext = {
+    profile: profile ? {
+      city: profile.city || 'Paris',
+      bio: profile.bio || '',
+      createdAt: profile.created_at
+    } : { city: 'Paris', bio: '', createdAt: new Date().toISOString() },
+    stats: stats || {},
+    isNewUser: !stats || Object.keys(stats).length === 0
+  };
+
+  const prompt = `
+Tu es un guide personnalisé pour ÉcoTrajet, une plateforme d'éco-mobilité.
+
+PROFIL UTILISATEUR:
+- Ville: ${userContext.profile.city}
+- Bio: ${userContext.profile.bio}
+- Nouveau utilisateur: ${userContext.isNewUser ? 'Oui' : 'Non'}
+- Membre depuis: ${userContext.profile.createdAt}
+
+SECTION DEMANDÉE: ${section}
+
+MISSION:
+Génère un guide personnalisé et engageant pour la section "${section}" en tenant compte:
+1. Du niveau d'expérience de l'utilisateur
+2. De sa localisation (conseils spéficiques à sa ville)
+3. De son profil et centres d'intérêt
+4. Des meilleures pratiques d'éco-mobilité
+
+RÉPONSE ATTENDUE (JSON uniquement):
+{
+  "guide": {
+    "title": "Titre personnalisé",
+    "introduction": "Introduction engageante",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Étape 1",
+        "content": "Contenu détaillé",
+        "tips": ["Conseil 1", "Conseil 2"],
+        "citySpecific": "Conseil spécifique à la ville"
+      }
+    ],
+    "nextSteps": "Suggestions pour la suite",
+    "personalizedMessage": "Message motivant personnalisé"
+  }
+}
+
+Adapte le contenu au niveau débutant si c'est un nouveau utilisateur, ou plus avancé sinon.
+`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 2000,
+        }
+      }),
+    });
+
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!content) {
+      throw new Error('Réponse Gemini invalide');
+    }
+
+    // Parser la réponse JSON de Gemini
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Format de réponse Gemini invalide');
+    }
+
+    const guide = JSON.parse(jsonMatch[0]);
+    
+    console.log('Guide personnalisé généré pour section:', section);
+
+    return new Response(
+      JSON.stringify(guide),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Erreur génération guide:', error);
+    throw error;
+  }
+}
