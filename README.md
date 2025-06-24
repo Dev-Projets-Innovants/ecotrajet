@@ -1,3 +1,4 @@
+
 <div align="center">
   <img src="public/logo.svg" alt="ÉcoTrajet Logo" width="120" height="120">
   
@@ -22,6 +23,7 @@
 - [🚀 Démarrage Rapide](#-démarrage-rapide)
 - [🛠️ Technologies Utilisées](#️-technologies-utilisées)
 - [⚙️ Options d'Installation](#️-options-dinstallation)
+- [🤖 Service ML](#-service-ml)
 - [📊 Architecture de l'Application](#-architecture-de-lapplication)
 - [🧪 Tests et Qualité](#-tests-et-qualité)
 - [📚 Documentation Technique](#-documentation-technique)
@@ -59,6 +61,11 @@
 - **Gestion de contenu** pour guides et ressources
 - **Système d'alertes** automatisées
 - **Analytics avancés** avec visualisations
+
+### 🤖 Intelligence Artificielle
+- **Prédictions Vélib'** - Modèle LSTM pour prédire la disponibilité
+- **Analyse des tendances** - Prophet pour l'évolution sur 7 jours
+- **Calcul carbone optimisé** - Random Forest pour les recommandations
 
 ---
 
@@ -121,30 +128,27 @@ docker-compose up --build
 
 ---
 
-### 📋 Autres Options d'Installation
-- **[Installation locale](##️-options-dinstallation)** (développeurs avancés)
-- **GitHub Codespaces** (développement cloud recommandée pour les membres de l'équipe)
-
----
-
 ## 🛠️ Technologies Utilisées
 
 ### Frontend
-- ** Vite** - Build tool ultra-rapide
-- ** TypeScript** - JavaScript typé et sécurisé
-- ** React** - Interface utilisateur moderne
-- ** Tailwind CSS** - Framework CSS utilitaire
-- ** shadcn/ui** - Composants réutilisables
+- **Vite** - Build tool ultra-rapide
+- **TypeScript** - JavaScript typé et sécurisé
+- **React** - Interface utilisateur moderne
+- **Tailwind CSS** - Framework CSS utilitaire
+- **shadcn/ui** - Composants réutilisables
 
 ### Backend & Infrastructure
-- ** Supabase** - Base de données et authentification
-- ** Leaflet** - Cartes interactives
-- ** React Query** - Gestion d'état et cache
-- ** Docker** - Containerisation
-- ** Vitest** - Tests unitaires
+- **Supabase** - Base de données et authentification
+- **Leaflet** - Cartes interactives
+- **React Query** - Gestion d'état et cache
+- **Docker** - Containerisation
+- **Vitest** - Tests unitaires
 
-### Architecture
-- **Draw.io** - Pour désigner l'architecture
+### Machine Learning
+- **FastAPI** - API REST pour les prédictions ML
+- **TensorFlow** - Modèles LSTM pour prédictions Vélib'
+- **Prophet** - Analyse des tendances temporelles
+- **Scikit-learn** - Modèles de classification et régression
 
 ---
 
@@ -177,20 +181,65 @@ npm run dev
 
 ---
 
+## 🤖 Service ML
+
+Le service de Machine Learning fournit des prédictions avancées pour optimiser l'expérience utilisateur.
+
+### 🚀 Démarrage du Service ML
+
+```bash
+# Navigation vers le service ML
+cd ml_service
+
+# Configuration (OBLIGATOIRE)
+cp .env.example .env
+# Éditer .env avec vos credentials Supabase
+
+# Installation des dépendances
+pip install -r requirements.txt
+
+# Entraînement des modèles (PREMIÈRE FOIS - OBLIGATOIRE)
+python scripts/train_models.py
+
+# Lancement de l'API
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### 🧠 Modèles Disponibles
+
+1. **LSTM Vélib'** - Prédiction de disponibilité des vélos (24h)
+2. **Prophet Tendances** - Analyse des tendances sur 7 jours
+3. **Random Forest Carbone** - Calculs d'empreinte carbone optimisés
+
+### 📊 Endpoints API
+
+- **Health** : `GET /health`
+- **Prédictions Vélib'** : `POST /api/v1/predict/velib-availability`
+- **Tendances** : `POST /api/v1/analyze/trends`
+- **Carbone** : `POST /api/v1/calculate/carbon-footprint`
+
+> **⚠️ Important :** L'entraînement des modèles est **OBLIGATOIRE** avant le premier lancement de l'API !
+
+---
+
 ## 📊 Architecture de l'Application
 
 ```
-src/
-├── 📄 pages/              # Pages de l'application
-├── 🧩 components/         # Composants réutilisables
-│   ├── admin/            # Interface d'administration
-│   ├── velib/            # Gestion des stations Vélib'
-│   └── ui/               # Composants de base (shadcn/ui)
-├── 🎣 hooks/             # Hooks personnalisés React
-├── 🔧 services/          # Services API et logique métier
-├── 📚 lib/               # Utilitaires et configurations
-├── 🧪 tests/             # Tests unitaires
-└── 📖 docs/              # Documentation technique
+├── src/                   # Application principale React
+│   ├── pages/            # Pages de l'application
+│   ├── components/       # Composants réutilisables
+│   ├── hooks/           # Hooks personnalisés React
+│   ├── services/        # Services API et logique métier
+│   └── lib/             # Utilitaires et configurations
+├── ml_service/           # Service Machine Learning
+│   ├── api/             # API FastAPI
+│   ├── src/             # Code source ML
+│   ├── scripts/         # Scripts d'entraînement
+│   ├── models/          # Modèles ML sauvegardés
+│   └── notebooks/       # Jupyter notebooks
+└── supabase/            # Configuration base de données
+    ├── migrations/      # Migrations SQL
+    └── functions/       # Edge functions
 ```
 
 ---
@@ -223,6 +272,7 @@ npm run type-check     # Vérification TypeScript
 
 ### 📋 Guides Complets
 - 🐳 **[Configuration Docker](docker-setup.md)** - Setup et déploiement complet
+- 🤖 **[Service ML](ml_service/SETUP_LOCAL.md)** - Installation et configuration ML
 - 🏗️ **[Environnements de Production](src/docs/environments/README.md)** - Architecture et processus
 - 🧪 **[Guide des Tests](src/docs/testing-guide.md)** - Tests et qualité
 - 🗃️ **[Architecture BDD](src/docs/database-architecture.md)** - Structure des données
@@ -239,6 +289,7 @@ npm run type-check     # Vérification TypeScript
 ### 🆘 Guide pour Nouveaux Développeurs
 - **[Configuration base de données](src/docs/guides/README.md#premiers-pas-pour-nouveaux-développeurs)** - Options Supabase détaillées
 - **[Résolution de problèmes](src/docs/guides/troubleshooting.md)** - Solutions aux erreurs courantes
+- **[Setup ML Service](ml_service/SETUP_LOCAL.md)** - Configuration complète du service ML
 
 ---
 
@@ -249,12 +300,18 @@ npm run type-check     # Vérification TypeScript
 # Développement avec Docker
 docker-compose --profile dev up ecotrajet-dev
 
-# Production
+# Production (avec ML Service)
 docker-compose up -d --build
 
 # Serveur (mise à jour)
 git pull origin main && docker-compose up -d --build
 ```
+
+### Architecture de Production
+- **Frontend** : Application React (port 8080)
+- **ML Service** : API FastAPI (port 8000)
+- **Base de données** : Supabase (cloud)
+- **Stockage** : Supabase Storage
 
 ---
 
@@ -274,15 +331,17 @@ git pull origin main && docker-compose up -d --build
 - ✅ **Couverture de code** maintenue > 80%
 - ✅ **Pas d'erreurs** ESLint ou TypeScript
 - ✅ **Documentation** mise à jour
+- ✅ **Modèles ML** testés si modification du service ML
 
 ---
 
 ## Support
 
 ### Ressources
--  **[Documentation complète](src/docs/)** - Guides techniques détaillés
--  **[Guide Docker](docker-setup.md)** - Configuration environnement
--  **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
+- 📚 **[Documentation complète](src/docs/)** - Guides techniques détaillés
+- 🐳 **[Guide Docker](docker-setup.md)** - Configuration environnement
+- 🤖 **[Setup ML](ml_service/SETUP_LOCAL.md)** - Service Machine Learning
+- 🧪 **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
 
 ---
 

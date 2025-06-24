@@ -127,6 +127,25 @@ models/
 └── training_report_*.json        # Rapports d'entraînement
 ```
 
+## 🧠 Détails des Modèles ML
+
+### 1. LSTM Vélib' (Prédiction de disponibilité)
+- **Objectif** : Prédire le nombre de vélos disponibles par station
+- **Architecture** : LSTM bidirectionnel avec Dropout
+- **Features** : Heure, jour, saison, historique de disponibilité
+- **Horizon** : Prédictions à 1-24h
+
+### 2. Prophet (Analyse des tendances)
+- **Objectif** : Analyser les tendances d'utilisation à long terme
+- **Modèle** : Prophet avec saisonnalités quotidienne, hebdomadaire, annuelle
+- **Features** : Taux d'occupation agrégé par jour
+- **Horizon** : Prédictions à 7 jours
+
+### 3. Random Forest (Calcul carbone)
+- **Objectif** : Estimer l'empreinte carbone économisée par trajet
+- **Features** : Distance, type de transport, historique utilisateur
+- **Optimisations** : Feature engineering avec transformations logarithmiques
+
 ## ⚠️ Troubleshooting
 
 ### Erreur "Modèle non trouvé" :
@@ -136,11 +155,60 @@ models/
 → Vérifiez votre fichier `.env` avec les bons credentials
 
 ### Erreur de dépendances :
-→ `pip install -r requirements.txt --upgrade`
+```bash
+# Réinstaller toutes les dépendances
+pip install -r requirements.txt --upgrade --force-reinstall
+```
+
+### Erreur TensorFlow/LSTM :
+```bash
+# Pour macOS avec Apple Silicon
+pip install tensorflow-macos tensorflow-metal
+
+# Pour GPU NVIDIA
+pip install tensorflow-gpu
+
+# Version CPU uniquement
+pip install tensorflow-cpu
+```
+
+### Erreur Prophet :
+```bash
+# Installation avec conda (recommandé)
+conda install -c conda-forge prophet
+
+# Ou avec pip
+pip install prophet --no-deps
+pip install pystan
+```
 
 ### L'API ne démarre pas :
 → Vérifiez que le port 8000 est libre : `lsof -i :8000`
 
+### Erreur d'imports relatifs :
+→ Les imports ont été corrigés pour être absolus. Si le problème persiste :
+```bash
+export PYTHONPATH=/chemin/vers/ml_service:$PYTHONPATH
+```
+
+### Problème de performance :
+→ Réduisez la taille des données d'entraînement en modifiant le paramètre `days_back` dans les scripts
+
+## 📈 Métriques de Performance
+
+### Objectifs de qualité des modèles :
+- **LSTM Vélib'** : MAPE < 15%, R² > 0.8
+- **Prophet Tendances** : MAE < 0.1, stabilité des prédictions
+- **Random Forest Carbone** : R² > 0.9, MAE < 0.1kg CO2
+
+### Monitoring en production :
+- Logs automatiques des prédictions
+- Alertes en cas de dégradation des performances
+- Re-entraînement automatique si nécessaire
+
 ---
 
 **🎉 Une fois l'API lancée, elle sera prête à recevoir les requêtes depuis l'application principale EcoTrajet !**
+
+**API ML disponible sur :** http://localhost:8000
+**Documentation interactive :** http://localhost:8000/docs
