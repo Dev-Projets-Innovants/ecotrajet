@@ -17,28 +17,28 @@
 
 ---
 
-## 📋 Table des Matières
+## Table des Matières
 
-- [🌟 Présentation du Projet](#-présentation-du-projet)
-- [✨ Fonctionnalités Principales](#-fonctionnalités-principales)
-- [🚀 Démarrage Rapide](#-démarrage-rapide)
-- [🛠️ Technologies Utilisées](#️-technologies-utilisées)
-- [⚙️ Options d'Installation](#️-options-dinstallation)
-- [🤖 Service ML](#-service-ml)
-- [📊 Architecture de l'Application](#-architecture-de-lapplication)
-- [🧪 Tests et Qualité](#-tests-et-qualité)
-- [📚 Documentation Technique](#-documentation-technique)
-- [🚀 Déploiement](#-déploiement)
-- [🤝 Contribution](#-contribution)
-- [📞 Support](#-support)
+- [Présentation du Projet](#-présentation-du-projet)
+- [Fonctionnalités Principales](#-fonctionnalités-principales)
+- [Démarrage Rapide](#-démarrage-rapide)
+- [Technologies Utilisées](#️-technologies-utilisées)
+- [Options d'Installation](#️-options-dinstallation)
+- [Service ML](#-service-ml)
+- [Architecture de l'Application](#-architecture-de-lapplication)
+- [Tests et Qualité](#-tests-et-qualité)
+- [Documentation Technique](#-documentation-technique)
+- [Déploiement](#-déploiement)
+- [Contribution](#-contribution)
+- [Support](#-support)
 
 ---
 
-## 🌟 Présentation du Projet
+## Présentation du Projet
 
 ÉcoTrajet est une **application web de mobilité durable** spécialement conçue pour les utilisateurs des systèmes de transport en commun et de vélos partagés à Paris. Notre mission est de promouvoir des déplacements écologiques tout en offrant une expérience utilisateur optimale.
 
-### 🎯 Objectifs
+### Objectifs
 - **Réduire l'empreinte carbone** des déplacements urbains
 - **Faciliter l'accès** aux transports durables
 - **Sensibiliser** à la mobilité écologique
@@ -46,7 +46,7 @@
 
 ---
 
-## ✨ Fonctionnalités Principales
+## Fonctionnalités Principales
 
 ### 🗺️ Interface Utilisateur
 - **Carte interactive** avec stations Vélib' en temps réel
@@ -56,25 +56,25 @@
 - **Statistiques personnelles** de suivi d'impact
 - **Guides et tutoriels** sur la mobilité durable
 
-### 👨‍💼 Panneau d'Administration
+### Panneau d'Administration
 - **Dashboard temps réel** avec métriques Vélib'
 - **Gestion utilisateurs** complète
 - **Gestion de contenu** pour guides et ressources
 - **Système d'alertes** automatisées
 - **Analytics avancés** avec visualisations
 
-### 🤖 Intelligence Artificielle
+### Intelligence Artificielle
 - **Prédictions Vélib'** - Modèle LSTM pour prédire la disponibilité
 - **Analyse des tendances** - Prophet pour l'évolution sur 7 jours
 - **Calcul carbone optimisé** - Random Forest pour les recommandations
 
 ---
 
-## 🚀 Démarrage Rapide
+## Démarrage Rapide
 
 > **⚠️ IMPORTANT :** Votre projet nécessite un fichier `package-lock.json`. Exécutez `npm install` dans le répertoire racine avant de continuer.
 
-### 🐳 Option 1: Docker (Recommandé)
+### Option 1: Docker (Recommandé)
 
 ```bash
 # 1. Cloner le projet
@@ -85,7 +85,7 @@ cd ecotrajet
 cp .env.example .env
 ```
 
-**🗃️ ÉTAPE CRUCIALE : Configuration Supabase**
+** ÉTAPE CRUCIALE : Configuration Supabase**
 
 > **⚠️ Les tables de base de données ne se créent PAS automatiquement !** Vous devez choisir une des deux options ci-dessous :
 
@@ -98,7 +98,7 @@ VITE_SUPABASE_URL=https://knebskomwvvvoaclrwjv.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-**✅ Avantages :**
+** Avantages :**
 - **Données partagées** avec l'équipe
 - **Tables déjà créées** et configurées
 - **Démarrage immédiat** sans configuration
@@ -110,7 +110,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 3. **Copier vos credentials** dans le fichier `.env`
 4. **Exécuter les migrations** (voir documentation technique)
 
-**✅ Avantages :**
+** Avantages :**
 - **Environnement isolé** pour vos tests
 - **Contrôle total** sur les données
 - **Pas d'impact** sur l'équipe
@@ -129,7 +129,7 @@ docker-compose up --build
 
 ---
 
-## 🛠️ Technologies Utilisées
+## Technologies Utilisées
 
 ### Frontend
 - **Vite** - Build tool ultra-rapide
@@ -153,7 +153,7 @@ docker-compose up --build
 
 ---
 
-## ⚙️ Options d'Installation
+## Options d'Installation
 
 ### Option 2: Installation Locale
 
@@ -182,11 +182,11 @@ npm run dev
 
 ---
 
-## 🤖 Service ML
+## Service ML
 
 Le service de Machine Learning fournit des prédictions avancées pour optimiser l'expérience utilisateur.
 
-### 🚀 Démarrage du Service ML
+### Démarrage du Service ML
 
 ```bash
 # Navigation vers le service ML
@@ -206,13 +206,13 @@ python scripts/train_models.py
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 🧠 Modèles Disponibles
+### Modèles Disponibles
 
 1. **LSTM Vélib'** - Prédiction de disponibilité des vélos (24h)
 2. **Prophet Tendances** - Analyse des tendances sur 7 jours
 3. **Random Forest Carbone** - Calculs d'empreinte carbone optimisés
 
-### 📊 Endpoints API
+### Endpoints API
 
 - **Health** : `GET /health`
 - **Prédictions Vélib'** : `POST /api/v1/predict/velib-availability`
@@ -223,7 +223,7 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-## 📊 Architecture de l'Application
+## Architecture de l'Application
 
 ```
 ├── src/                   # Application principale React
@@ -245,7 +245,7 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-## 🧪 Tests et Qualité
+## Tests et Qualité
 
 ### Framework de Test
 - **Vitest** avec environnement jsdom
@@ -269,17 +269,17 @@ npm run type-check     # Vérification TypeScript
 
 ---
 
-## 📚 Documentation Technique
+## Documentation Technique
 
-### 📋 Guides Complets
-- 🐳 **[Configuration Docker](docker-setup.md)** - Setup et déploiement complet
-- 🤖 **[Service ML](ml_service/SETUP_LOCAL.md)** - Installation et configuration ML
-- 🏗️ **[Environnements de Production](src/docs/environments/README.md)** - Architecture et processus
-- 🧪 **[Guide des Tests](src/docs/testing-guide.md)** - Tests et qualité
-- 🗃️ **[Architecture BDD](src/docs/database-architecture.md)** - Structure des données
-- 🚀 **[Guide CI/CD](src/docs/ci-cd-guide.md)** - Intégration continue
+### Guides Complets
+- **[Configuration Docker](docker-setup.md)** - Setup et déploiement complet
+- **[Service ML](ml_service/SETUP_LOCAL.md)** - Installation et configuration ML
+- **[Environnements de Production](src/docs/environments/README.md)** - Architecture et processus
+- **[Guide des Tests](src/docs/testing-guide.md)** - Tests et qualité
+- **[Architecture BDD](src/docs/database-architecture.md)** - Structure des données
+- **[Guide CI/CD](src/docs/ci-cd-guide.md)** - Intégration continue
 
-### 📖 Documentation par Thème
+### Documentation par Thème
 - **[Vue d'ensemble](src/docs/environments/overview.md)** - Architecture générale
 - **[Supabase](src/docs/environments/supabase/README.md)** - Base de données
 - **[Docker](src/docs/environments/docker/README.md)** - Containerisation
@@ -287,14 +287,14 @@ npm run type-check     # Vérification TypeScript
 - **[Opérations](src/docs/operations/README.md)** - Maintenance et support
 - **[Guides pratiques](src/docs/guides/README.md)** - Procédures détaillées
 
-### 🆘 Guide pour Nouveaux Développeurs
+### Guide pour Nouveaux Développeurs
 - **[Configuration base de données](src/docs/guides/README.md#premiers-pas-pour-nouveaux-développeurs)** - Options Supabase détaillées
 - **[Résolution de problèmes](src/docs/guides/troubleshooting.md)** - Solutions aux erreurs courantes
 - **[Setup ML Service](ml_service/SETUP_LOCAL.md)** - Configuration complète du service ML
 
 ---
 
-## 🚀 Déploiement
+## Déploiement
 
 ### Commandes de Déploiement
 ```bash
@@ -316,7 +316,7 @@ git pull origin main && docker-compose up -d --build
 
 ---
 
-## 🤝 Contribution
+## Contribution
 
 ### Processus de Contribution
 1. **Fork** le projet
@@ -328,21 +328,21 @@ git pull origin main && docker-compose up -d --build
 7. **Ouvrir** une Pull Request
 
 ### Standards de Qualité
-- ✅ **Tests unitaires** requis pour nouvelles fonctionnalités
-- ✅ **Couverture de code** maintenue > 80%
-- ✅ **Pas d'erreurs** ESLint ou TypeScript
-- ✅ **Documentation** mise à jour
-- ✅ **Modèles ML** testés si modification du service ML
+- **Tests unitaires** requis pour nouvelles fonctionnalités
+- **Couverture de code** maintenue > 80%
+- **Pas d'erreurs** ESLint ou TypeScript
+- **Documentation** mise à jour
+- **Modèles ML** testés si modification du service ML
 
 ---
 
 ## Support
 
 ### Ressources
-- 📚 **[Documentation complète](src/docs/)** - Guides techniques détaillés
-- 🐳 **[Guide Docker](docker-setup.md)** - Configuration environnement
-- 🤖 **[Setup ML](ml_service/SETUP_LOCAL.md)** - Service Machine Learning
-- 🧪 **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
+- **[Documentation complète](src/docs/)** - Guides techniques détaillés
+- **[Guide Docker](docker-setup.md)** - Configuration environnement
+- **[Setup ML](ml_service/SETUP_LOCAL.md)** - Service Machine Learning
+- **[Guide des tests](src/docs/testing-guide.md)** - Assurance qualité
 
 ---
 
